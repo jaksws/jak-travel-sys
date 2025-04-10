@@ -58,28 +58,30 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        if ($data['user_type'] === 'agency') {
-            // إنشاء وكالة جديدة أولاً
-            $agency = Agency::create([
-                'name' => $data['agency_name'] ?? $data['name'],
-                'email' => $data['email'], // Make sure this is properly assigned
-                'phone' => $data['phone'],
-            ]);
-            
-            $agencyId = $agency->id;
-        } else {
-            $agencyId = $data['agency_id'] ?? null;
-        }
-        
-        return User::create([
+        // Create user first
+        $user = User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'],
+            'email' => $data['email'], // Make sure this is properly assigned
             'password' => Hash::make($data['password']),
             'user_type' => $data['user_type'],
-            'agency_id' => $agencyId,
-            'parent_id' => $data['parent_id'] ?? null,
+            'phone' => $data['phone'] ?? null,
         ]);
+
+        // If the user is of agency type, create an agency record
+        if ($data['user_type'] === 'agency') {
+            // Create agency
+            $agency = Agency::create([
+                'name' => $data['agency_name'] ?? $data['name'],
+                'email' => $data['email'], // Add this line to set the email
+                'phone' => $data['phone'] ?? null,
+            ]);
+
+            // Associate user with agency
+            $user->agency_id = $agency->id;
+            $user->save();
+        }
+
+        return $user;
     }
 
     /**

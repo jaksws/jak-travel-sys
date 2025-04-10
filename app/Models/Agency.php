@@ -11,6 +11,7 @@ class Agency extends Model
 
     protected $fillable = [
         'name',
+        'email', // Add this line to allow mass assignment
         'phone',
         'contact_email',
         'website',
