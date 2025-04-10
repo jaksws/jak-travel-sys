@@ -49,7 +49,14 @@ class SetupAdminUser extends Command
         $adminType = $this->determineAdminType($validUserTypes);
 
         // توضيح دور المسؤول في النظام
-        $this->info('المسؤول (Admin) هو المستخدم الذي يدير جميع الوكالات ولا ينتمي إلى وكالة معينة.');
+        $this->info('=== صلاحيات المسؤول (Admin) ===');
+        $this->info('المسؤول هو المستخدم الذي يدير جميع الوكالات ولا ينتمي إلى وكالة معينة.');
+        $this->line('الصلاحيات الرئيسية للمسؤول:');
+        $this->line('- إدارة جميع الوكالات والسبوكلاء');
+        $this->line('- الوصول الكامل لجميع الخدمات والطلبات');
+        $this->line('- إدارة إعدادات النظام العامة');
+        $this->line('- مراقبة أنشطة النظام والتقارير');
+        $this->line('');
 
         if ($adminType !== 'admin') {
             $this->warn("تم استخدام دور '{$adminType}' بدلاً من 'admin' نظراً لقيود قاعدة البيانات.");
@@ -129,7 +136,7 @@ class SetupAdminUser extends Command
             // المسؤول لا ينتمي إلى أي وكالة، بل يدير جميع الوكالات
             if (in_array('agency_id', $columns)) {
                 $userData['agency_id'] = null;
-                $this->info('سيتم إنشاء المسؤول بدون ربط بأي وكالة محددة، حيث يمكنه إدارة جميع الوكالات.');
+                $this->info('المسؤول لا ينتمي لأي وكالة محددة ولديه صلاحية على جميع الوكالات.');
             }
             
             if (in_array('parent_id', $columns)) {
@@ -159,6 +166,18 @@ class SetupAdminUser extends Command
             if (in_array('is_superadmin', $columns)) {
                 $user->is_superadmin = true;
                 $user->save();
+                $hasSuperAdminFlag = true;
+            } else {
+                $hasSuperAdminFlag = false;
+            }
+            
+            // تعيين حقل is_admin إذا كان موجوداً
+            if (in_array('is_admin', $columns)) {
+                $user->is_admin = true;
+                $user->save();
+                $hasAdminFlag = true;
+            } else {
+                $hasAdminFlag = false;
             }
             
             $this->info('تم إنشاء حساب المسؤول بنجاح!');
@@ -168,6 +187,20 @@ class SetupAdminUser extends Command
             $this->line("البريد الإلكتروني: {$user->email}");
             $this->line("الدور: {$user->$roleColumn} (مسؤول)");
             $this->line("الصلاحية: إدارة جميع الوكالات");
+            
+            // التحقق من الصلاحيات الإضافية
+            if ($hasSuperAdminFlag) {
+                $this->line("وسم المسؤول العام: مفعّل (is_superadmin = true)");
+            }
+            
+            if ($hasAdminFlag) {
+                $this->line("وسم المسؤول: مفعّل (is_admin = true)");
+            }
+            
+            if (!$hasSuperAdminFlag && !$hasAdminFlag && $adminType !== 'admin') {
+                $this->warn("ملاحظة: لم يتم العثور على وسم إضافي للمسؤول (is_admin/is_superadmin).");
+                $this->warn("الصلاحيات معتمدة فقط على حقل {$roleColumn} = '{$adminType}'");
+            }
             
             return 0;
         } catch (\Exception $e) {
@@ -315,11 +348,15 @@ class SetupAdminUser extends Command
      */
     private function determineAdminType(array $validUserTypes): string
     {
-        // البحث عن أنسب دور للمستخدم المسؤول
+        // البحث عن أنسب دور للمستخدم المسؤول بترتيب الأفضلية
         if (in_array('admin', $validUserTypes)) {
             return 'admin';
         } elseif (in_array('superadmin', $validUserTypes)) {
             return 'superadmin';
+        } elseif (in_array('administrator', $validUserTypes)) {
+            return 'administrator';
+        } elseif (in_array('admin_user', $validUserTypes)) {
+            return 'admin_user';
         } elseif (in_array('agency', $validUserTypes)) {
             return 'agency'; // وكالة كأقرب دور للمسؤول
         }
