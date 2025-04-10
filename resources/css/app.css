@@ -1,11 +1,8 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Removed unsupported @source and @theme rules */
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-/* V2 Custom Styles */
+/* V1 Custom Styles */
 :root {
     --primary-color: #2563eb;
     --secondary-color: #4f46e5;

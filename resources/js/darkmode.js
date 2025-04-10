@@ -3,8 +3,8 @@
  */
 class DarkModeManager {
     constructor() {
-        this.darkModeEnabled = config('v2_features.dark_mode.enabled', false);
-        this.defaultMode = config('v2_features.dark_mode.default', 'light');
+        this.darkModeEnabled = config('V1_features.dark_mode.enabled', false);
+        this.defaultMode = config('V1_features.dark_mode.default', 'light');
         this.init();
     }
 

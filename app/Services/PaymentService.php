@@ -52,18 +52,18 @@ class PaymentService
                 return [
                     'success' => true,
                     'payment' => $payment,
-                    'message' => __('v2.payment_success')
+                    'message' => __('V1.payment_success')
                 ];
             } else {
                 $payment->update([
                     'status' => 'failed',
-                    'error_message' => $paymentResult['error_message'] ?? __('v2.payment_failed')
+                    'error_message' => $paymentResult['error_message'] ?? __('V1.payment_failed')
                 ]);
 
                 return [
                     'success' => false,
                     'payment' => $payment,
-                    'message' => $paymentResult['error_message'] ?? __('v2.payment_failed')
+                    'message' => $paymentResult['error_message'] ?? __('V1.payment_failed')
                 ];
             }
         } catch (\Exception $e) {
@@ -78,7 +78,7 @@ class PaymentService
 
             return [
                 'success' => false,
-                'message' => __('v2.payment_failed') . ': ' . $e->getMessage()
+                'message' => __('V1.payment_failed') . ': ' . $e->getMessage()
             ];
         }
     }
@@ -89,7 +89,7 @@ class PaymentService
     private function processPaymentWithGateway($gateway, $paymentData, $quote, $payment)
     {
         // في وضع الاختبار، نحاكي عملية دفع ناجحة
-        if (config('v2_features.payment_system.test_mode')) {
+        if (config('V1_features.payment_system.test_mode')) {
             return [
                 'success' => true,
                 'transaction_id' => Str::random(16),
@@ -104,7 +104,7 @@ class PaymentService
                 return $this->processCreditCardPayment($paymentData, $quote, $payment);
             // ... معالجة طرق الدفع الأخرى
             default:
-                throw new \Exception(__('v2.invalid_payment_method'));
+                throw new \Exception(__('V1.invalid_payment_method'));
         }
     }
 

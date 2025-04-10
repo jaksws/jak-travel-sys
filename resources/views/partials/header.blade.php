@@ -56,25 +56,25 @@
                     </li>
                 @endguest
                 <!-- إضافة زر تبديل الوضع الليلي -->
-                @if(config('v2_features.dark_mode.enabled', false))
+                @if(config('V1_features.dark_mode.enabled', false))
                 <li class="nav-item ms-2">
-                    <button id="theme-toggle" class="btn btn-outline-secondary btn-sm" title="{{ __('v2.toggle_dark_mode') }}">
+                    <button id="theme-toggle" class="btn btn-outline-secondary btn-sm" title="{{ __('V1.toggle_dark_mode') }}">
                         <i id="theme-icon" class="fas fa-moon"></i>
                     </button>
                 </li>
                 @endif
                 <!-- إضافة مفتاح تغيير اللغة -->
-                @if(config('v2_features.multilingual.enabled', false))
+                @if(config('V1_features.multilingual.enabled', false))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-globe"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                        @foreach(config('v2_features.multilingual.available_locales', ['ar']) as $locale)
+                        @foreach(config('V1_features.multilingual.available_locales', ['ar']) as $locale)
                             <li>
                                 <a class="dropdown-item {{ app()->getLocale() == $locale ? 'active' : '' }}" 
                                    href="{{ route('set.locale', ['locale' => $locale]) }}">
-                                    {{ __('v2.locale_' . $locale) }}
+                                    {{ __('V1.locale_' . $locale) }}
                                 </a>
                             </li>
                         @endforeach

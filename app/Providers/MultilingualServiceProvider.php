@@ -23,7 +23,7 @@ class MultilingualServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (Config::get('v2_features.multilingual.enabled')) {
+        if (Config::get('V1_features.multilingual.enabled')) {
             $this->setupLocale();
             $this->shareLocaleDataWithViews();
         }
@@ -34,8 +34,8 @@ class MultilingualServiceProvider extends ServiceProvider
      */
     protected function setupLocale(): void
     {
-        $locales = Config::get('v2_features.multilingual.available_locales', ['ar']);
-        $defaultLocale = Config::get('v2_features.multilingual.default_locale', 'ar');
+        $locales = Config::get('V1_features.multilingual.available_locales', ['ar']);
+        $defaultLocale = Config::get('V1_features.multilingual.default_locale', 'ar');
         
         // Get locale from session or use default
         $locale = Session::get('locale', $defaultLocale);
@@ -61,7 +61,7 @@ class MultilingualServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $view->with([
                 'currentLocale' => App::getLocale(),
-                'availableLocales' => Config::get('v2_features.multilingual.available_locales'),
+                'availableLocales' => Config::get('V1_features.multilingual.available_locales'),
                 'textDirection' => Session::get('textDirection', 'rtl')
             ]);
         });
