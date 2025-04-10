@@ -50,6 +50,18 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 });
 
+// مسارات دليل المستخدمين
+Route::middleware(['auth'])->group(function () {
+    Route::get('/help', [App\Http\Controllers\HelpController::class, 'index'])->name('help.index');
+    Route::get('/help/search', [App\Http\Controllers\HelpController::class, 'search'])->name('help.search');
+    Route::get('/help/section/{section}', [App\Http\Controllers\HelpController::class, 'showSection'])->name('help.section');
+});
+
+// مسارات توجيه المستخدمين الجدد
+Route::middleware(['auth'])->group(function () {
+    Route::get('/onboarding/tips', [App\Http\Controllers\OnboardingController::class, 'tips'])->name('onboarding.tips');
+});
+
 // مسارات الوكيل الأساسي - usando la clase middleware directamente
 Route::prefix('agency')->middleware(['auth', \App\Http\Middleware\AgencyMiddleware::class])->name('agency.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

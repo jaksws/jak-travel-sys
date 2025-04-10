@@ -3,30 +3,30 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | ميزات الإصدار 2.0
+    | ميزات الإصدار 1.0
     |--------------------------------------------------------------------------
     |
-    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 2.0 من النظام
+    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 1.0 من النظام
     | يمكنك تفعيل أو تعطيل أي من هذه الميزات حسب الحاجة
     |
     */
 
     'multilingual' => [
-        'enabled' => false,
-        'available_locales' => ['ar', 'en', 'fr', 'tr'],
+        'enabled' => true,
+        'available_locales' => ['ar', 'en', 'fr', 'tr', 'es', 'id', 'ur'],
         'default_locale' => 'ar',
     ],
 
     'dark_mode' => [
-        'enabled' => false,
-        'default' => 'light', // 'light', 'dark', 'system'
+        'enabled' => true,
+        'default' => 'system', // 'light', 'dark', 'system'
     ],
 
     'payment_system' => [
-        'enabled' => false,
+        'enabled' => true,
         'providers' => [
             'mada' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
                 'config' => [
                     'merchant_id' => env('MADA_MERCHANT_ID', ''),
@@ -35,7 +35,7 @@ return [
                 ],
             ],
             'visa' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
                 'config' => [
                     'merchant_id' => env('VISA_MERCHANT_ID', ''),
@@ -43,7 +43,7 @@ return [
                 ],
             ],
             'mastercard' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
                 'config' => [
                     'merchant_id' => env('MASTERCARD_MERCHANT_ID', ''),
@@ -51,7 +51,7 @@ return [
                 ],
             ],
             'apple_pay' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
                 'config' => [
                     'merchant_id' => env('APPLE_PAY_MERCHANT_ID', ''),
@@ -59,7 +59,7 @@ return [
                 ],
             ],
             'google_pay' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
                 'config' => [
                     'merchant_id' => env('GOOGLE_PAY_MERCHANT_ID', ''),
@@ -71,5 +71,12 @@ return [
 
     'enhanced_ui' => [
         'enabled' => true,
+    ],
+    
+    'ai_features' => [
+        'enabled' => false,
+        'smart_pricing' => false,
+        'customer_recommendations' => false,
+        'virtual_assistant' => false,
     ],
 ];
