@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class OnboardingController extends Controller
 {
     /**
-     * عرض نصائح الاستخدام للمستخدمين الجدد
+     * عرض نصائح الاستخدام للمستخدمين
      */
     public function tips()
     {
@@ -34,6 +34,9 @@ class OnboardingController extends Controller
                 $tips = $this->getGuestTips();
         }
         
+        // إضافة روابط الإجراءات للنصائح
+        $tips = $this->addActionLinks($tips, $role);
+        
         // إضافة رابط دليل المساعدة الخاص بنوع المستخدم
         $helpLinks = $this->getHelpLinks($role);
         
@@ -43,6 +46,58 @@ class OnboardingController extends Controller
             'helpUrl' => route('help.index'),
             'helpLinks' => $helpLinks
         ]);
+    }
+    
+    /**
+     * إضافة روابط إجراءات للنصائح
+     */
+    private function addActionLinks($tips, $role)
+    {
+        foreach ($tips as $key => $tip) {
+            switch ($role) {
+                case 'admin':
+                    if ($tip['title'] === 'إدارة المستخدمين') {
+                        $tips[$key]['action_url'] = route('admin.users.index');
+                        $tips[$key]['action_text'] = 'إدارة المستخدمين';
+                    } elseif ($tip['title'] === 'مراقبة النظام') {
+                        $tips[$key]['action_url'] = route('admin.system.logs');
+                        $tips[$key]['action_text'] = 'عرض السجلات';
+                    }
+                    break;
+                    
+                case 'agency':
+                    if ($tip['title'] === 'إدارة السبوكلاء') {
+                        $tips[$key]['action_url'] = route('agency.subagents.index');
+                        $tips[$key]['action_text'] = 'إدارة السبوكلاء';
+                    } elseif ($tip['title'] === 'إدارة الخدمات') {
+                        $tips[$key]['action_url'] = route('agency.services.index');
+                        $tips[$key]['action_text'] = 'إدارة الخدمات';
+                    }
+                    break;
+                    
+                case 'subagent':
+                    if ($tip['title'] === 'استعراض الطلبات') {
+                        $tips[$key]['action_url'] = route('subagent.requests.index');
+                        $tips[$key]['action_text'] = 'عرض الطلبات';
+                    } elseif ($tip['title'] === 'تقديم العروض') {
+                        $tips[$key]['action_url'] = route('subagent.quotes.index');
+                        $tips[$key]['action_text'] = 'عرض العروض';
+                    }
+                    break;
+                    
+                case 'customer':
+                    if ($tip['title'] === 'استكشاف الخدمات') {
+                        $tips[$key]['action_url'] = route('customer.services.index');
+                        $tips[$key]['action_text'] = 'عرض الخدمات';
+                    } elseif ($tip['title'] === 'تقديم طلب') {
+                        $tips[$key]['action_url'] = route('customer.requests.create');
+                        $tips[$key]['action_text'] = 'طلب جديد';
+                    }
+                    break;
+            }
+        }
+        
+        return $tips;
     }
     
     /**

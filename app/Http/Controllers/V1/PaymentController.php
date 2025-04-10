@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\V2;
+namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -17,8 +17,8 @@ class PaymentController extends Controller
      */
     public function showPaymentPage(Request $request, $quoteId)
     {
-        if (!config('v2_features.payment_system.enabled')) {
-            return redirect()->back()->with('error', __('v2.feature_disabled'));
+        if (!config('V1_features.payment_system.enabled')) {
+            return redirect()->back()->with('error', __('V1.feature_disabled'));
         }
 
         $quote = Quote::with(['request', 'subagent'])->findOrFail($quoteId);
@@ -28,7 +28,7 @@ class PaymentController extends Controller
         
         $paymentGateways = $this->getAvailablePaymentGateways();
         
-        return view('v2.payments.checkout', compact('quote', 'paymentGateways'));
+        return view('V1.payments.checkout', compact('quote', 'paymentGateways'));
     }
     
     /**
@@ -36,8 +36,8 @@ class PaymentController extends Controller
      */
     public function processPayment(Request $request, $quoteId)
     {
-        if (!config('v2_features.payment_system.enabled')) {
-            return redirect()->back()->with('error', __('v2.feature_disabled'));
+        if (!config('V1_features.payment_system.enabled')) {
+            return redirect()->back()->with('error', __('V1.feature_disabled'));
         }
 
         $quote = Quote::findOrFail($quoteId);
@@ -85,17 +85,17 @@ class PaymentController extends Controller
                 $quote->save();
                 
                 return redirect()
-                    ->route('v2.payments.success', ['payment' => $payment->id])
-                    ->with('success', __('v2.payment_success'));
+                    ->route('V1.payments.success', ['payment' => $payment->id])
+                    ->with('success', __('V1.payment_success'));
             } else {
                 // تحديث حالة الدفع بالفشل
                 $payment->status = 'failed';
-                $payment->error_message = $paymentResult['error_message'] ?? __('v2.payment_failed');
+                $payment->error_message = $paymentResult['error_message'] ?? __('V1.payment_failed');
                 $payment->save();
                 
                 return redirect()
-                    ->route('v2.payments.failed', ['payment' => $payment->id])
-                    ->with('error', $paymentResult['error_message'] ?? __('v2.payment_failed'));
+                    ->route('V1.payments.failed', ['payment' => $payment->id])
+                    ->with('error', $paymentResult['error_message'] ?? __('V1.payment_failed'));
             }
         } catch (\Exception $e) {
             Log::error('Payment processing error: ' . $e->getMessage());
@@ -107,7 +107,7 @@ class PaymentController extends Controller
             
             return redirect()
                 ->back()
-                ->with('error', __('v2.payment_failed') . ': ' . $e->getMessage());
+                ->with('error', __('V1.payment_failed') . ': ' . $e->getMessage());
         }
     }
     
@@ -118,7 +118,7 @@ class PaymentController extends Controller
     {
         $this->authorize('view', $payment);
         
-        return view('v2.payments.success', compact('payment'));
+        return view('V1.payments.success', compact('payment'));
     }
     
     /**
@@ -128,7 +128,7 @@ class PaymentController extends Controller
     {
         $this->authorize('view', $payment);
         
-        return view('v2.payments.failed', compact('payment'));
+        return view('V1.payments.failed', compact('payment'));
     }
     
     /**
@@ -137,7 +137,7 @@ class PaymentController extends Controller
     private function getAvailablePaymentGateways()
     {
         $gateways = [];
-        $config = config('v2_features.payment_system.gateways');
+        $config = config('V1_features.payment_system.gateways');
         
         if ($config['mada']) {
             $gateways['mada'] = [
@@ -183,7 +183,7 @@ class PaymentController extends Controller
     private function processPaymentWithGateway($gateway, $paymentData, $quote, $payment)
     {
         // في وضع الاختبار، إرجاع نجاح افتراضي
-        if (config('v2_features.payment_system.test_mode')) {
+        if (config('V1_features.payment_system.test_mode')) {
             return [
                 'success' => true,
                 'transaction_id' => 'TEST_' . Str::random(16),
@@ -203,7 +203,7 @@ class PaymentController extends Controller
             case 'google_pay':
                 return $this->processGooglePayPayment($paymentData, $quote, $payment);
             default:
-                throw new \Exception(__('v2.invalid_payment_method'));
+                throw new \Exception(__('V1.invalid_payment_method'));
         }
     }
     

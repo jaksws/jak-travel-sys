@@ -366,5 +366,11 @@
 </body>     }, 8000);
 </html> });
     </script>
+
+    <!-- إضافة القوالب وعناصر الدعم -->
+    @stack('templates')
+
+    <!-- سكربتات مضافة من خلال stack -->
+    @stack('scripts')
 </body>
 </html>

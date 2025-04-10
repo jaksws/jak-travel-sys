@@ -62,6 +62,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/onboarding/tips', [App\Http\Controllers\OnboardingController::class, 'tips'])->name('onboarding.tips');
 });
 
+// مسارات تفضيلات المستخدم
+Route::middleware(['auth'])->group(function () {
+    Route::post('/user/preferences', [App\Http\Controllers\UserPreferencesController::class, 'update'])->name('user.preferences.update');
+});
+
 // مسارات الوكيل الأساسي - usando la clase middleware directamente
 Route::prefix('agency')->middleware(['auth', \App\Http\Middleware\AgencyMiddleware::class])->name('agency.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

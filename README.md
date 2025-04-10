@@ -3,6 +3,9 @@
 <p align="center">
   <img src="public/images/logo.png" alt="نظام وكالات السفر" height="150" onerror="this.src='https://via.placeholder.com/300x150?text=RTLA'">
 </p>
+![إصدار النظام](https://img.shields.io/badge/الإصدار-1.0.0-blue)  
+![Laravel](https://img.shields.io/badge/Laravel-v12.7.2-red)  
+![الترخيص](https://img.shields.io/badge/الترخيص-MIT-green)
 
 نظام متكامل لإدارة وكالات السفر والحج والعمرة، مع دعم كامل للغة العربية والاتجاه من اليمين إلى اليسار.
 
@@ -69,7 +72,13 @@ cp .env.example .env
 php artisan key:generate
 
 # إعداد قاعدة البيانات
-php artisan migrate --seed
+php artisan migrate
+
+# تثبيت بيانات البدء (اختياري)
+php artisan db:seed
+
+# إعداد حساب المسؤول (Admin)
+php artisan app:setup-admin-user
 
 # تثبيت الأصول الأمامية
 npm install
@@ -80,6 +89,20 @@ php artisan serve
 ```
 
 > التطبيق سيكون متاحًا على: `http://localhost:8000`
+
+### التحقق من تكامل النظام مع قاعدة البيانات
+
+للتأكد من تكامل ميزات النظام مع قاعدة البيانات، يمكنك تشغيل الأمر التالي:
+
+```bash
+php artisan app:check-features-db-integrity
+```
+
+سيقوم هذا الأمر بالتحقق من:
+- وجود جداول قاعدة البيانات اللازمة للميزات المفعّلة
+- وجود مستخدمين بدور مسؤول (Admin) وتكوينهم الصحيح
+- صلاحيات المسؤول ومدى تكاملها مع النظام
+- الإعدادات الضرورية للنظام
 
 ---
 
