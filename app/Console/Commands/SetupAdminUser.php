@@ -12,7 +12,7 @@ use App\Models\User;
 class SetupAdminUser extends Command
 {
     protected $signature = 'app:setup-admin-user';
-    protected $description = 'إنشاء أو تحديث حساب مستخدم من نوع مسؤول (admin)';
+    protected $description = 'إنشاء أو تحديث حساب مستخدم من نوع مسؤول (admin) - يدير جميع الوكالات';
 
     public function handle()
     {
@@ -47,6 +47,9 @@ class SetupAdminUser extends Command
         
         // اختيار القيمة المناسبة للمسؤول
         $adminType = $this->determineAdminType($validUserTypes);
+
+        // توضيح دور المسؤول في النظام
+        $this->info('المسؤول (Admin) هو المستخدم الذي يدير جميع الوكالات ولا ينتمي إلى وكالة معينة.');
 
         if ($adminType !== 'admin') {
             $this->warn("تم استخدام دور '{$adminType}' بدلاً من 'admin' نظراً لقيود قاعدة البيانات.");
@@ -123,18 +126,10 @@ class SetupAdminUser extends Command
                 $userData['theme_preference'] = 'light';
             }
             
+            // المسؤول لا ينتمي إلى أي وكالة، بل يدير جميع الوكالات
             if (in_array('agency_id', $columns)) {
-                $agencies = DB::table('agencies')->select('id')->get();
-                if ($agencies->count() > 0) {
-                    $agencyId = $this->choice(
-                        'اختر الوكالة التي ينتمي إليها المسؤول (اترك فارغًا للمسؤول العام)',
-                        $agencies->pluck('id')->prepend('لا يوجد')->toArray(), 
-                        0
-                    );
-                    $userData['agency_id'] = $agencyId === 'لا يوجد' ? null : $agencyId;
-                } else {
-                    $userData['agency_id'] = null;
-                }
+                $userData['agency_id'] = null;
+                $this->info('سيتم إنشاء المسؤول بدون ربط بأي وكالة محددة، حيث يمكنه إدارة جميع الوكالات.');
             }
             
             if (in_array('parent_id', $columns)) {
@@ -172,6 +167,7 @@ class SetupAdminUser extends Command
             $this->line("الاسم: {$user->name}");
             $this->line("البريد الإلكتروني: {$user->email}");
             $this->line("الدور: {$user->$roleColumn} (مسؤول)");
+            $this->line("الصلاحية: إدارة جميع الوكالات");
             
             return 0;
         } catch (\Exception $e) {
@@ -235,6 +231,7 @@ class SetupAdminUser extends Command
                     $this->line("الاسم: {$name}");
                     $this->line("البريد الإلكتروني: {$email}");
                     $this->line("الدور: {$adminType} (مسؤول)");
+                    $this->line("الصلاحية: إدارة جميع الوكالات");
                     return 0;
                 } catch (\Exception $sqlEx) {
                     $this->error("فشل إنشاء المستخدم: " . $sqlEx->getMessage());
@@ -306,7 +303,7 @@ class SetupAdminUser extends Command
             }
             
             // إذا لم يكن هناك مستخدمين، استخدم القيم المتوقعة
-            return ['agency', 'subagent', 'customer'];
+            return ['admin', 'agency', 'subagent', 'customer'];
         } catch (\Exception $e) {
             // استخدم القيم الافتراضية كخطة بديلة
             return ['agency', 'subagent', 'customer'];

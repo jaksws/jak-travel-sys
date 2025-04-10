@@ -26,7 +26,7 @@ return new class extends Migration
         $roleColumn = $this->getRoleColumn();
         if ($roleColumn) {
             DB::table('users')
-                ->where($roleColumn, 'agency')
+                ->where($roleColumn, 'admin')
                 ->where(function($query) {
                     $query->where('email', 'like', '%admin%')
                           ->orWhere('name', 'like', '%admin%');
