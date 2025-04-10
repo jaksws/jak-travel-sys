@@ -3,8 +3,8 @@
 <p align="center">
   <img src="public/images/logo.png" alt="نظام وكالات السفر" height="150" onerror="this.src='https://via.placeholder.com/300x150?text=RTLA'">
 </p>
-![إصدار النظام](https://img.shields.io/badge/الإصدار-1.0.0-blue)  
-![Laravel](https://img.shields.io/badge/Laravel-v12.7.2-red)  
+![إصدار النظام](https://img.shields.io/badge/الإصدار-1.0.0-blue)
+![Laravel](https://img.shields.io/badge/Laravel-v12.7.2-red)
 ![الترخيص](https://img.shields.io/badge/الترخيص-MIT-green)
 
 نظام متكامل لإدارة وكالات السفر والحج والعمرة، مع دعم كامل للغة العربية والاتجاه من اليمين إلى اليسار.
