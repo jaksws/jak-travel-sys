@@ -1,0 +1,73 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8.2, 8.3, 8.4]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      # Add Node.js and Vite build steps
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Copy debug Vite config
+        run: cp vite.config.debug.js vite.config.js
+
+      - name: Build assets
+        run: |
+          npm run build
+          echo "Checking build output:"
+          ls -la public/build/
+          if [ -f "public/build/manifest.json" ]; then
+            echo "manifest.json exists!"
+            cat public/build/manifest.json
+          else
+            echo "ERROR: manifest.json not found!"
+            exit 1
+          fi
+
+      - name: Execute tests
+        run: php artisan test
