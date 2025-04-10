@@ -1,0 +1,70 @@
+/* الأنماط الأساسية للوضع الليلي */
+html.dark-theme {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-card: #2d2d2d;
+    --text-primary: #e0e0e0;
+    --text-secondary: #aaaaaa;
+    --border-color: #424242;
+    --primary-color: #4b9fff;
+    --secondary-color: #757575;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+}
+
+html.dark-theme body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+html.dark-theme .card,
+html.dark-theme .modal-content {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+html.dark-theme .card-header,
+html.dark-theme .modal-header {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+html.dark-theme .table {
+    color: var(--text-primary);
+}
+
+html.dark-theme .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+html.dark-theme .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.075);
+}
+
+html.dark-theme .form-control,
+html.dark-theme .form-select {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+html.dark-theme .navbar,
+html.dark-theme .sidebar {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+html.dark-theme .dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+html.dark-theme .dropdown-item {
+    color: var(--text-primary);
+}
+
+html.dark-theme .dropdown-item:hover {
+    background-color: var(--bg-secondary);
+}
