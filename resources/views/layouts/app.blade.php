@@ -171,6 +171,16 @@
                                 <i class="fas fa-envelope me-1"></i> اتصل بنا
                             </a>
                         </li>
+                        
+                        @auth
+                            @if(auth()->user()->is_admin || (method_exists(auth()->user(), 'isAdmin') && auth()->user()->isAdmin()))
+                                <li class="nav-item">
+                                    <a class="nav-item nav-link" href="{{ route('admin.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt"></i> لوحة تحكم المسؤول
+                                    </a>
+                                </li>
+                            @endif
+                        @endauth
                     </ul>
 
                     <!-- Right Side Of Navbar -->

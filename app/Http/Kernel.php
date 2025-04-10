@@ -40,6 +40,7 @@ class Kernel extends HttpKernel
         'agency' => \App\Http\Middleware\AgencyMiddleware::class,
         'subagent' => \App\Http\Middleware\SubagentMiddleware::class,
         'customer' => \App\Http\Middleware\CustomerMiddleware::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 
     /**

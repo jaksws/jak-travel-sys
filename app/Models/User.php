@@ -127,4 +127,47 @@ class User extends Authenticatable
     {
         return $this->user_type === 'customer';
     }
+
+    /**
+     * تحقق مما إذا كان المستخدم مسؤولاً
+     *
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        // التحقق بناءً على الحقول المتوقعة في النظام
+        if (isset($this->is_admin) && $this->is_admin) {
+            return true;
+        }
+
+        if (isset($this->is_superadmin) && $this->is_superadmin) {
+            return true;
+        }
+
+        // التحقق من حقل الدور
+        $roleColumn = $this->determineRoleColumn();
+        if ($roleColumn && isset($this->$roleColumn)) {
+            return in_array(strtolower($this->$roleColumn), ['admin', 'superadmin', 'administrator']);
+        }
+
+        return false;
+    }
+
+    /**
+     * تحديد عمود الدور المستخدم في النظام
+     *
+     * @return string|null
+     */
+    private function determineRoleColumn()
+    {
+        $possibleColumns = ['role', 'user_type', 'type'];
+        
+        foreach ($possibleColumns as $column) {
+            if (isset($this->$column)) {
+                return $column;
+            }
+        }
+        
+        return null;
+    }
 }
