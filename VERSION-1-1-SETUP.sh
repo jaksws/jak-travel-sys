@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# سكريبت ترقية نظام وكالات السفر (RTLA) من الإصدار 2.0 إلى 2.1
+# سكريبت ترقية نظام وكالات السفر (RTLA) من الإصدار 1.0 إلى 1.0
 # الاستخدام: ./VERSION-2-1-SETUP.sh
 
 # تعيين الألوان للإخراج
@@ -9,7 +9,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}بدء عملية الترقية إلى النسخة 2.1 من نظام وكالات السفر (RTLA)${NC}\n"
+echo -e "${YELLOW}بدء عملية الترقية إلى النسخة 1.0 من نظام وكالات السفر (RTLA)${NC}\n"
 
 # التأكد من أننا في المجلد الصحيح
 if [ ! -f "artisan" ]; then
@@ -21,8 +21,8 @@ fi
 echo -e "${YELLOW}التحقق من الإصدار الحالي...${NC}"
 CURRENT_VERSION=$(grep "version" composer.json | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[:space:]')
 
-if [[ "$CURRENT_VERSION" != "2.0."* ]]; then
-    echo -e "${YELLOW}تحذير: هذا السكريبت مخصص للترقية من الإصدار 2.0.x إلى 2.1${NC}"
+if [[ "$CURRENT_VERSION" != "1.0."* ]]; then
+    echo -e "${YELLOW}تحذير: هذا السكريبت مخصص للترقية من الإصدار 1.0.x إلى 1.0${NC}"
     read -p "النسخة الحالية لديك هي $CURRENT_VERSION. هل ترغب في المتابعة؟ (y/n): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -31,7 +31,7 @@ if [[ "$CURRENT_VERSION" != "2.0."* ]]; then
     fi
 fi
 
-if [[ "$CURRENT_VERSION" == "2.1."* ]]; then
+if [[ "$CURRENT_VERSION" == "1.0."* ]]; then
     echo -e "${YELLOW}ملاحظة: يبدو أنك تستخدم بالفعل الإصدار $CURRENT_VERSION${NC}"
     read -p "هل ترغب في المتابعة على أي حال؟ (y/n): " -n 1 -r
     echo
@@ -43,7 +43,7 @@ fi
 
 # إنشاء نسخة احتياطية قبل الترقية
 echo -e "${YELLOW}إنشاء نسخة احتياطية من الملفات والبيانات...${NC}"
-BACKUP_DIR="backups/pre_upgrade_v2_1_$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="backups/pre_upgrade_v1_1_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
 # نسخة احتياطية من ملفات التكوين
@@ -79,39 +79,39 @@ if command -v git &> /dev/null; then
     
     # إنشاء فرع جديد للترقية
     echo -e "${YELLOW}إنشاء فرع جديد للترقية...${NC}"
-    git checkout -b upgrade-v2.1 || echo -e "${YELLOW}لا يمكن إنشاء فرع جديد للترقية${NC}"
+    git checkout -b upgrade-v1.1 || echo -e "${YELLOW}لا يمكن إنشاء فرع جديد للترقية${NC}"
     
-    # محاولة الدمج مع فرع الإصدار 2.1
-    echo -e "${YELLOW}دمج تغييرات الإصدار 2.1...${NC}"
-    git merge origin/version-2.1 || echo -e "${RED}حدث تعارض أثناء الدمج. يرجى حل التعارضات يدويًا${NC}"
+    # محاولة الدمج مع فرع الإصدار 1.0
+    echo -e "${YELLOW}دمج تغييرات الإصدار 1.0...${NC}"
+    git merge origin/version-1.0 || echo -e "${RED}حدث تعارض أثناء الدمج. يرجى حل التعارضات يدويًا${NC}"
 else
     echo -e "${YELLOW}لم يتم العثور على git. سيتم تخطي تحديث الملفات عبر git.${NC}"
-    echo -e "${YELLOW}يرجى تحميل الإصدار 2.1 يدويًا وتحديث الملفات.${NC}"
+    echo -e "${YELLOW}يرجى تحميل الإصدار 1.0 يدويًا وتحديث الملفات.${NC}"
 fi
 
-# تحديث ملف تكوين ميزات الإصدار 2.1
-echo -e "${YELLOW}تحديث ملف تكوين ميزات الإصدار 2.1...${NC}"
+# تحديث ملف تكوين ميزات الإصدار 1.0
+echo -e "${YELLOW}تحديث ملف تكوين ميزات الإصدار 1.0...${NC}"
 
-if [ -f "config/v2_features.php" ]; then
+if [ -f "config/v1_features.php" ]; then
     # احتفظ بنسخة من إعدادات المستخدم الحالية
-    cp config/v2_features.php config/v2_features.backup.php
+    cp config/v1_features.php config/v1_features.backup.php
     
     # تحديث ملف التكوين مع الإبقاء على إعدادات المستخدم
     echo -e "${YELLOW}تطبيق تحديثات ملف التكوين مع الحفاظ على الإعدادات الحالية...${NC}"
     # هذا سيتم تنفيذه في خطوة لاحقة عبر أوامر PHP Artisan
 else
-    echo -e "${YELLOW}إنشاء ملف تكوين ميزات الإصدار 2.1...${NC}"
+    echo -e "${YELLOW}إنشاء ملف تكوين ميزات الإصدار 1.0...${NC}"
     mkdir -p config
-    cat > config/v2_features.php << 'EOL'
+    cat > config/v1_features.php << 'EOL'
 <?php
 
 return [
     /*
     |--------------------------------------------------------------------------
-    | ميزات الإصدار 2.1
+    | ميزات الإصدار 1.0
     |--------------------------------------------------------------------------
     |
-    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 2.1 من النظام
+    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 1.0 من النظام
     | يمكنك تفعيل أو تعطيل أي من هذه الميزات حسب الحاجة
     |
     */
@@ -199,7 +199,7 @@ return [
 EOL
 fi
 
-echo -e "${GREEN}تم تحديث ملف تكوين ميزات الإصدار 2.1${NC}"
+echo -e "${GREEN}تم تحديث ملف تكوين ميزات الإصدار 1.0${NC}"
 
 # تحديث التبعيات
 echo -e "${YELLOW}تحديث تبعيات Composer...${NC}"
@@ -214,19 +214,19 @@ mkdir -p lang/es lang/id lang/ur
 
 # تنفيذ أوامر التحديث المخصصة
 echo -e "${YELLOW}تنفيذ الأوامر المخصصة للترقية...${NC}"
-php artisan v2:update-features || echo -e "${YELLOW}لا يوجد أمر تحديث مخصص أو فشل تنفيذه${NC}"
+php artisan v1:update-features || echo -e "${YELLOW}لا يوجد أمر تحديث مخصص أو فشل تنفيذه${NC}"
 
 # إضافة إرشادات ختامية
 echo -e "\n${GREEN}=============================${NC}"
-echo -e "${GREEN}اكتملت عملية الترقية إلى الإصدار 2.1${NC}"
+echo -e "${GREEN}اكتملت عملية الترقية إلى الإصدار 1.0${NC}"
 echo -e "${GREEN}=============================${NC}"
 echo -e "\n${YELLOW}الخطوات التالية:${NC}"
 echo -e "1. قم بتشغيل المايغريشن: ${GREEN}php artisan migrate${NC}"
 echo -e "2. قم بتجميع الأصول الأمامية: ${GREEN}npm run build${NC}"
 echo -e "3. قم بمسح ذاكرة التخزين المؤقت: ${GREEN}php artisan optimize:clear${NC}"
-echo -e "4. قم بمراجعة الميزات الجديدة في ملف: ${GREEN}config/v2_features.php${NC}"
+echo -e "4. قم بمراجعة الميزات الجديدة في ملف: ${GREEN}config/v1_features.php${NC}"
 echo -e "\n${YELLOW}ملاحظة: تم إنشاء نسخة احتياطية قبل الترقية في مجلد:${NC} ${GREEN}$BACKUP_DIR${NC}"
 echo -e "${YELLOW}إذا واجهتك أي مشكلة، يمكنك استعادة النسخة الاحتياطية.${NC}"
-echo -e "\n${YELLOW}لمزيد من المعلومات حول ميزات الإصدار 2.1، راجع:${NC} ${GREEN}VERSION-2-ROADMAP.md${NC}"
+echo -e "\n${YELLOW}لمزيد من المعلومات حول ميزات الإصدار 1.0، راجع:${NC} ${GREEN}VERSION-2-ROADMAP.md${NC}"
 
 exit 0

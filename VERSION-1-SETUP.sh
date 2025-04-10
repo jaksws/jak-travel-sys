@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "إعداد النسخة 2.0 من نظام وكالات السفر RTLA"
+echo "إعداد النسخة 1.0 من نظام وكالات السفر RTLA"
 echo "============================================"
 
 # تأكيد أننا في المجلد الصحيح
@@ -14,22 +14,22 @@ echo "جاري تحديث الفرع الرئيسي..."
 git checkout main
 git pull origin main
 
-# إنشاء فرع للنسخة 2.0
-echo "جاري إنشاء فرع للنسخة 2.0..."
-git checkout -b version-2.0
+# إنشاء فرع للنسخة 1.0
+echo "جاري إنشاء فرع للنسخة 1.0..."
+git checkout -b version-1.0
 
-# تحديث ملف composer.json للنسخة 2.0
+# تحديث ملف composer.json للنسخة 1.0
 echo "تحديث معلومات الإصدار..."
-sed -i 's/"version": "1.0.0"/"version": "2.0.0-dev"/g' composer.json 2>/dev/null || 
-  sed -i '' 's/"version": "1.0.0"/"version": "2.0.0-dev"/g' composer.json
+sed -i 's/"version": "1.0.0"/"version": "1.0.0-dev"/g' composer.json 2>/dev/null || 
+  sed -i '' 's/"version": "1.0.0"/"version": "1.0.0-dev"/g' composer.json
 
-# إنشاء ملف تكوين لميزات النسخة 2.0
-echo "إنشاء ملف تكوين للنسخة 2.0..."
-cat > config/v2_features.php << 'EOL'
+# إنشاء ملف تكوين لميزات النسخة 1.0
+echo "إنشاء ملف تكوين للنسخة 1.0..."
+cat > config/v1_features.php << 'EOL'
 <?php
 
 return [
-    // إعدادات ميزات النسخة 2.0
+    // إعدادات ميزات النسخة 1.0
     'multilingual' => [
         'enabled' => false,
         'available_locales' => ['ar', 'en', 'fr', 'tr'],
@@ -69,28 +69,28 @@ return [
 ];
 EOL
 
-# إضافة الملفات الجديدة للنسخة 2.0
+# إضافة الملفات الجديدة للنسخة 1.0
 echo "إضافة التغييرات إلى Git..."
 git add .
-git commit -m "بدء النسخة 2.0: إعداد الفرع وملفات التكوين الأساسية"
+git commit -m "بدء النسخة 1.0: إعداد الفرع وملفات التكوين الأساسية"
 
 # طباعة إرشادات المتابعة
 echo ""
-echo "تم إعداد فرع النسخة 2.0 بنجاح!"
+echo "تم إعداد فرع النسخة 1.0 بنجاح!"
 echo ""
-echo "للبدء في تطوير النسخة 2.0، يمكنك البدء بتنفيذ المهام التالية:"
+echo "للبدء في تطوير النسخة 1.0، يمكنك البدء بتنفيذ المهام التالية:"
 echo "1. راجع خريطة الطريق في ملف VERSION-2-ROADMAP.md"
 echo "2. ابدأ بتنفيذ البنية التحتية للميزات ذات الأولوية العالية"
-echo "3. قم بتحديث ملف التكوين config/v2_features.php عند إضافة ميزات جديدة"
+echo "3. قم بتحديث ملف التكوين config/v1_features.php عند إضافة ميزات جديدة"
 echo ""
 echo "لدفع التغييرات إلى المستودع البعيد:"
-echo "git push -u origin version-2.0"
+echo "git push -u origin version-1.0"
 echo ""
-echo "لاختبار ميزات النسخة 2.0، تأكد من تشغيل المهاجرات الجديدة:"
+echo "لاختبار ميزات النسخة 1.0، تأكد من تشغيل المهاجرات الجديدة:"
 echo "php artisan migrate"
 
-# سكريبت ترقية نظام وكالات السفر (RTLA) من الإصدار 1.0 إلى 2.0
-# الاستخدام: ./VERSION-2-SETUP.sh
+# سكريبت ترقية نظام وكالات السفر (RTLA) من الإصدار 1.0 إلى 1.0
+# الاستخدام: ./VERSION-1-SETUP.sh
 
 # تعيين الألوان للإخراج
 GREEN='\033[0;32m'
@@ -98,7 +98,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}بدء عملية الترقية إلى النسخة 2.0 من نظام وكالات السفر (RTLA)${NC}\n"
+echo -e "${YELLOW}بدء عملية الترقية إلى النسخة 1.0 من نظام وكالات السفر (RTLA)${NC}\n"
 
 # التأكد من أننا في المجلد الصحيح
 if [ ! -f "artisan" ]; then
@@ -110,7 +110,7 @@ fi
 echo -e "${YELLOW}التحقق من الإصدار الحالي...${NC}"
 CURRENT_VERSION=$(grep "version" composer.json | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[:space:]')
 
-if [[ "$CURRENT_VERSION" == "2."* ]]; then
+if [[ "$CURRENT_VERSION" == "1."* ]]; then
     echo -e "${YELLOW}ملاحظة: يبدو أنك تستخدم بالفعل الإصدار $CURRENT_VERSION${NC}"
     read -p "هل ترغب في المتابعة على أي حال؟ (y/n): " -n 1 -r
     echo
@@ -122,7 +122,7 @@ fi
 
 # إنشاء نسخة احتياطية قبل الترقية
 echo -e "${YELLOW}إنشاء نسخة احتياطية من الملفات والبيانات...${NC}"
-BACKUP_DIR="backups/pre_upgrade_v2_$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="backups/pre_upgrade_v1_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
 # نسخة احتياطية من ملفات التكوين
@@ -145,25 +145,25 @@ echo -e "${YELLOW}تحديث ملفات المشروع...${NC}"
 # التحقق من وجود git
 if command -v git &> /dev/null; then
     git fetch origin || echo -e "${YELLOW}لا يمكن جلب التحديثات من المستودع البعيد${NC}"
-    git checkout tags/v2.0.0 -b upgrade-v2.0.0 || echo -e "${YELLOW}لا يمكن الانتقال إلى الإصدار 2.0.0${NC}"
+    git checkout tags/v1.0.0 -b upgrade-v1.0.0 || echo -e "${YELLOW}لا يمكن الانتقال إلى الإصدار 1.0.0${NC}"
 else
     echo -e "${YELLOW}لم يتم العثور على git. سيتم تخطي تحديث الملفات عبر git.${NC}"
-    echo -e "${YELLOW}يرجى تحميل الإصدار 2.0.0 يدويًا وتحديث الملفات.${NC}"
+    echo -e "${YELLOW}يرجى تحميل الإصدار 1.0.0 يدويًا وتحديث الملفات.${NC}"
 fi
 
-# إنشاء ملف تكوين ميزات الإصدار 2.0
-echo -e "${YELLOW}إنشاء ملف تكوين ميزات الإصدار 2.0...${NC}"
+# إنشاء ملف تكوين ميزات الإصدار 1.0
+echo -e "${YELLOW}إنشاء ملف تكوين ميزات الإصدار 1.0...${NC}"
 mkdir -p config
-cat > config/v2_features.php << 'EOL'
+cat > config/v1_features.php << 'EOL'
 <?php
 
 return [
     /*
     |--------------------------------------------------------------------------
-    | ميزات الإصدار 2.0
+    | ميزات الإصدار 1.0
     |--------------------------------------------------------------------------
     |
-    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 2.0 من النظام
+    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 1.0 من النظام
     | يمكنك تفعيل أو تعطيل أي من هذه الميزات حسب الحاجة
     |
     */
@@ -211,7 +211,7 @@ return [
 ];
 EOL
 
-echo -e "${GREEN}تم إنشاء ملف تكوين ميزات الإصدار 2.0${NC}"
+echo -e "${GREEN}تم إنشاء ملف تكوين ميزات الإصدار 1.0${NC}"
 
 # تحديث التبعيات
 echo -e "${YELLOW}تحديث تبعيات Composer...${NC}"
@@ -226,13 +226,13 @@ mkdir -p lang/en lang/fr lang/tr
 
 # إضافة إرشادات ختامية
 echo -e "\n${GREEN}=============================${NC}"
-echo -e "${GREEN}اكتملت عملية الترقية إلى الإصدار 2.0${NC}"
+echo -e "${GREEN}اكتملت عملية الترقية إلى الإصدار 1.0${NC}"
 echo -e "${GREEN}=============================${NC}"
 echo -e "\n${YELLOW}الخطوات التالية:${NC}"
 echo -e "1. قم بتشغيل المايغريشن: ${GREEN}php artisan migrate${NC}"
 echo -e "2. قم بتجميع الأصول الأمامية: ${GREEN}npm run build${NC}"
 echo -e "3. قم بمسح ذاكرة التخزين المؤقت: ${GREEN}php artisan optimize:clear${NC}"
-echo -e "4. قم بتفعيل الميزات الجديدة في ملف: ${GREEN}config/v2_features.php${NC}"
+echo -e "4. قم بتفعيل الميزات الجديدة في ملف: ${GREEN}config/v1_features.php${NC}"
 echo -e "\n${YELLOW}ملاحظة: تم إنشاء نسخة احتياطية قبل الترقية في مجلد:${NC} ${GREEN}$BACKUP_DIR${NC}"
 echo -e "${YELLOW}إذا واجهتك أي مشكلة، يمكنك استعادة النسخة الاحتياطية.${NC}"
 
