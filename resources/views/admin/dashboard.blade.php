@@ -16,7 +16,7 @@
                                 <div class="card-body text-center">
                                     <h5>المستخدمين</h5>
                                     <h2>{{ $stats['users_count'] }}</h2>
-                                    <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-primary mt-2">إدارة المستخدمين</a>
+                                    <a href="{{ route('admin.users.index', [], false) }}" class="btn btn-sm btn-outline-primary mt-2">إدارة المستخدمين</a>
                                 </div>
                             </div>
                         </div>
@@ -25,7 +25,7 @@
                                 <div class="card-body text-center">
                                     <h5>الوكالات</h5>
                                     <h2>{{ $stats['agencies_count'] }}</h2>
-                                    <a href="{{ route('admin.agencies.index') ?? '#' }}" class="btn btn-sm btn-outline-primary mt-2">إدارة الوكالات</a>
+                                    <a href="{{ route('admin.users.index', [], false) }}" class="btn btn-sm btn-outline-primary mt-2">إدارة الوكالات</a>
                                 </div>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                                     <h5>سجل النظام</h5>
                                     <i class="fas fa-clipboard-list fa-2x mb-2"></i>
                                     <br>
-                                    <a href="{{ route('admin.system.logs') }}" class="btn btn-sm btn-outline-primary mt-2">عرض السجلات</a>
+                                    <a href="{{ route('admin.system.logs', [], false) }}" class="btn btn-sm btn-outline-primary mt-2">عرض السجلات</a>
                                 </div>
                             </div>
                         </div>
