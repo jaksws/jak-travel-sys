@@ -5,143 +5,257 @@ namespace App\Services;
 use App\Models\Notification;
 use App\Models\User;
 use App\Models\Quote;
-use App\Models\Request as ServiceRequest;
+use App\Notifications\QuoteStatusChanged;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class NotificationService
 {
     /**
-     * Crear una notificación para un usuario
+     * Create a new notification for the given user
+     *
+     * @param User $user
+     * @param string $type
+     * @param array $data
+     * @return Notification
      */
-    public static function notify(User $user, string $title, string $message, string $type = 'info', string $actionUrl = null, array $data = [])
+    public function createNotification(User $user, string $type, array $data): Notification
     {
-        return Notification::create([
-            'user_id' => $user->id,
-            'title' => $title,
-            'message' => $message,
-            'type' => $type,
-            'action_url' => $actionUrl,
-            'data' => $data,
-        ]);
+        try {
+            $notification = new Notification();
+            $notification->user_id = $user->id;
+            $notification->type = $type;
+            $notification->data = json_encode($data);
+            $notification->read = false;
+            $notification->save();
+            
+            return $notification;
+        } catch (\Exception $e) {
+            Log::error('Failed to create notification: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**
-     * Notificar a un usuario de un nuevo pedido
+     * Mark a notification as read
+     *
+     * @param int $notificationId
+     * @param User|null $user Optional user object
+     * @return bool
      */
-    public static function notifyNewRequest(ServiceRequest $request)
+    public function markAsRead(int $notificationId, ?User $user = null): bool
     {
-        // Notificar a la agencia
-        $agency = User::where('id', $request->agency_id)->first();
-        if ($agency) {
-            self::notify(
-                $agency,
-                'طلب جديد',
-                'تم إنشاء طلب جديد من قبل العميل ' . $request->customer->name,
-                'info',
-                route('agency.requests.show', $request),
-                ['request_id' => $request->id]
-            );
+        try {
+            if ($user) {
+                // Use user-specific notification lookup
+                $notification = $user->notifications()->where('id', $notificationId)->first();
+                
+                if (!$notification) {
+                    return false;
+                }
+                
+                $notification->markAsRead();
+                return true;
+            } else {
+                // Use general notification lookup by ID
+                $notification = Notification::findOrFail($notificationId);
+                $notification->read = true;
+                return $notification->save();
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to mark notification as read: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get all unread notifications for a user
+     *
+     * @param int|User $userOrId User ID or User object
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getUnreadNotifications($userOrId)
+    {
+        if ($userOrId instanceof User) {
+            // If a User object is provided
+            return $userOrId->unreadNotifications;
+        } else {
+            // If a user ID is provided
+            return Notification::where('user_id', $userOrId)
+                ->where('read', false)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+    }
+
+    /**
+     * Send quote status change notification
+     * 
+     * @param User|Quote $userOrQuote User object or Quote object
+     * @param array|string $quoteDataOrStatus Quote data array or status string
+     * @return void
+     */
+    public function sendQuoteStatusNotification($userOrQuote, $quoteDataOrStatus): void
+    {
+        if ($userOrQuote instanceof User) {
+            // Handle case where first parameter is a User (backward compatibility)
+            $user = $userOrQuote;
+            $quoteData = $quoteDataOrStatus;
+            
+            $user->notify(new QuoteStatusChanged($quoteData));
+            
+            // Also create a database notification
+            $this->createNotification($user, 'quote_status_changed', $quoteData);
+        } 
+        elseif ($userOrQuote instanceof Quote) {
+            // Handle case where first parameter is a Quote
+            $quote = $userOrQuote;
+            $status = $quoteDataOrStatus;
+            
+            $notification = new QuoteStatusChanged($quote, $status);
+            
+            // Notify the quote owner/customer
+            if ($quote->user) {
+                $quote->user->notify($notification);
+                $this->createNotification($quote->user, 'quote_status_changed', [
+                    'quote_id' => $quote->id,
+                    'status' => $status
+                ]);
+            }
+        }
+    }
+
+    /**
+     * إرسال إشعار لمستخدم محدد
+     *
+     * @param int $userId
+     * @param Notification $notification
+     * @param string $message
+     * @return bool
+     */
+    public function notify(int $userId, Notification $notification, string $message = ''): bool
+    {
+        $user = User::find($userId);
+        
+        if (!$user) {
+            return false;
         }
         
-        // Notificar a los سبوكلاء المرتبطين بهذه الخدمة
-        $subagents = $request->service->subagents;
-        foreach ($subagents as $subagent) {
-            self::notify(
-                $subagent,
-                'طلب متاح جديد',
-                'هناك طلب جديد متاح لتقديم عرض سعر: ' . $request->service->name,
-                'info',
-                route('subagent.requests.show', $request),
-                ['request_id' => $request->id]
-            );
-        }
-    }
-
-    /**
-     * Notificar عند تقديم عرض سعر جديد
-     */
-    public static function notifyNewQuote(Quote $quote)
-    {
-        // Notificar للوكالة
-        $agency = User::where('id', $quote->request->agency_id)->first();
-        if ($agency) {
-            self::notify(
-                $agency,
-                'عرض سعر جديد',
-                'تم تقديم عرض سعر جديد من قبل ' . $quote->subagent->name,
-                'info',
-                route('agency.quotes.show', $quote),
-                ['quote_id' => $quote->id]
-            );
-        }
-    }
-
-    /**
-     * Notificar عند الموافقة على عرض السعر
-     */
-    public static function notifyQuoteApproved(Quote $quote)
-    {
-        // Notificar للسبوكيل
-        self::notify(
-            $quote->subagent,
-            'تمت الموافقة على عرضك',
-            'تمت الموافقة على عرض السعر الخاص بك للطلب رقم #' . $quote->request_id,
-            'success',
-            route('subagent.quotes.show', $quote),
-            ['quote_id' => $quote->id]
-        );
+        $user->notify($notification);
         
-        // Notificar للعميل
-        self::notify(
-            $quote->request->customer,
-            'عرض سعر متاح',
-            'يوجد عرض سعر جديد متاح للطلب رقم #' . $quote->request_id,
-            'info',
-            route('customer.quotes.show', $quote),
-            ['quote_id' => $quote->id]
-        );
-    }
-
-    /**
-     * Notificar عند رفض عرض السعر
-     */
-    public static function notifyQuoteRejected(Quote $quote)
-    {
-        self::notify(
-            $quote->subagent,
-            'تم رفض عرضك',
-            'تم رفض عرض السعر الخاص بك للطلب رقم #' . $quote->request_id,
-            'danger',
-            route('subagent.quotes.show', $quote),
-            ['quote_id' => $quote->id]
-        );
-    }
-
-    /**
-     * Notificar عند قبول العميل لعرض السعر
-     */
-    public static function notifyQuoteAcceptedByCustomer(Quote $quote)
-    {
-        // Notificar للوكالة
-        $agency = User::where('id', $quote->request->agency_id)->first();
-        if ($agency) {
-            self::notify(
-                $agency,
-                'تم قبول عرض السعر',
-                'تم قبول عرض السعر من قبل العميل ' . $quote->request->customer->name,
-                'success',
-                route('agency.quotes.show', $quote),
-                ['quote_id' => $quote->id]
-            );
+        // تسجيل الإشعار في جدول الإشعارات العامة إن وجد رسالة
+        if (!empty($message)) {
+            DB::table('notifications')->insert([
+                'id' => \Illuminate\Support\Str::uuid(),
+                'type' => get_class($notification),
+                'notifiable_type' => 'App\Models\User',
+                'notifiable_id' => $userId,
+                'data' => json_encode([
+                    'message' => $message,
+                    'link' => null,
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
         
-        // Notificar للسبوكيل
-        self::notify(
-            $quote->subagent,
-            'تم قبول عرضك',
-            'تم قبول عرض السعر الخاص بك من قبل العميل ' . $quote->request->customer->name,
-            'success',
-            route('subagent.quotes.show', $quote),
-            ['quote_id' => $quote->id]
-        );
+        return true;
+    }
+    
+    /**
+     * إرسال إشعار لعدة مستخدمين
+     *
+     * @param array $userIds
+     * @param Notification $notification
+     * @param string $message
+     * @return int عدد الإشعارات التي تم إرسالها
+     */
+    public function notifyMany(array $userIds, Notification $notification, string $message = ''): int
+    {
+        $count = 0;
+        
+        foreach ($userIds as $userId) {
+            if ($this->notify($userId, $notification, $message)) {
+                $count++;
+            }
+        }
+        
+        return $count;
+    }
+    
+    /**
+     * إرسال إشعار لمجموعة من المستخدمين بناءً على أدوارهم
+     *
+     * @param array $roles
+     * @param Notification $notification
+     * @param string $message
+     * @return int عدد الإشعارات التي تم إرسالها
+     */
+    public function notifyByRole(array $roles, Notification $notification, string $message = ''): int
+    {
+        $users = User::whereIn('role', $roles)->get();
+        $count = 0;
+        
+        foreach ($users as $user) {
+            $user->notify($notification);
+            $count++;
+            
+            // تسجيل الإشعار في جدول الإشعارات العامة إن وجد رسالة
+            if (!empty($message)) {
+                DB::table('notifications')->insert([
+                    'id' => \Illuminate\Support\Str::uuid(),
+                    'type' => get_class($notification),
+                    'notifiable_type' => 'App\Models\User',
+                    'notifiable_id' => $user->id,
+                    'data' => json_encode([
+                        'message' => $message,
+                        'link' => null,
+                    ]),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+        
+        return $count;
+    }
+
+    /**
+     * إرسال إشعار إلى مستخدم
+     *
+     * @param User $user
+     * @param Notification $notification
+     * @return void
+     */
+    public function sendNotification(User $user, Notification $notification): void
+    {
+        $user->notify($notification);
+    }
+
+    /**
+     * إرسال إشعار إلى عدة مستخدمين
+     *
+     * @param array $users
+     * @param Notification $notification
+     * @return void
+     */
+    public function sendNotificationToMultipleUsers(array $users, Notification $notification): void
+    {
+        foreach ($users as $user) {
+            $this->sendNotification($user, $notification);
+        }
+    }
+
+    // Removed duplicate method declaration to resolve the error
+
+    /**
+     * الحصول على جميع الإشعارات للمستخدم
+     *
+     * @param User $user
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllNotifications(User $user)
+    {
+        return $user->notifications;
     }
 }

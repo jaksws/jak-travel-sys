@@ -34,6 +34,10 @@ class User extends Authenticatable
         'nationality',
         'preferred_currency',
         'notification_preferences',
+        'role',
+        'status',
+        'profile_photo',
+        'last_login_at'
     ];
 
     /**
@@ -52,6 +56,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
         'notification_preferences' => 'array',
+        'last_login_at' => 'datetime'
     ];
 
     public function agency()
@@ -105,19 +110,21 @@ class User extends Authenticatable
     }
 
     /**
+     * علاقة مع المعاملات المالية للمستخدم
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
      * تحديد ما إذا كان المستخدم وكيلاً
      */
     public function isAgency()
     {
         return $this->user_type === 'agency';
-    }
-
-    /**
-     * تحديد ما إذا كان المستخدم سبوكيلاً
-     */
-    public function isSubagent()
-    {
-        return $this->user_type === 'subagent';
     }
 
     /**
@@ -129,28 +136,53 @@ class User extends Authenticatable
     }
 
     /**
-     * تحقق مما إذا كان المستخدم مسؤولاً
+     * التحقق من أن المستخدم هو وكيل
      *
      * @return bool
      */
-    public function isAdmin()
+    public function isAgent(): bool
     {
-        // التحقق بناءً على الحقول المتوقعة في النظام
-        if (isset($this->is_admin) && $this->is_admin) {
-            return true;
-        }
+        return $this->role === 'agent' || $this->user_type === 'agency';
+    }
+    
+    /**
+     * التحقق من أن المستخدم هو وكيل فرعي
+     *
+     * @return bool
+     */
+    public function isSubAgent(): bool
+    {
+        return $this->role === 'subagent' || $this->user_type === 'subagent';
+    }
+    
+    /**
+     * التحقق من أن المستخدم هو عميل
+     *
+     * @return bool
+     */
+    public function isClient(): bool
+    {
+        return $this->role === 'client' || $this->user_type === 'customer';
+    }
 
-        if (isset($this->is_superadmin) && $this->is_superadmin) {
-            return true;
-        }
+    /**
+     * التحقق من أن حساب المستخدم نشط
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active' || $this->is_active;
+    }
 
-        // التحقق من حقل الدور
-        $roleColumn = $this->determineRoleColumn();
-        if ($roleColumn && isset($this->$roleColumn)) {
-            return in_array(strtolower($this->$roleColumn), ['admin', 'superadmin', 'administrator']);
-        }
-
-        return false;
+    /**
+     * الحصول على صورة المستخدم مع مسار افتراضي
+     *
+     * @return string
+     */
+    public function getProfilePhotoAttribute($value): string
+    {
+        return $value ?: '/images/default-profile.png';
     }
 
     /**

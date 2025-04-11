@@ -8,12 +8,13 @@ use App\Models\Request as TravelRequest;
 use App\Models\Quote;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RequestManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function client_can_create_new_request()
     {
         // تجهيز بيانات الاختبار
@@ -45,7 +46,7 @@ class RequestManagementTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function agent_can_view_requests()
     {
         // تجهيز بيانات الاختبار
@@ -65,7 +66,7 @@ class RequestManagementTest extends TestCase
         $response->assertViewHas('requests');
     }
     
-    /** @test */
+    #[Test]
     public function subagent_can_create_quote_for_request()
     {
         // تجهيز بيانات الاختبار
@@ -101,7 +102,7 @@ class RequestManagementTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function client_can_accept_quote()
     {
         // تجهيز بيانات الاختبار
@@ -134,7 +135,7 @@ class RequestManagementTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function admin_can_view_all_requests()
     {
         // تجهيز بيانات الاختبار

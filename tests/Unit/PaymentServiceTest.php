@@ -11,6 +11,7 @@ use App\Models\Currency;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
 
 class PaymentServiceTest extends TestCase
 {
@@ -32,7 +33,7 @@ class PaymentServiceTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function it_processes_payment_successfully()
     {
         // تجهيز البيانات الأساسية
@@ -78,7 +79,7 @@ class PaymentServiceTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function it_fails_payment_with_invalid_data()
     {
         // تجهيز البيانات الأساسية
@@ -125,7 +126,7 @@ class PaymentServiceTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function it_refunds_payment_successfully()
     {
         // إنشاء معاملة تمت بنجاح

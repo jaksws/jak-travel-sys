@@ -8,12 +8,13 @@ use App\Models\Currency;
 use App\Helpers\ServiceTypeHelper;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_service()
     {
         $agency = Agency::factory()->create();
@@ -37,7 +38,7 @@ class ServiceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_an_agency()
     {
         $agency = Agency::factory()->create();
@@ -49,7 +50,7 @@ class ServiceTest extends TestCase
         $this->assertInstanceOf(Agency::class, $service->agency);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_currency()
     {
         $currency = Currency::factory()->create();
@@ -61,7 +62,7 @@ class ServiceTest extends TestCase
         $this->assertInstanceOf(Currency::class, $service->currency);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_service_types()
     {
         $hajjService = Service::factory()->create(['type' => ServiceTypeHelper::HAJJ]);

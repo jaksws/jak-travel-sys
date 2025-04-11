@@ -10,12 +10,13 @@ use App\Services\NotificationService;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class NotificationSystemTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_sends_notification_when_quote_status_changes()
     {
         // تجاهل الإشعارات الفعلية أثناء الاختبار
@@ -49,7 +50,7 @@ class NotificationSystemTest extends TestCase
         );
     }
     
-    /** @test */
+    #[Test]
     public function notification_service_sends_multiple_notifications()
     {
         // تجاهل الإشعارات الفعلية أثناء الاختبار
@@ -86,7 +87,7 @@ class NotificationSystemTest extends TestCase
         }
     }
     
-    /** @test */
+    #[Test]
     public function it_sets_notification_as_read()
     {
         // إنشاء بيانات الاختبار
@@ -116,7 +117,7 @@ class NotificationSystemTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function users_can_view_their_notifications()
     {
         // إنشاء بيانات الاختبار

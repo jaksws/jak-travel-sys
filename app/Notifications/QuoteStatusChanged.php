@@ -2,24 +2,30 @@
 
 namespace App\Notifications;
 
+use App\Models\Quote;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\Quote;
 
-class QuoteStatusChanged extends Notification
+class QuoteStatusChanged extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $quote;
-
+    protected $status;
+    protected $title;
+    
     /**
      * Create a new notification instance.
      */
-    public function __construct(Quote $quote)
+    public function __construct(Quote $quote, string $status)
     {
         $this->quote = $quote;
+        $this->status = $status;
+        
+        // إعداد عنوان الإشعار بناءً على حالة عرض السعر
+        $this->title = $this->generateTitle($status);
     }
 
     /**
@@ -29,7 +35,7 @@ class QuoteStatusChanged extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['database', 'mail'];
     }
 
     /**
@@ -37,30 +43,13 @@ class QuoteStatusChanged extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $statusText = match($this->quote->status) {
-            'pending' => 'قيد المراجعة',
-            'agency_approved' => 'تمت الموافقة من قبل الوكالة',
-            'customer_approved' => 'تم قبوله من قبل العميل',
-            'agency_rejected' => 'تم رفضه من قبل الوكالة',
-            'customer_rejected' => 'تم رفضه من قبل العميل',
-            default => $this->quote->status,
-        };
-
-        // تخصيص الرسالة حسب نوع المستخدم
-        $subject = "تحديث حالة عرض السعر #" . $this->quote->id;
-        $introMessage = "تم تحديث حالة عرض السعر الخاص بطلب '" . $this->quote->request->service->name . "' إلى: " . $statusText;
-        
-        // تخصيص إضافي حسب الحالة
-        if ($this->quote->status === 'agency_rejected' && $notifiable->id === $this->quote->subagent_id) {
-            $introMessage .= "\nسبب الرفض: " . $this->quote->rejection_reason;
-        }
-
         return (new MailMessage)
-                    ->subject($subject)
-                    ->line($introMessage)
-                    ->line("سعر العرض: " . $this->quote->price . " " . $this->quote->currency_code)
-                    ->action('عرض التفاصيل', $this->getActionUrl($notifiable))
-                    ->line('شكراً لاستخدامك نظام وكالات السفر!');
+            ->subject($this->title)
+            ->greeting('مرحبا ' . $notifiable->name)
+            ->line($this->title)
+            ->line('تم تغيير حالة عرض السعر الخاص بالخدمة ' . $this->quote->service->name . ' إلى ' . $this->getStatusArabicName())
+            ->action('عرض التفاصيل', url('/quotes/' . $this->quote->id))
+            ->line('شكرًا لاستخدامك نظام جاك للسفر والسياحة!');
     }
 
     /**
@@ -72,25 +61,48 @@ class QuoteStatusChanged extends Notification
     {
         return [
             'quote_id' => $this->quote->id,
-            'request_id' => $this->quote->request_id,
-            'status' => $this->quote->status,
-            'price' => $this->quote->price,
-            'currency_code' => $this->quote->currency_code,
-            'rejection_reason' => $this->quote->rejection_reason,
+            'status' => $this->status,
+            'title' => $this->title,
+            'message' => 'تم تغيير حالة عرض السعر إلى ' . $this->getStatusArabicName(),
+            'service_name' => $this->quote->service->name,
         ];
     }
-
+    
     /**
-     * تحديد URL العمل بناءً على نوع المستخدم
+     * الحصول على النسخة العربية من حالة عرض السعر
      */
-    private function getActionUrl($notifiable): string
+    protected function getStatusArabicName(): string
     {
-        if ($notifiable->user_type === 'subagent') {
-            return route('subagent.quotes.show', $this->quote->id);
-        } elseif ($notifiable->user_type === 'customer') {
-            return route('customer.quotes.show', $this->quote->id);
-        } else {
-            return route('agency.quotes.show', $this->quote->id);
+        $statusNames = [
+            'pending' => 'قيد الانتظار',
+            'accepted' => 'مقبول',
+            'rejected' => 'مرفوض',
+            'expired' => 'منتهي الصلاحية',
+            'paid' => 'مدفوع',
+            'cancelled' => 'ملغي',
+        ];
+        
+        return $statusNames[$this->status] ?? $this->status;
+    }
+    
+    /**
+     * توليد عنوان الإشعار بناءً على الحالة
+     */
+    protected function generateTitle(string $status): string
+    {
+        switch ($status) {
+            case 'accepted':
+                return 'تم قبول عرض السعر';
+            case 'rejected':
+                return 'تم رفض عرض السعر';
+            case 'expired':
+                return 'انتهت صلاحية عرض السعر';
+            case 'paid':
+                return 'تم دفع قيمة عرض السعر';
+            case 'cancelled':
+                return 'تم إلغاء عرض السعر';
+            default:
+                return 'تم تحديث حالة عرض السعر';
         }
     }
 }

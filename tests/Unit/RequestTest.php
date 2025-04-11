@@ -8,12 +8,13 @@ use App\Models\Service;
 use App\Models\Quote;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RequestTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_request()
     {
         $client = User::factory()->create(['role' => 'client']);
@@ -36,7 +37,7 @@ class RequestTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_user()
     {
         $user = User::factory()->create();
@@ -48,7 +49,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(User::class, $request->user);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_service()
     {
         $service = Service::factory()->create();
@@ -60,7 +61,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(Service::class, $request->service);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_quotes()
     {
         $request = Request::factory()->create();
@@ -72,7 +73,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(Quote::class, $request->quotes->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_request_status()
     {
         $pendingRequest = Request::factory()->create(['status' => 'pending']);

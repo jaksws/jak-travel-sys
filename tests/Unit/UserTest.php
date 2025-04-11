@@ -6,12 +6,13 @@ use App\Models\User;
 use App\Models\Agency;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_create_a_user()
     {
         $user = User::factory()->create([
@@ -28,7 +29,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_user_roles()
     {
         $admin = User::factory()->create(['role' => 'admin']);
@@ -49,7 +50,7 @@ class UserTest extends TestCase
         $this->assertFalse($client->isAdmin());
     }
 
-    /** @test */
+    #[Test]
     public function it_tests_relationship_with_agency()
     {
         $agency = Agency::factory()->create();

@@ -11,12 +11,13 @@ use App\Helpers\ServiceTypeHelper;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\Test;
 
 class ApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_list_services()
     {
         // إنشاء بيانات اختبار
@@ -50,7 +51,7 @@ class ApiTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function it_can_filter_services_by_type()
     {
         // إنشاء بيانات اختبار
@@ -87,7 +88,7 @@ class ApiTest extends TestCase
         $response->assertJsonCount(4, 'data');
     }
     
-    /** @test */
+    #[Test]
     public function it_can_create_request_via_api()
     {
         // إنشاء بيانات اختبار
@@ -134,7 +135,7 @@ class ApiTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function it_can_get_quote_details_via_api()
     {
         // إنشاء بيانات اختبار
@@ -181,12 +182,9 @@ class ApiTest extends TestCase
         ]);
     }
     
-    /** @test */
+    #[Test]
     public function it_returns_error_when_unauthorized_access()
     {
-        // إنشاء مستخدم بدون توكن API
-        $user = User::factory()->create();
-        
         // تنفيذ الطلب بدون توثيق
         $response = $this->getJson('/api/v1/services');
         

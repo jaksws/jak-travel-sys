@@ -6,12 +6,13 @@ use App\Helpers\CurrencyHelper;
 use App\Models\Currency;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class CurrencyHelperTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_convert_between_currencies()
     {
         // إنشاء عملات للاختبار
@@ -48,7 +49,7 @@ class CurrencyHelperTest extends TestCase
         $this->assertEquals($expectedEGP, $convertedToEGP);
     }
     
-    /** @test */
+    #[Test]
     public function it_formats_currency_with_symbol()
     {
         $sar = Currency::factory()->create([
@@ -72,7 +73,7 @@ class CurrencyHelperTest extends TestCase
         $this->assertEquals('1,000.00﷼', $formattedSAR);
     }
     
-    /** @test */
+    #[Test]
     public function it_gets_default_currency()
     {
         $sar = Currency::factory()->create([

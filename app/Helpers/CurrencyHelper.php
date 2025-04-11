@@ -102,4 +102,75 @@ class CurrencyHelper
         // ثم تحويله إلى العملة المستهدفة
         return $baseAmount * $targetCurrency->exchange_rate;
     }
+
+    /**
+     * تحويل بين عملتين
+     *
+     * @param float $amount
+     * @param int $fromCurrencyId
+     * @param int $toCurrencyId
+     * @return float
+     */
+    public static function convert(float $amount, int $fromCurrencyId, int $toCurrencyId): float
+    {
+        $fromCurrency = Currency::findOrFail($fromCurrencyId);
+        $toCurrency = Currency::findOrFail($toCurrencyId);
+        
+        // تحويل من العملة المصدر إلى الدولار الأمريكي كعملة وسيطة
+        $valueInUSD = $amount / $fromCurrency->exchange_rate;
+        
+        // تحويل من الدولار الأمريكي إلى العملة الهدف
+        return $valueInUSD * $toCurrency->exchange_rate;
+    }
+    
+    /**
+     * تنسيق المبلغ بعملة معينة
+     *
+     * @param float $amount
+     * @param int $currencyId
+     * @return string
+     */
+    public static function format(float $amount, int $currencyId): string
+    {
+        $currency = Currency::findOrFail($currencyId);
+        $formattedAmount = number_format($amount, 2);
+        
+        // إذا كان رمز العملة يظهر قبل المبلغ
+        if ($currency->symbol_position === 'before') {
+            return $currency->symbol . $formattedAmount;
+        }
+        
+        // إذا كان رمز العملة يظهر بعد المبلغ
+        return $formattedAmount . ' ' . $currency->symbol;
+    }
+    
+    /**
+     * الحصول على العملة الافتراضية
+     *
+     * @return Currency
+     */
+    public static function getDefaultCurrency(): ?Currency
+    {
+        return Currency::where('is_default', true)->first();
+    }
+    
+    /**
+     * الحصول على قائمة العملات كقائمة منسدلة
+     *
+     * @return array
+     */
+    public static function getCurrencyOptions(): array
+    {
+        $currencies = Currency::all();
+        $options = [];
+        
+        foreach ($currencies as $currency) {
+            $options[] = [
+                'value' => $currency->id,
+                'label' => "{$currency->name} ({$currency->symbol})"
+            ];
+        }
+        
+        return $options;
+    }
 }

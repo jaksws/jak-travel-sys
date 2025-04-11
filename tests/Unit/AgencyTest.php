@@ -7,12 +7,13 @@ use App\Models\User;
 use App\Models\Service;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 
 class AgencyTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_create_an_agency()
     {
         $agency = Agency::factory()->create([
@@ -31,7 +32,7 @@ class AgencyTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_users()
     {
         $agency = Agency::factory()->create();
@@ -44,7 +45,7 @@ class AgencyTest extends TestCase
         $this->assertInstanceOf(User::class, $agency->users->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_services()
     {
         $agency = Agency::factory()->create();
@@ -57,7 +58,7 @@ class AgencyTest extends TestCase
         $this->assertInstanceOf(Service::class, $agency->services->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_agency_status()
     {
         $activeAgency = Agency::factory()->create(['status' => 'active']);
