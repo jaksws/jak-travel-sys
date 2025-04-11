@@ -7,6 +7,7 @@ use App\Models\Request as TravelRequest;
 use App\Notifications\QuoteStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class QuoteController extends Controller
 {
@@ -90,12 +91,17 @@ class QuoteController extends Controller
         // Update request status
         $quote->request->update(['status' => 'approved']);
 
-        // Send notification
+        // Send notification - Fix for null user reference
         try {
-            $quote->user->notify(new QuoteStatusChanged($quote, 'accepted'));
+            // Check if subagent_id exists instead of user_id
+            if ($quote->subagent_id && $quote->subagent) {
+                $quote->subagent->notify(new QuoteStatusChanged($quote, 'accepted'));
+            } else {
+                Log::warning('No valid user found for notification on quote #' . $quote->id);
+            }
         } catch (\Exception $e) {
             // Log the error
-            \Log::error('Error sending notification: ' . $e->getMessage());
+            Log::error('Error sending notification: ' . $e->getMessage());
         }
 
         return redirect()->route('quotes.show', $quote)
@@ -121,12 +127,17 @@ class QuoteController extends Controller
         // Update quote status
         $quote->update(['status' => 'rejected']);
 
-        // Send notification
+        // Send notification - Fix for null user reference
         try {
-            $quote->user->notify(new QuoteStatusChanged($quote, 'rejected'));
+            // Check if subagent_id exists instead of user_id
+            if ($quote->subagent_id && $quote->subagent) {
+                $quote->subagent->notify(new QuoteStatusChanged($quote, 'rejected'));
+            } else {
+                Log::warning('No valid user found for notification on quote #' . $quote->id);
+            }
         } catch (\Exception $e) {
             // Log the error
-            \Log::error('Error sending notification: ' . $e->getMessage());
+            Log::error('Error sending notification: ' . $e->getMessage());
         }
 
         return redirect()->route('quotes.show', $quote)

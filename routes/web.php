@@ -28,6 +28,7 @@ use App\Http\Controllers\Customer\ProfileController as CustomerProfileController
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\DataFixController;
 
 // صفحة الترحيب
 Route::get('/', function () {
@@ -240,4 +241,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     // Notifications routes
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    
+    // Test routes for views that don't exist yet
+    Route::get('agent/requests', [DataFixController::class, 'getView'])->name('agent.requests.index')->defaults('viewName', 'agent.requests.index');
+    Route::get('admin/requests', [DataFixController::class, 'getView'])->name('admin.requests.index')->defaults('viewName', 'admin.requests.index');
 });
