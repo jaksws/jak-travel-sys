@@ -64,7 +64,15 @@
 git clone https://github.com/jaksws/jak-travel-sys.git
 cd jak-travel-sys
 
+# تثبيت اعتماديات PHP
 composer install
+
+# إذا واجهتك رسالة "Class TestClass located in ./tests/compatibility-check.php does not comply with psr-4 autoloading standard"
+# فهذا طبيعي ولا يؤثر على عمل النظام. هذا ملف اختبار للتوافق فقط.
+
+# للتحقق من توافق النظام مع PHP 8.3
+php tests/compatibility-check.php
+
 cp .env.example .env
 php artisan key:generate
 
