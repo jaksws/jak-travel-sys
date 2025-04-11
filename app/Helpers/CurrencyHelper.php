@@ -135,6 +135,11 @@ class CurrencyHelper
         $currency = Currency::findOrFail($currencyId);
         $formattedAmount = number_format($amount, 2);
         
+        // خاص بعملة الريال السعودي - الرمز يظهر بعد المبلغ دائمًا
+        if ($currency->code === 'SAR') {
+            return $formattedAmount . $currency->symbol;
+        }
+        
         // إذا كان رمز العملة يظهر قبل المبلغ
         if ($currency->symbol_position === 'before') {
             return $currency->symbol . $formattedAmount;

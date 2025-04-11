@@ -4,15 +4,28 @@ namespace App\Helpers;
 
 class ServiceTypeHelper
 {
+    // Constants for service types
+    const HAJJ = 'hajj';
+    const UMRAH = 'umrah';
+    const VISA = 'visa';
+    const FLIGHT_TICKET = 'flight_ticket';
+    const HOTEL = 'hotel';
+    const TRANSPORT = 'transport';
+    const PACKAGE = 'package';
+    const ACTIVITY = 'activity';
+    const INSURANCE = 'insurance';
+
     // أنواع الخدمات المعتمدة في النظام
     const TYPES = [
-        'flight_ticket' => 'تذاكر طيران',
-        'hotel' => 'حجز فندق',
-        'package' => 'باقة سياحية',
-        'visa' => 'تأشيرة',
-        'transport' => 'نقل ومواصلات',
-        'activity' => 'نشاط سياحي',
-        'insurance' => 'تأمين سفر'
+        self::FLIGHT_TICKET => 'تذاكر طيران',
+        self::HOTEL => 'حجز فندق',
+        self::PACKAGE => 'باقة سياحية',
+        self::VISA => 'تأشيرة',
+        self::TRANSPORT => 'نقل ومواصلات',
+        self::ACTIVITY => 'نشاط سياحي',
+        self::INSURANCE => 'تأمين سفر',
+        self::HAJJ => 'حج',
+        self::UMRAH => 'عمرة',
     ];
     
     /**
@@ -79,7 +92,9 @@ class ServiceTypeHelper
             'visa' => 'fa-passport',
             'transport' => 'fa-car',
             'activity' => 'fa-hiking',
-            'insurance' => 'fa-shield-alt'
+            'insurance' => 'fa-shield-alt',
+            'hajj' => 'fa-kaaba',
+            'umrah' => 'fa-kaaba'
         ];
         
         return $icons[$type] ?? 'fa-question';
