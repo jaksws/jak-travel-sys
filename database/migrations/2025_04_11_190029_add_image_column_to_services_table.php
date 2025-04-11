@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            // Add currency_id column if it doesn't exist
-            if (!Schema::hasColumn('services', 'currency_id')) {
-                $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
+            // Add image column if it doesn't exist
+            if (!Schema::hasColumn('services', 'image')) {
+                $table->string('image')->nullable();
             }
         });
     }
@@ -25,10 +25,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            // Drop foreign key and column
-            if (Schema::hasColumn('services', 'currency_id')) {
-                $table->dropForeign(['currency_id']);
-                $table->dropColumn('currency_id');
+            // Drop image column if it exists
+            if (Schema::hasColumn('services', 'image')) {
+                $table->dropColumn('image');
             }
         });
     }

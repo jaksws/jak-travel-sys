@@ -176,6 +176,16 @@ class User extends Authenticatable
     }
 
     /**
+     * التحقق من أن المستخدم هو مدير النظام
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin' || $this->user_type === 'admin';
+    }
+
+    /**
      * الحصول على صورة المستخدم مع مسار افتراضي
      *
      * @return string

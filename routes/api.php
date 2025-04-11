@@ -23,6 +23,11 @@ use App\Http\Controllers\Api\AgencyController;
 Route::prefix('v1')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
+    
+    // Fallback route for unauthenticated API access - returns 401 instead of 404
+    Route::fallback(function () {
+        return response()->json(['message' => 'Unauthenticated. Please login to access this resource'], 401);
+    });
 });
 
 // واجهة برمجية محمية

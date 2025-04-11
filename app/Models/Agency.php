@@ -157,4 +157,24 @@ class Agency extends Model
         $settings = json_decode($value, true) ?: [];
         return array_merge($this->getDefaultCommissionSettings(), $settings);
     }
+
+    /**
+     * Check if the agency is active
+     * 
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Check if the agency is suspended
+     * 
+     * @return bool
+     */
+    public function isSuspended(): bool
+    {
+        return $this->status === 'suspended';
+    }
 }
