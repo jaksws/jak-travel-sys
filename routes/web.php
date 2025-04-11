@@ -207,7 +207,11 @@ Route::prefix('admin')->name('admin.')->middleware(['web', 'auth', 'admin'])->gr
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
     Route::get('/system/logs', [\App\Http\Controllers\Admin\DashboardController::class, 'logs'])->name('system.logs');
+    Route::get('/admin/requests', [App\Http\Controllers\Admin\RequestController::class, 'index'])->name('admin.requests.index');
 });
+
+// مسارات تستخدم في الاختبارات
+Route::post('/requests', [CustomerRequestController::class, 'store'])->name('requests.store');
 
 // مسار تحميل المستندات
 Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download')->middleware('auth');

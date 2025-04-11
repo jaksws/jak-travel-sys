@@ -12,13 +12,35 @@ class Quote extends Model
     protected $fillable = [
         'request_id',
         'subagent_id',
+        'user_id',
         'price',
         'commission_amount',
         'details',
+        'description',
         'status',
         'currency_code',
+        'currency_id',
         'rejection_reason',
+        'valid_until',
+        'notes',
     ];
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Auto-assign subagent_id from user_id if it's missing but required
+        static::creating(function ($quote) {
+            if (empty($quote->subagent_id)) {
+                $quote->subagent_id = $quote->user_id;
+            }
+        });
+    }
 
     /**
      * Get the request that owns the quote.
