@@ -1,0 +1,159 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use App\Models\Service;
+use App\Models\Request as TravelRequest;
+use App\Models\Quote;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class RequestManagementTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function client_can_create_new_request()
+    {
+        // تجهيز بيانات الاختبار
+        $client = User::factory()->create(['role' => 'client']);
+        $service = Service::factory()->create();
+        
+        $requestData = [
+            'service_id' => $service->id,
+            'title' => 'طلب حجز رحلة عمرة',
+            'description' => 'أرغب في حجز رحلة عمرة لعائلة مكونة من 4 أفراد في شهر رمضان',
+            'required_date' => now()->addMonths(3)->format('Y-m-d'),
+            'notes' => 'أفضل السكن القريب من الحرم'
+        ];
+        
+        // تنفيذ الاختبار
+        $response = $this->actingAs($client)
+                         ->post(route('requests.store'), $requestData);
+        
+        // التحقق من النتائج
+        $response->assertStatus(302); // تمت إعادة التوجيه بعد الإنشاء بنجاح
+        $response->assertRedirect(); // تم إعادة التوجيه للصفحة الصحيحة
+        
+        // التحقق من وجود الطلب في قاعدة البيانات
+        $this->assertDatabaseHas('requests', [
+            'user_id' => $client->id,
+            'service_id' => $service->id,
+            'title' => 'طلب حجز رحلة عمرة',
+            'status' => 'pending' // الحالة الافتراضية للطلب الجديد
+        ]);
+    }
+    
+    /** @test */
+    public function agent_can_view_requests()
+    {
+        // تجهيز بيانات الاختبار
+        $agent = User::factory()->create(['role' => 'agent']);
+        $service = Service::factory()->create(['agency_id' => $agent->agency_id]);
+        
+        // إنشاء بعض الطلبات للاختبار
+        TravelRequest::factory()->count(5)->create(['service_id' => $service->id]);
+        
+        // تنفيذ الاختبار
+        $response = $this->actingAs($agent)
+                         ->get(route('agent.requests.index'));
+        
+        // التحقق من النتائج
+        $response->assertStatus(200);
+        $response->assertViewIs('agent.requests.index');
+        $response->assertViewHas('requests');
+    }
+    
+    /** @test */
+    public function subagent_can_create_quote_for_request()
+    {
+        // تجهيز بيانات الاختبار
+        $subagent = User::factory()->create(['role' => 'subagent']);
+        $request = TravelRequest::factory()->create([
+            'status' => 'pending',
+            'service_id' => Service::factory()->create(['agency_id' => $subagent->agency_id])->id
+        ]);
+        
+        $quoteData = [
+            'request_id' => $request->id,
+            'price' => 5000,
+            'currency_id' => 1,
+            'description' => 'عرض سعر شامل جميع الخدمات',
+            'valid_until' => now()->addWeeks(1)->format('Y-m-d')
+        ];
+        
+        // تنفيذ الاختبار
+        $response = $this->actingAs($subagent)
+                         ->post(route('quotes.store'), $quoteData);
+        
+        // التحقق من النتائج
+        $response->assertStatus(302);
+        $response->assertRedirect();
+        
+        // التحقق من وجود عرض السعر في قاعدة البيانات
+        $this->assertDatabaseHas('quotes', [
+            'request_id' => $request->id,
+            'user_id' => $subagent->id,
+            'price' => 5000,
+            'description' => 'عرض سعر شامل جميع الخدمات',
+            'status' => 'pending' // الحالة الافتراضية لعرض السعر الجديد
+        ]);
+    }
+    
+    /** @test */
+    public function client_can_accept_quote()
+    {
+        // تجهيز بيانات الاختبار
+        $client = User::factory()->create(['role' => 'client']);
+        $request = TravelRequest::factory()->create([
+            'user_id' => $client->id,
+            'status' => 'pending'
+        ]);
+        $quote = Quote::factory()->create([
+            'request_id' => $request->id,
+            'status' => 'pending'
+        ]);
+        
+        // تنفيذ الاختبار
+        $response = $this->actingAs($client)
+                         ->patch(route('quotes.accept', $quote->id));
+        
+        // التحقق من النتائج
+        $response->assertStatus(302);
+        
+        // التحقق من تحديث حالة عرض السعر والطلب
+        $this->assertDatabaseHas('quotes', [
+            'id' => $quote->id,
+            'status' => 'accepted'
+        ]);
+        
+        $this->assertDatabaseHas('requests', [
+            'id' => $request->id,
+            'status' => 'approved'
+        ]);
+    }
+    
+    /** @test */
+    public function admin_can_view_all_requests()
+    {
+        // تجهيز بيانات الاختبار
+        $admin = User::factory()->create(['role' => 'admin']);
+        
+        // إنشاء بعض الطلبات للاختبار
+        TravelRequest::factory()->count(10)->create();
+        
+        // تنفيذ الاختبار
+        $response = $this->actingAs($admin)
+                         ->get(route('admin.requests.index'));
+        
+        // التحقق من النتائج
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.requests.index');
+        $response->assertViewHas('requests');
+        
+        // التحقق من أن جميع الطلبات معروضة للأدمن
+        $requestsCount = TravelRequest::count();
+        $this->assertEquals(10, $requestsCount);
+    }
+}
