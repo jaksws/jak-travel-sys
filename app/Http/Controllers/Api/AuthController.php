@@ -7,130 +7,98 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     /**
-     * تسجيل الدخول وإنشاء توكن API
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * Handle user login
      */
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'خطأ في البيانات المدخلة',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['بيانات الاعتماد المقدمة غير صحيحة.'],
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $user = Auth::user();
+            $token = $user->createToken('api-token')->plainTextToken;
+            
+            return response()->json([
+                'message' => 'تم تسجيل الدخول بنجاح',
+                'user' => $user,
+                'token' => $token,
             ]);
         }
-
-        // التحقق من حالة المستخدم
-        if ($user->status !== 'active') {
-            return response()->json([
-                'message' => 'الحساب غير نشط. يرجى الاتصال بمسؤول النظام.',
-            ], 403);
-        }
-
-        // تسجيل تاريخ آخر تسجيل دخول
-        $user->last_login_at = now();
-        $user->save();
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
+        
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'agency_id' => $user->agency_id,
-                'status' => $user->status,
-                'profile_photo' => $user->profile_photo,
-            ],
-            'token' => $token,
-        ]);
+            'message' => 'بيانات الاعتماد غير صحيحة'
+        ], 401);
     }
-
+    
     /**
-     * تسجيل مستخدم جديد
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * Handle user registration
      */
     public function register(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'required|string',
+            'phone' => 'nullable|string|max:20',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'خطأ في البيانات المدخلة',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'address' => $request->address,
-            'role' => 'client',  // الدور الافتراضي للمستخدمين الجدد هو عميل
-            'status' => 'pending',  // يحتاج إلى موافقة من المشرف
+            'role' => 'client',
         ]);
-
+        
+        $token = $user->createToken('api-token')->plainTextToken;
+        
         return response()->json([
-            'message' => 'تم إنشاء الحساب بنجاح. يرجى انتظار موافقة المسؤول.',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ]
+            'message' => 'تم إنشاء الحساب بنجاح',
+            'user' => $user,
+            'token' => $token,
         ], 201);
     }
-
+    
     /**
-     * تسجيل الخروج (إبطال التوكن)
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function logout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'message' => 'تم تسجيل الخروج بنجاح'
-        ]);
-    }
-
-    /**
-     * الحصول على بيانات المستخدم الحالي
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * Get authenticated user
      */
     public function user(Request $request)
     {
-        $user = $request->user();
+        return response()->json([
+            'user' => $request->user(),
+        ]);
+    }
+    
+    /**
+     * Handle user logout
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
         
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'agency_id' => $user->agency_id,
-                'phone' => $user->phone,
-                'address' => $user->address,
-                'status' => $user->status,
-                'profile_photo' => $user->profile_photo,
-            ]
+            'message' => 'تم تسجيل الخروج بنجاح'
         ]);
     }
 }

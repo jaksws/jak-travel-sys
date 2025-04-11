@@ -32,18 +32,11 @@ class ServiceController extends Controller
         }
         
         // التصفية حسب الحالة
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
+        $query->where('status', 'active');
         
-        // البحث بالاسم
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-        
-        $services = $query->with('agency')->paginate($request->per_page ?? 10);
+        $services = $query->paginate($request->per_page ?? 10);
 
-        return response()->json($services);
+        return response()->json(['data' => $services]);
     }
 
     /**
@@ -104,11 +97,7 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        $service->load('agency');
-        
-        return response()->json([
-            'service' => $service
-        ]);
+        return response()->json(['data' => $service]);
     }
 
     /**

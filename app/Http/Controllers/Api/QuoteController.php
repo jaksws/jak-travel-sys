@@ -388,4 +388,21 @@ class QuoteController extends Controller
             'data' => $quote->fresh(['request', 'user', 'currency'])
         ]);
     }
+
+    /**
+     * Delete a quote
+     *
+     * @param Quote $quote
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Quote $quote)
+    {
+        // Add authorization logic here
+        
+        $quote->delete();
+        
+        return response()->json([
+            'message' => 'تم حذف عرض السعر بنجاح'
+        ]);
+    }
 }
