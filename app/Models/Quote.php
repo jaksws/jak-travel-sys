@@ -26,6 +26,17 @@ class Quote extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'price' => 'decimal:2',
+        'commission_amount' => 'decimal:2',
+        'valid_until' => 'datetime',
+    ];
+
+    /**
      * The "booting" method of the model.
      *
      * @return void
@@ -38,6 +49,12 @@ class Quote extends Model
         static::creating(function ($quote) {
             if (empty($quote->subagent_id)) {
                 $quote->subagent_id = $quote->user_id;
+            }
+
+            // If commission_amount is not set, set a default based on price (10%)
+            if (empty($quote->commission_amount) && !empty($quote->price)) {
+                $rate = $quote->commission_rate ?? 10; // Default 10%
+                $quote->commission_amount = ($quote->price * $rate) / 100;
             }
         });
     }

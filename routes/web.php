@@ -26,6 +26,8 @@ use App\Http\Controllers\Customer\RequestController as CustomerRequestController
 use App\Http\Controllers\Customer\QuoteController as CustomerQuoteController;
 use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RequestController;
+use App\Http\Controllers\QuoteController;
 
 // صفحة الترحيب
 Route::get('/', function () {
@@ -215,3 +217,27 @@ Route::post('/requests', [CustomerRequestController::class, 'store'])->name('req
 
 // مسار تحميل المستندات
 Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download')->middleware('auth');
+
+// Add authentication middleware for all routes
+Route::middleware(['web', 'auth'])->group(function () {
+    // Client routes
+    Route::post('/requests', [RequestController::class, 'store'])->name('requests.store');
+    Route::get('/requests/create', [RequestController::class, 'create'])->name('requests.create');
+    Route::get('/requests/{request}', [RequestController::class, 'show'])->name('requests.show');
+    
+    // Quote routes
+    Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
+    Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+    Route::patch('/quotes/{quote}/accept', [QuoteController::class, 'accept'])->name('quotes.accept');
+    Route::patch('/quotes/{quote}/reject', [QuoteController::class, 'reject'])->name('quotes.reject');
+    
+    // Agent routes
+    Route::get('/agent/requests', [RequestController::class, 'index'])->name('agent.requests.index');
+    
+    // Admin routes
+    Route::get('/admin/requests', [RequestController::class, 'adminIndex'])->name('admin.requests.index');
+    
+    // Notifications routes
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+});

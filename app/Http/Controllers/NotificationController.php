@@ -3,17 +3,35 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
 
 class NotificationController extends Controller
 {
     /**
-     * عرض جميع الإشعارات
+     * Display a listing of the user's notifications.
      */
     public function index()
     {
-        $notifications = auth()->user()->notifications()->latest()->paginate(15);
+        $notifications = Auth::user()->notifications()->paginate(15);
+        
         return view('notifications.index', compact('notifications'));
+    }
+    
+    /**
+     * Mark a notification as read.
+     */
+    public function markAsRead($id)
+    {
+        $notification = Auth::user()->notifications()->where('id', $id)->first();
+        
+        if (!$notification) {
+            return response()->json(['error' => 'Notification not found'], 404);
+        }
+        
+        $notification->markAsRead();
+        
+        return response()->json(['success' => true]);
     }
     
     /**
@@ -26,21 +44,6 @@ class NotificationController extends Controller
             'count' => auth()->user()->notifications()->unread()->count(),
             'notifications' => $notifications
         ]);
-    }
-    
-    /**
-     * تعليم إشعار كمقروء
-     */
-    public function markAsRead(Notification $notification)
-    {
-        // التأكد من أن الإشعار ينتمي للمستخدم الحالي
-        if ($notification->user_id !== auth()->id()) {
-            return response()->json(['error' => 'غير مصرح لك بالوصول إلى هذا الإشعار'], 403);
-        }
-        
-        $notification->markAsRead();
-        
-        return response()->json(['success' => true]);
     }
     
     /**

@@ -64,7 +64,22 @@ class QuoteStatusChanged extends Notification implements ShouldQueue
             'status' => $this->status,
             'title' => $this->title,
             'message' => 'تم تغيير حالة عرض السعر إلى ' . $this->getStatusArabicName(),
-            'service_name' => $this->quote->service->name,
+            'service_name' => $this->quote->service->name ?? 'خدمة غير محددة',
+        ];
+    }
+    
+    /**
+     * Save notification to the database.
+     * 
+     * @param mixed $notifiable
+     * @return array
+     */
+    public function toDatabase($notifiable)
+    {
+        return [
+            'quote_id' => $this->quote->id,
+            'status' => $this->status,
+            'message' => 'تم تغيير حالة عرض السعر إلى ' . $this->getStatusArabicName(),
         ];
     }
     
