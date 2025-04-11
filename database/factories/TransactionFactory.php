@@ -5,8 +5,10 @@ namespace Database\Factories;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Quote;
+use App\Models\Agency;
 use App\Models\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class TransactionFactory extends Factory
 {
@@ -27,55 +29,49 @@ class TransactionFactory extends Factory
         return [
             'user_id' => User::factory(),
             'quote_id' => Quote::factory(),
-            'amount' => $this->faker->numberBetween(1000, 10000),
+            'agency_id' => null, // Make this nullable
             'currency_id' => Currency::factory(),
-            'reference_id' => 'txn_' . $this->faker->unique()->uuid(),
-            'payment_method' => $this->faker->randomElement(['credit_card', 'bank_transfer', 'cash', 'online_payment']),
-            'status' => $this->faker->randomElement(['completed', 'pending', 'failed', 'refunded']),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'amount' => $this->faker->numberBetween(100, 10000),
+            'status' => $this->faker->randomElement(['pending', 'completed', 'failed', 'refunded']),
+            'payment_method' => $this->faker->randomElement(['credit_card', 'mada', 'bank_transfer']),
+            'reference_id' => 'txn_' . Str::random(16),
+            'description' => $this->faker->sentence(),
+            'type' => $this->faker->randomElement(['payment', 'refund', 'commission']),
+            'refunded_at' => null,
+            'refund_reason' => null,
+            'refund_reference' => null,
         ];
     }
 
     /**
-     * Configure the factory to create a completed transaction.
+     * Indicate that the transaction is completed.
      *
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function completed()
     {
         return $this->state(function (array $attributes) {
             return [
                 'status' => 'completed',
+                'type' => 'payment'
             ];
         });
     }
 
     /**
-     * Configure the factory to create a failed transaction.
+     * Indicate that the transaction is refunded.
      *
-     * @return $this
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public function failed()
+    public function refunded()
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => 'failed',
-            ];
-        });
-    }
-
-    /**
-     * Configure the factory to create a transaction for a specific quote.
-     *
-     * @param int $quoteId
-     * @return $this
-     */
-    public function forQuote($quoteId)
-    {
-        return $this->state(function (array $attributes) use ($quoteId) {
-            return [
-                'quote_id' => $quoteId,
+                'status' => 'refunded',
+                'type' => 'refund',
+                'refunded_at' => now(),
+                'refund_reason' => 'Customer request',
+                'refund_reference' => 'ref_' . Str::random(16),
             ];
         });
     }

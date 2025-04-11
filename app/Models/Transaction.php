@@ -10,7 +10,9 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'agency_id', 'user_id', 'quote_id', 'amount', 'type', 'status', 'notes'
+        'agency_id', 'user_id', 'quote_id', 'amount', 'currency_id', 'type', 'status',
+        'notes', 'reference_id', 'payment_method', 'description', 'refunded_at',
+        'refund_reason', 'refund_reference'
     ];
 
     public function agency()

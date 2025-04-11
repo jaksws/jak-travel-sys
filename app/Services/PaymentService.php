@@ -72,8 +72,8 @@ class PaymentService
                 // تحديث حالة عرض السعر
                 $quote->update(['status' => 'paid']);
 
-                // Create transaction record
-                $transaction = Transaction::create([
+                // Create transaction record with agency_id from the quote if available
+                $transactionData = [
                     'user_id' => $user->id,
                     'quote_id' => $quote->id,
                     'amount' => $quote->price, 
@@ -81,8 +81,16 @@ class PaymentService
                     'status' => 'completed',
                     'payment_method' => $data['payment_method'],
                     'reference_id' => $paymentResult['transaction_id'] ?? Str::uuid(),
-                    'description' => 'دفع قيمة الخدمة'
-                ]);
+                    'description' => 'دفع قيمة الخدمة',
+                    'type' => 'payment' // Add default type
+                ];
+                
+                // Include agency_id if it exists in the quote
+                if ($quote->agency_id) {
+                    $transactionData['agency_id'] = $quote->agency_id;
+                }
+                
+                $transaction = Transaction::create($transactionData);
 
                 return [
                     'success' => true,

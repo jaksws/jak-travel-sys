@@ -138,7 +138,8 @@ class PaymentServiceTest extends TestCase
             'amount' => 1000,
             'status' => 'completed',
             'payment_method' => 'credit_card',
-            'reference_id' => 'txn_' . uniqid()
+            'reference_id' => 'txn_' . uniqid(),
+            'type' => 'payment' // Add the type field
         ]);
         
         // تنفيذ عملية استرداد المبلغ
