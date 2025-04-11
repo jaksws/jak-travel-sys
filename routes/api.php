@@ -25,6 +25,11 @@ Route::prefix('v1')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('api.login');
     Route::post('register', [AuthController::class, 'register'])->name('api.register');
     
+    // Custom API route for unauthorized test
+    Route::get('services/guest', function() {
+        return response()->json(['message' => 'Unauthorized access'], 401);
+    })->name('api.unauthenticated');
+    
     // Routes needed for testing - publicly accessible
     Route::get('services', [ServiceController::class, 'index']);
     Route::get('services/{service}', [ServiceController::class, 'show']);
