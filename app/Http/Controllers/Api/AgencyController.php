@@ -9,59 +9,29 @@ use Illuminate\Http\Request;
 class AgencyController extends Controller
 {
     /**
-     * عرض قائمة الوكالات
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Display a listing of agencies
      */
     public function index(Request $request)
     {
-        $query = Agency::query();
-        
-        // التصفية حسب الحالة (نشط / معلق)
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        } else {
-            // عرض الوكالات النشطة فقط بشكل افتراضي
-            $query->where('status', 'active');
-        }
-        
-        // البحث حسب الاسم
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('license_number', 'like', '%' . $request->search . '%');
-        }
-        
-        // ترتيب الوكالات حسب الاسم
-        $query->orderBy('name');
-        
-        $agencies = $query->paginate(15);
-        
-        return response()->json([
-            'data' => $agencies->items(),
-            'meta' => [
-                'current_page' => $agencies->currentPage(),
-                'last_page' => $agencies->lastPage(),
-                'per_page' => $agencies->perPage(),
-                'total' => $agencies->total()
-            ]
-        ]);
+        $agencies = Agency::where('status', 'active')
+            ->with(['services' => function($query) {
+                $query->where('status', 'active');
+            }])
+            ->paginate($request->per_page ?? 10);
+            
+        return response()->json($agencies);
     }
-
+    
     /**
-     * عرض تفاصيل وكالة محددة
-     *
-     * @param  \App\Models\Agency  $agency
-     * @return \Illuminate\Http\Response
+     * Display details for a specific agency
      */
     public function show(Agency $agency)
     {
-        // تحميل الخدمات النشطة المرتبطة بالوكالة
+        // Load active services for this agency
         $agency->load([
-            'services' => function ($query) {
+            'services' => function($query) {
                 $query->where('status', 'active')
-                      ->orderBy('created_at', 'desc')
-                      ->limit(10);
+                      ->orderBy('created_at', 'desc');
             }
         ]);
         

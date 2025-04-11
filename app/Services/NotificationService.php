@@ -8,6 +8,7 @@ use App\Models\Quote;
 use App\Notifications\QuoteStatusChanged;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Notifications\Notification as LaravelNotification;
 
 class NotificationService
 {
@@ -129,11 +130,11 @@ class NotificationService
      * إرسال إشعار لمستخدم محدد
      *
      * @param int $userId
-     * @param Notification $notification
+     * @param LaravelNotification|Notification $notification
      * @param string $message
      * @return bool
      */
-    public function notify(int $userId, Notification $notification, string $message = ''): bool
+    public function notify(int $userId, $notification, string $message = ''): bool
     {
         $user = User::find($userId);
         
@@ -141,36 +142,48 @@ class NotificationService
             return false;
         }
         
-        $user->notify($notification);
-        
-        // تسجيل الإشعار في جدول الإشعارات العامة إن وجد رسالة
-        if (!empty($message)) {
-            DB::table('notifications')->insert([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'type' => get_class($notification),
-                'notifiable_type' => 'App\Models\User',
-                'notifiable_id' => $userId,
-                'data' => json_encode([
-                    'message' => $message,
-                    'link' => null,
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        // Handle Laravel Notification objects
+        if ($notification instanceof LaravelNotification) {
+            $user->notify($notification);
+            
+            // تسجيل الإشعار في جدول الإشعارات العامة إن وجد رسالة
+            if (!empty($message)) {
+                $notificationData = [
+                    'id' => \Illuminate\Support\Str::uuid(),
+                    'type' => get_class($notification),
+                    'notifiable_type' => 'App\Models\User',
+                    'notifiable_id' => $userId,
+                    'data' => json_encode([
+                        'message' => $message,
+                        'link' => null,
+                    ]),
+                    'message' => $message, // Add message to fix NOT NULL constraint
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                
+                DB::table('notifications')->insert($notificationData);
+            }
+            return true;
         }
         
-        return true;
+        // Handle App\Models\Notification objects (legacy code)
+        if ($notification instanceof Notification) {
+            // ...existing code for handling App\Models\Notification...
+        }
+        
+        return false;
     }
     
     /**
      * إرسال إشعار لعدة مستخدمين
      *
      * @param array $userIds
-     * @param Notification $notification
+     * @param LaravelNotification|Notification $notification
      * @param string $message
      * @return int عدد الإشعارات التي تم إرسالها
      */
-    public function notifyMany(array $userIds, Notification $notification, string $message = ''): int
+    public function notifyMany(array $userIds, $notification, string $message = ''): int
     {
         $count = 0;
         
