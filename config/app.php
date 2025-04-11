@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\ServiceProvider;
+
 return [
 
     /*
@@ -135,5 +138,12 @@ return [
     */
 
     'version' => env('APP_VERSION', '1.0.0'),
+
+    'providers' => ServiceProvider::defaultProviders()->merge([
+        // ...existing providers...
+        
+        // Add our test provider
+        App\Providers\TestRouteServiceProvider::class,
+    ])->toArray(),
 
 ];

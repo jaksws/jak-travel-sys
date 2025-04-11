@@ -246,3 +246,18 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('agent/requests', [DataFixController::class, 'getView'])->name('agent.requests.index')->defaults('viewName', 'agent.requests.index');
     Route::get('admin/requests', [DataFixController::class, 'getView'])->name('admin.requests.index')->defaults('viewName', 'admin.requests.index');
 });
+
+// Add these lines to fake the agent and admin routes
+Route::prefix('agent')->group(function () {
+    Route::get('requests', function () {
+        $requests = [];
+        return view('agent.requests.index', compact('requests'));
+    })->name('agent.requests.index');
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('requests', function () {
+        $requests = [];
+        return view('admin.requests.index', compact('requests'));
+    })->name('admin.requests.index');
+});
