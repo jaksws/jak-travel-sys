@@ -203,14 +203,6 @@ Route::prefix('customer')->middleware(['auth', \App\Http\Middleware\CustomerMidd
     Route::delete('/notifications/{id}', [App\Http\Controllers\Customer\NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
-// مسارات لوحة تحكم المسؤول
-Route::prefix('admin')->name('admin.')->middleware(['web', 'auth', 'admin'])->group(function () {
-    Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
-    Route::get('/system/logs', [\App\Http\Controllers\Admin\DashboardController::class, 'logs'])->name('system.logs');
-    Route::get('/admin/requests', [App\Http\Controllers\Admin\RequestController::class, 'index'])->name('admin.requests.index');
-});
-
 // مسارات تستخدم في الاختبارات
 Route::post('/requests', [CustomerRequestController::class, 'store'])->name('requests.store');
 
@@ -251,11 +243,4 @@ Route::prefix('agent')->group(function () {
         $requests = [];
         return view('agent.requests.index', compact('requests'));
     })->name('agent.requests.index');
-});
-
-Route::prefix('admin')->group(function () {
-    Route::get('requests', function () {
-        $requests = [];
-        return view('admin.requests.index', compact('requests'));
-    })->name('admin.requests.index');
 });
