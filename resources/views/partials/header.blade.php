@@ -44,38 +44,66 @@
                             <i class="fa fa-user-circle me-1"></i> {{ auth()->user()->name }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">الملف الشخصي</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('v2.profile_settings') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('user.preferences') }}">{{ __('v2.appearance_settings') }}</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item">تسجيل الخروج</button>
+                                    <button type="submit" class="dropdown-item">{{ __('v2.logout') }}</button>
                                 </form>
                             </li>
                         </ul>
                     </li>
                 @endguest
                 <!-- إضافة زر تبديل الوضع الليلي -->
-                @if(config('V1_features.dark_mode.enabled', false))
+                @if(config('v1_features.dark_mode.enabled', false))
                 <li class="nav-item ms-2">
-                    <button id="theme-toggle" class="btn btn-outline-secondary btn-sm" title="{{ __('V1.toggle_dark_mode') }}">
+                    <button id="dark-mode-toggle" class="btn btn-outline-secondary btn-sm" title="{{ __('v2.toggle_dark_mode') }}">
                         <i id="theme-icon" class="fas fa-moon"></i>
                     </button>
                 </li>
                 @endif
                 <!-- إضافة مفتاح تغيير اللغة -->
-                @if(config('V1_features.multilingual.enabled', false))
+                @if(config('v1_features.multilingual.enabled', false))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-globe"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                        @foreach(config('V1_features.multilingual.available_locales', ['ar']) as $locale)
+                        @foreach(config('v1_features.multilingual.available_locales', ['ar']) as $locale)
                             <li>
-                                <a class="dropdown-item {{ app()->getLocale() == $locale ? 'active' : '' }}" 
-                                   href="{{ route('set.locale', ['locale' => $locale]) }}">
-                                    {{ __('V1.locale_' . $locale) }}
-                                </a>
+                                <form action="{{ route('user.preferences.save') }}" method="POST" class="locale-form">
+                                    @csrf
+                                    <input type="hidden" name="locale" value="{{ $locale }}">
+                                    <button type="submit" class="dropdown-item {{ app()->getLocale() == $locale ? 'active' : '' }}">
+                                        @switch($locale)
+                                            @case('ar')
+                                                العربية
+                                                @break
+                                            @case('en')
+                                                English
+                                                @break
+                                            @case('fr')
+                                                Français
+                                                @break
+                                            @case('tr')
+                                                Türkçe
+                                                @break
+                                            @case('es')
+                                                Español
+                                                @break
+                                            @case('id')
+                                                Bahasa Indonesia
+                                                @break
+                                            @case('ur')
+                                                اردو
+                                                @break
+                                            @default
+                                                {{ $locale }}
+                                        @endswitch
+                                    </button>
+                                </form>
                             </li>
                         @endforeach
                     </ul>
@@ -85,3 +113,38 @@
         </div>
     </div>
 </header>
+
+@push('scripts')
+<script>
+    // تنفيذ نماذج تغيير اللغة بواسطة AJAX
+    document.addEventListener('DOMContentLoaded', function() {
+        const localeForms = document.querySelectorAll('.locale-form');
+        
+        localeForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(form);
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+</script>
+@endpush

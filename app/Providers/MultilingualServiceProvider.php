@@ -34,7 +34,7 @@ class MultilingualServiceProvider extends ServiceProvider
      */
     protected function setupLocale(): void
     {
-        $locales = Config::get('V1_features.multilingual.available_locales', ['ar']);
+        $locales = Config::get('V1_features.multilingual.available_locales', ['ar', 'en', 'fr', 'tr']);
         $defaultLocale = Config::get('V1_features.multilingual.default_locale', 'ar');
         
         // Get locale from session or use default
@@ -62,7 +62,13 @@ class MultilingualServiceProvider extends ServiceProvider
             $view->with([
                 'currentLocale' => App::getLocale(),
                 'availableLocales' => Config::get('V1_features.multilingual.available_locales'),
-                'textDirection' => Session::get('textDirection', 'rtl')
+                'textDirection' => Session::get('textDirection', 'rtl'),
+                'localeNames' => [
+                    'ar' => 'العربية',
+                    'en' => 'English',
+                    'fr' => 'Français',
+                    'tr' => 'Türkçe'
+                ]
             ]);
         });
     }

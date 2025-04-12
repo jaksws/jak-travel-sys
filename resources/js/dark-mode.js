@@ -1,5 +1,6 @@
 /**
  * Dark mode functionality for RTLA v2.0
+ * System for managing light/dark theme preferences
  */
 document.addEventListener('DOMContentLoaded', function() {
     const darkModeEnabled = window.darkModeSettings?.enabled || false;
@@ -27,7 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Listen for system preference changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-                applyTheme(event.matches ? 'dark' : 'light');
+                if (localStorage.getItem('theme') === 'system') {
+                    applyTheme(event.matches ? 'dark' : 'light', false);
+                }
             });
         } else {
             // Apply default theme
@@ -36,20 +39,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Apply specified theme
-    function applyTheme(theme) {
+    function applyTheme(theme, savePreference = true) {
         if (theme === 'dark') {
             htmlElement.classList.add('dark');
-        } else {
+            htmlElement.classList.add('dark-theme');
+        } else if (theme === 'light') {
             htmlElement.classList.remove('dark');
+            htmlElement.classList.remove('dark-theme');
+        } else if (theme === 'system') {
+            // Apply theme based on system preference
+            const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDarkMode) {
+                htmlElement.classList.add('dark');
+                htmlElement.classList.add('dark-theme');
+            } else {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.remove('dark-theme');
+            }
         }
         
         // Update toggle button if it exists
         if (darkModeToggle) {
-            darkModeToggle.setAttribute('aria-checked', theme === 'dark');
+            const isDarkActive = htmlElement.classList.contains('dark');
+            darkModeToggle.setAttribute('aria-checked', isDarkActive);
+            
+            // Update icon if exists
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeIcon) {
+                themeIcon.className = isDarkActive ? 'fas fa-sun' : 'fas fa-moon';
+            }
         }
         
         // Save theme preference
-        localStorage.setItem('theme', theme);
+        if (savePreference) {
+            localStorage.setItem('theme', theme);
+        }
     }
     
     // Toggle between dark and light mode
@@ -59,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Send theme preference to server if user is logged in
         if (window.userId) {
-            fetch('/api/user/preferences/theme', {
+            fetch('/api/user/preferences', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -77,6 +101,38 @@ document.addEventListener('DOMContentLoaded', function() {
         darkModeToggle.addEventListener('click', toggleDarkMode);
     }
     
+    // Setup theme selector if exists
+    const themeSelector = document.getElementById('theme-selector');
+    if (themeSelector) {
+        themeSelector.addEventListener('change', function() {
+            applyTheme(this.value);
+            
+            // Send theme preference to server if user is logged in
+            if (window.userId) {
+                fetch('/api/user/preferences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        theme: this.value
+                    })
+                });
+            }
+        });
+        
+        // Set initial value
+        const currentTheme = localStorage.getItem('theme') || window.darkModeSettings?.default || 'light';
+        themeSelector.value = currentTheme;
+    }
+    
     // Initialize dark mode
     initDarkMode();
+    
+    // Make functions available globally
+    window.darkModeManager = {
+        applyTheme,
+        toggleDarkMode
+    };
 });

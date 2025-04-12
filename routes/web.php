@@ -68,6 +68,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/user/preferences', [App\Http\Controllers\UserPreferencesController::class, 'update'])->name('user.preferences.update');
 });
 
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+    Route::get('/preferences', [App\Http\Controllers\UserPreferencesController::class, 'index'])->name('preferences');
+    Route::post('/preferences', [App\Http\Controllers\UserPreferencesController::class, 'save'])->name('preferences.save');
+    Route::get('/preferences/get', [App\Http\Controllers\UserPreferencesController::class, 'getPreferences'])->name('preferences.get');
+});
+
 // مسارات الوكيل الأساسي - usando la clase middleware directamente
 Route::prefix('agency')->middleware(['auth', \App\Http\Middleware\AgencyMiddleware::class])->name('agency.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
