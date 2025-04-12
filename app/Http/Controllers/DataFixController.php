@@ -12,6 +12,16 @@ class DataFixController extends Controller
      */
     public function getView($viewName)
     {
+        // Special handling for admin requests view
+        if ($viewName === 'admin.requests.index') {
+            $requests = \App\Models\Request::select(['id', 'title', 'status'])
+                ->with(['service', 'user'])
+                ->latest()
+                ->paginate(15);
+            
+            return view($viewName, ['requests' => $requests]);
+        }
+        
         // Create dummy views for testing purposes
         if (!View::exists($viewName)) {
             // For testing, we'll return a simple view

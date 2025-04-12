@@ -16,6 +16,9 @@ Route::group([
     // Users management
     Route::get('/users', [DashboardController::class, 'users'])->name('users.index');
     
+    // Requests management
+    Route::get('/requests', [DashboardController::class, 'requests'])->name('requests.index');
+    
     // System logs
     Route::get('/system/logs', [DashboardController::class, 'logs'])->name('system.logs');
 });

@@ -46,6 +46,21 @@ class DashboardController extends Controller
     }
     
     /**
+     * Show requests management page
+     */
+    public function requests()
+    {
+        // Obtener todas las solicitudes con sus relaciones
+        $requests = \App\Models\Request::select(['id', 'title', 'status'])
+            ->with(['service', 'user'])
+            ->latest()
+            ->paginate(15);
+            
+        // Forzar la asignación de la variable a la vista mediante array asociativo
+        return view('admin.requests.index', ['requests' => $requests]);
+    }
+    
+    /**
      * Get agencies count
      */
     private function getAgenciesCount()

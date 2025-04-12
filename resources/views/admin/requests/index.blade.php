@@ -9,13 +9,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($requests as $request)
-            <tr>
-                <td>{{ $request->id ?? '' }}</td>
-                <td>{{ $request->title ?? '' }}</td>
-                <td>{{ $request->status ?? '' }}</td>
-            </tr>
-            @endforeach
+            @if(isset($requests) && count($requests) > 0)
+                @foreach($requests as $request)
+                <tr>
+                    <td>{{ $request->id ?? '' }}</td>
+                    <td>{{ $request->title ?? '' }}</td>
+                    <td>{{ $request->status ?? '' }}</td>
+                </tr>
+                @endforeach
+            @else
+                <tr>
+                    <td colspan="3" class="text-center">No requests found</td>
+                </tr>
+            @endif
         </tbody>
     </table>
 </div>
