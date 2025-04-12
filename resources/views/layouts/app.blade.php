@@ -247,42 +247,90 @@
             @endif
         </main>
         
-        <footer class="footer py-4 mt-5">
+        <footer class="footer py-5 mt-4">
             <div class="container">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <h5>{{ config('app.name', 'وكالات السفر') }}</h5>
-                        <p>نظام متكامل لإدارة وكالات السفر والسبوكلاء والعملاء</p>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <h5>روابط سريعة</h5>
-                        <ul class="list-unstyled">
-                            <li><a href="{{ url('/') }}">{{ __('v2.dashboard') }}</a></li>
-                            <li><a href="#">{{ __('About Us') }}</a></li>
-                            <li><a href="#">{{ __('Contact') }}</a></li>
-                            <li><a href="#">{{ __('Terms & Conditions') }}</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <h5>{{ __('Contact Us') }}</h5>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-envelope me-2"></i> info@travelagency.com</li>
-                            <li><i class="fas fa-phone me-2"></i> +966 55 123 4567</li>
-                            <li><i class="fas fa-map-marker-alt me-2"></i> الرياض، المملكة العربية السعودية</li>
-                        </ul>
-                        <div class="mt-3">
-                            <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="me-2"><i class="fab fa-instagram"></i></a>
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <!-- القسم العلوي من التذييل -->
+                <div class="row mb-4">
+                    <div class="col-lg-4 mb-4 mb-lg-0">
+                        <div class="footer-brand d-flex align-items-center mb-3">
+                            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" width="40" height="40" class="me-2" onerror="this.style.display='none'">
+                            <h5 class="m-0">{{ config('app.name', 'وكالات السفر') }}</h5>
+                        </div>
+                        <p class="text-secondary">نظام متكامل لإدارة وكالات السفر والسبوكلاء والعملاء، يوفر حلولاً شاملة لعمليات الحجز وإدارة الخدمات السياحية.</p>
+                        <div class="social-icons">
+                            <a href="#" class="me-2 social-icon"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="me-2 social-icon"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="me-2 social-icon"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
                         </div>
                     </div>
+                    <div class="col-sm-6 col-lg-2 mb-4 mb-lg-0">
+                        <h6 class="fw-bold mb-3">روابط سريعة</h6>
+                        <ul class="list-unstyled footer-links">
+                            <li class="mb-2"><a href="{{ url('/') }}"><i class="fas fa-chevron-left me-1 small"></i> {{ __('v2.dashboard') }}</a></li>
+                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> {{ __('About Us') }}</a></li>
+                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> {{ __('Services') }}</a></li>
+                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> {{ __('Terms & Conditions') }}</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6 col-lg-2 mb-4 mb-lg-0">
+                        <h6 class="fw-bold mb-3">خدماتنا</h6>
+                        <ul class="list-unstyled footer-links">
+                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> تذاكر السفر</a></li>
+                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> حجز الفنادق</a></li>
+                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> برامج سياحية</a></li>
+                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> تأشيرات السفر</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h6 class="fw-bold mb-3">{{ __('Contact Us') }}</h6>
+                        <ul class="list-unstyled footer-contact">
+                            <li class="mb-3 d-flex">
+                                <span class="icon-circle bg-primary-soft text-primary me-3">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <div>
+                                    <p class="mb-0 text-secondary">البريد الإلكتروني</p>
+                                    <a href="mailto:info@travelagency.com">info@travelagency.com</a>
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex">
+                                <span class="icon-circle bg-primary-soft text-primary me-3">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                                <div>
+                                    <p class="mb-0 text-secondary">رقم الهاتف</p>
+                                    <a href="tel:+966551234567">+966 55 123 4567</a>
+                                </div>
+                            </li>
+                            <li class="d-flex">
+                                <span class="icon-circle bg-primary-soft text-primary me-3">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </span>
+                                <div>
+                                    <p class="mb-0 text-secondary">العنوان</p>
+                                    <address class="mb-0">الرياض، المملكة العربية السعودية</address>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+                
+                <!-- القسم السفلي من التذييل -->
                 <hr>
-                <div class="text-center">
-                    <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'وكالات السفر') }}. {{ __('All rights reserved') }}</p>
-                    <div class="version">
-                        Version: {{ config('app.version', '1.1') }}
+                <div class="row align-items-center py-3">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'وكالات السفر') }}. {{ __('All rights reserved') }}</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="footer-meta d-flex flex-wrap justify-content-center justify-content-md-end">
+                            <span class="mx-2"><a href="#">الخصوصية</a></span>
+                            <span class="mx-2"><a href="#">الشروط والأحكام</a></span>
+                            <span class="mx-2"><a href="#">الأمان</a></span>
+                            <span class="version ms-3 text-muted">
+                                <i class="fas fa-code-branch me-1 small"></i> v{{ config('app.version', '1.1') }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
