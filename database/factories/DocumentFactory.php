@@ -23,6 +23,7 @@ class DocumentFactory extends Factory
             Request::class,
         ];
         $documentableType = $this->faker->randomElement($documentableTypes);
+        $user = User::factory()->create();
 
         return [
             'name' => $this->faker->words(3, true) . '.' . $this->faker->randomElement(['pdf', 'doc', 'jpg']),
@@ -31,7 +32,8 @@ class DocumentFactory extends Factory
             'size' => $this->faker->numberBetween(1000, 10000000),
             'documentable_id' => 1, // سيتم تعيينه لاحقًا
             'documentable_type' => $documentableType,
-            'uploaded_by' => User::factory(),
+            'user_id' => $user->id, // إضافة user_id الإلزامي
+            'uploaded_by' => $user->id, // استخدام نفس المستخدم
             'visibility' => $this->faker->randomElement(['public', 'agency', 'private']),
             'notes' => $this->faker->sentence()
         ];

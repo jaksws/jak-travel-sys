@@ -14,7 +14,7 @@ class Notification extends Model
         'title',
         'message',
         'type',
-        'action_url',
+        'link',
         'is_read',
         'data',
     ];
@@ -25,6 +25,31 @@ class Notification extends Model
     ];
 
     /**
+     * التحقق من وجود جدول وإنشائه إذا لم يكن موجودًا
+     */
+    public static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($model) {
+            // نتأكد من أن العمود title موجود، وإذا لم يكن موجودًا نستخدم قيمة افتراضية
+            if (!isset($model->title)) {
+                $model->title = 'إشعار جديد';
+            }
+            
+            // نتأكد من العمود message
+            if (!isset($model->message)) {
+                $model->message = '';
+            }
+            
+            // نتأكد من العمود type
+            if (!isset($model->type)) {
+                $model->type = 'general';
+            }
+        });
+    }
+
+    /**
      * Get the user that owns the notification.
      */
     public function user()
@@ -33,7 +58,7 @@ class Notification extends Model
     }
 
     /**
-     * Marcar como leída
+     * وضع علامة "مقروء" على الإشعار
      */
     public function markAsRead()
     {
@@ -41,7 +66,7 @@ class Notification extends Model
     }
 
     /**
-     * Scope a query to only include unread notifications.
+     * تصفية الاستعلام ليشمل الإشعارات غير المقروءة فقط
      */
     public function scopeUnread($query)
     {

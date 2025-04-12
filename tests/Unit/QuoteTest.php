@@ -69,17 +69,14 @@ class QuoteTest extends TestCase
     public function it_has_many_attachments()
     {
         $quote = Quote::factory()->create();
-        // Create attachments if QuoteAttachment factory exists
-        if (class_exists('\Database\Factories\QuoteAttachmentFactory')) {
-            QuoteAttachment::factory()->count(3)->create([
-                'quote_id' => $quote->id
-            ]);
-            
-            $this->assertCount(3, $quote->attachments);
-            $this->assertInstanceOf(QuoteAttachment::class, $quote->attachments->first());
-        } else {
-            $this->markTestSkipped('QuoteAttachment factory not available');
-        }
+        
+        // إنشاء 3 مرفقات للعرض
+        QuoteAttachment::factory()->count(3)->create([
+            'quote_id' => $quote->id
+        ]);
+        
+        $this->assertCount(3, $quote->attachments);
+        $this->assertInstanceOf(QuoteAttachment::class, $quote->attachments->first());
     }
 
     #[Test]
