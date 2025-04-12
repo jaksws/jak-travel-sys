@@ -13,6 +13,20 @@ use App\Http\Controllers\Admin\DashboardController;
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+// إدارة الواجهات - مسارات جديدة لإدارة واجهة المستخدم
+Route::prefix('ui')->name('ui.')->group(function () {
+    // إدارة الصفحة الرئيسية
+    Route::get('/home', [DashboardController::class, 'homePageManager'])->name('home');
+    Route::post('/home', [DashboardController::class, 'updateHomePage'])->name('home.update');
+    
+    // إدارة واجهات التطبيق
+    Route::get('/interfaces', [DashboardController::class, 'interfacesManager'])->name('interfaces');
+    Route::post('/interfaces', [DashboardController::class, 'updateInterfaces'])->name('interfaces.update');
+    
+    // تقارير وإحصائيات
+    Route::get('/analytics', [DashboardController::class, 'analyticsReports'])->name('analytics');
+});
+
 // إدارة المستخدمين
 Route::get('/users', [DashboardController::class, 'users'])->name('users.index');
 Route::get('/users/{id}', [DashboardController::class, 'viewUser'])->name('users.show');

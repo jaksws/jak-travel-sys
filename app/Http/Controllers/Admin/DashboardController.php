@@ -322,4 +322,333 @@ class DashboardController extends Controller
         
         return redirect('/admin/settings')->with('success', 'تم تحديث إعدادات النظام بنجاح');
     }
+
+    /**
+     * عرض صفحة إدارة الصفحة الرئيسية
+     * 
+     * @return \Illuminate\View\View
+     */
+    public function homePageManager()
+    {
+        // جلب بيانات الصفحة الرئيسية
+        $homePageSections = config('ui.home_page_sections', []);
+        $colors = config('ui.colors', []);
+        $fonts = config('ui.fonts', []);
+        $logoSettings = config('ui.logos', []);
+        
+        return view('admin.ui.home_page', compact('homePageSections', 'colors', 'fonts', 'logoSettings'));
+    }
+    
+    /**
+     * تحديث بيانات الصفحة الرئيسية
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateHomePage(Request $request)
+    {
+        // التحقق من البيانات
+        $request->validate([
+            'sections' => 'array',
+            'section_order' => 'string',
+            'primary_color' => 'string|max:7',
+            'secondary_color' => 'string|max:7',
+            'accent_color' => 'string|max:7',
+            'font_primary' => 'string|max:100',
+            'font_secondary' => 'string|max:100',
+        ]);
+
+        // تحديث بيانات الصفحة الرئيسية
+        $sections = $request->sections ?? [];
+        $sectionOrder = explode(',', $request->section_order);
+        
+        // تحديث الألوان
+        $colors = [
+            'primary' => $request->primary_color,
+            'secondary' => $request->secondary_color,
+            'accent' => $request->accent_color,
+        ];
+        
+        // تحديث الخطوط
+        $fonts = [
+            'primary' => $request->font_primary,
+            'secondary' => $request->font_secondary,
+        ];
+        
+        // معالجة تحميل الشعارات
+        $logoSettings = config('ui.logos', []);
+        
+        if ($request->hasFile('main_logo')) {
+            $mainLogo = $request->file('main_logo');
+            $mainLogoPath = $mainLogo->store('logos', 'public');
+            $logoSettings['main'] = $mainLogoPath;
+        }
+        
+        if ($request->hasFile('small_logo')) {
+            $smallLogo = $request->file('small_logo');
+            $smallLogoPath = $smallLogo->store('logos', 'public');
+            $logoSettings['small'] = $smallLogoPath;
+        }
+        
+        // حفظ الإعدادات في ملف التكوين
+        $this->updateUIConfig([
+            'home_page_sections' => $sections,
+            'section_order' => $sectionOrder,
+            'colors' => $colors,
+            'fonts' => $fonts,
+            'logos' => $logoSettings,
+        ]);
+        
+        return redirect()->route('admin.ui.home')->with('success', 'تم تحديث الصفحة الرئيسية بنجاح');
+    }
+    
+    /**
+     * عرض صفحة إدارة واجهات التطبيق
+     * 
+     * @return \Illuminate\View\View
+     */
+    public function interfacesManager()
+    {
+        $navigation = config('ui.navigation', []);
+        $pages = config('ui.pages', []);
+        $banners = config('ui.banners', []);
+        $alerts = config('ui.alerts', []);
+        $footer = config('ui.footer', []);
+        
+        return view('admin.ui.interfaces', compact('navigation', 'pages', 'banners', 'alerts', 'footer'));
+    }
+    
+    /**
+     * تحديث واجهات التطبيق
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateInterfaces(Request $request)
+    {
+        // تحديث معلومات التنقل
+        $navigation = $request->navigation ?? [];
+        
+        // تحديث معلومات الصفحات
+        $pages = config('ui.pages', []);
+        
+        if ($request->has('page_updates')) {
+            foreach ($request->page_updates as $id => $data) {
+                if (isset($pages[$id])) {
+                    $pages[$id]['title'] = $data['title'] ?? $pages[$id]['title'];
+                    $pages[$id]['content'] = $data['content'] ?? $pages[$id]['content'];
+                    $pages[$id]['active'] = isset($data['active']);
+                }
+            }
+        }
+        
+        // إضافة صفحة جديدة
+        if ($request->filled('new_page_title') && $request->filled('new_page_slug')) {
+            $pages[$request->new_page_slug] = [
+                'title' => $request->new_page_title,
+                'content' => $request->new_page_content ?? '',
+                'active' => true,
+            ];
+        }
+        
+        // تحديث البانرات
+        $banners = [];
+        if ($request->has('banner_titles')) {
+            foreach ($request->banner_titles as $index => $title) {
+                if (!empty($title)) {
+                    $banner = [
+                        'title' => $title,
+                        'content' => $request->banner_contents[$index] ?? '',
+                        'active' => isset($request->banner_active[$index]),
+                    ];
+                    
+                    if (isset($request->file('banner_images')[$index])) {
+                        $image = $request->file('banner_images')[$index];
+                        $path = $image->store('banners', 'public');
+                        $banner['image'] = $path;
+                    } elseif (isset($request->banner_existing_images[$index])) {
+                        $banner['image'] = $request->banner_existing_images[$index];
+                    }
+                    
+                    $banners[] = $banner;
+                }
+            }
+        }
+        
+        // تحديث التنبيهات
+        $alerts = [];
+        if ($request->has('alert_messages')) {
+            foreach ($request->alert_messages as $index => $message) {
+                if (!empty($message)) {
+                    $alerts[] = [
+                        'message' => $message,
+                        'type' => $request->alert_types[$index] ?? 'info',
+                        'active' => isset($request->alert_active[$index]),
+                        'expiry' => $request->alert_expiry[$index] ?? null,
+                    ];
+                }
+            }
+        }
+        
+        // تحديث معلومات التذييل
+        $footer = [
+            'text' => $request->footer_text ?? config('ui.footer.text', ''),
+            'links' => [],
+            'social' => [],
+        ];
+        
+        if ($request->has('footer_link_texts')) {
+            foreach ($request->footer_link_texts as $index => $text) {
+                if (!empty($text) && !empty($request->footer_link_urls[$index])) {
+                    $footer['links'][] = [
+                        'text' => $text,
+                        'url' => $request->footer_link_urls[$index],
+                    ];
+                }
+            }
+        }
+        
+        if ($request->has('footer_social_names')) {
+            foreach ($request->footer_social_names as $index => $name) {
+                if (!empty($name) && !empty($request->footer_social_urls[$index])) {
+                    $footer['social'][] = [
+                        'name' => $name,
+                        'url' => $request->footer_social_urls[$index],
+                        'icon' => $request->footer_social_icons[$index] ?? 'globe',
+                    ];
+                }
+            }
+        }
+        
+        // حفظ الإعدادات في ملف التكوين
+        $this->updateUIConfig([
+            'navigation' => $navigation,
+            'pages' => $pages,
+            'banners' => $banners,
+            'alerts' => $alerts,
+            'footer' => $footer,
+        ]);
+        
+        return redirect()->route('admin.ui.interfaces')->with('success', 'تم تحديث واجهات التطبيق بنجاح');
+    }
+    
+    /**
+     * عرض صفحة التقارير والإحصائيات
+     * 
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function analyticsReports(Request $request)
+    {
+        // الإحصائيات العامة للزيارات
+        $visitorStats = [
+            'total' => $this->getRandomStat(10000, 50000), // بيانات وهمية للعرض
+            'unique' => $this->getRandomStat(5000, 15000),
+            'average_time' => rand(120, 360),
+            'bounce_rate' => rand(20, 60),
+        ];
+        
+        // إحصائيات الصفحات الأكثر زيارةً
+        $topPages = [
+            ['path' => '/', 'title' => 'الصفحة الرئيسية', 'visits' => $this->getRandomStat(1000, 5000)],
+            ['path' => '/services', 'title' => 'الخدمات', 'visits' => $this->getRandomStat(800, 3000)],
+            ['path' => '/contact', 'title' => 'اتصل بنا', 'visits' => $this->getRandomStat(500, 2000)],
+            ['path' => '/about', 'title' => 'من نحن', 'visits' => $this->getRandomStat(400, 1500)],
+            ['path' => '/blog', 'title' => 'المدونة', 'visits' => $this->getRandomStat(300, 1000)],
+        ];
+        
+        // بيانات المتصفحات
+        $browsers = [
+            'Chrome' => $this->getRandomStat(40, 60),
+            'Firefox' => $this->getRandomStat(10, 20),
+            'Safari' => $this->getRandomStat(10, 25),
+            'Edge' => $this->getRandomStat(5, 15),
+            'Others' => $this->getRandomStat(1, 10),
+        ];
+        
+        // بيانات الأجهزة
+        $devices = [
+            'Desktop' => $this->getRandomStat(40, 60),
+            'Mobile' => $this->getRandomStat(30, 50),
+            'Tablet' => $this->getRandomStat(5, 15),
+            'Others' => $this->getRandomStat(1, 5),
+        ];
+        
+        // بيانات تحميلات التطبيق
+        $downloads = [
+            'android' => $this->getRandomStat(1000, 5000),
+            'ios' => $this->getRandomStat(800, 4000),
+        ];
+        
+        // معلومات حالة الخادم
+        $serverStatus = [
+            'uptime' => rand(95, 100) . '%',
+            'response_time' => rand(50, 200) . 'ms',
+            'memory_usage' => rand(40, 80) . '%',
+            'disk_usage' => rand(30, 70) . '%',
+        ];
+        
+        // بيانات الزيارات لآخر 7 أيام
+        $visitorsData = [
+            'dates' => collect([]),
+            'visits' => collect([]),
+        ];
+        
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $visitorsData['dates']->push($date->format('Y-m-d'));
+            $visitorsData['visits']->push($this->getRandomStat(100, 1000));
+        }
+        
+        return view('admin.ui.analytics', compact(
+            'visitorStats',
+            'topPages',
+            'browsers',
+            'devices',
+            'downloads',
+            'serverStatus',
+            'visitorsData'
+        ));
+    }
+    
+    /**
+     * توليد إحصائية عشوائية للعرض
+     * 
+     * @param int $min
+     * @param int $max
+     * @return int
+     */
+    private function getRandomStat($min, $max)
+    {
+        return rand($min, $max);
+    }
+    
+    /**
+     * تحديث ملف التكوين للواجهة
+     * 
+     * @param array $data
+     * @return void
+     */
+    private function updateUIConfig($data)
+    {
+        $configPath = config_path('ui.php');
+        $currentConfig = [];
+        
+        // جلب الإعدادات الحالية
+        if (file_exists($configPath)) {
+            $currentConfig = config('ui');
+        }
+        
+        // دمج الإعدادات الجديدة
+        $newConfig = array_merge($currentConfig, $data);
+        
+        // إنشاء محتوى ملف التكوين
+        $configContent = "<?php\n\nreturn " . var_export($newConfig, true) . ";\n";
+        
+        // حفظ ملف التكوين
+        file_put_contents($configPath, $configContent);
+        
+        // إعادة تحميل الإعدادات
+        \Artisan::call('config:clear');
+    }
 }
