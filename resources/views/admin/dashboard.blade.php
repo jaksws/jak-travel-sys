@@ -236,7 +236,7 @@
                                 @forelse ($latestRequests as $request)
                                 <tr>
                                     <td>{{ $request->title }}</td>
-                                    <td>{{ $request->user->name }}</td>
+                                    <td>{{ $request->user ? $request->user->name : 'غير محدد' }}</td>
                                     <td>
                                         @switch($request->status)
                                             @case('pending')

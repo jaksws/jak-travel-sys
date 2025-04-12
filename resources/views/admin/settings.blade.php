@@ -9,187 +9,196 @@
 
 @section('content')
 <div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">إعدادات النظام</h1>
+    </div>
+
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
     <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold">إعدادات النظام</h6>
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold">تعديل الإعدادات العامة</h6>
         </div>
         <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('admin.settings.update') }}">
+            <form action="{{ route('admin.settings.update') }}" method="POST" class="mb-0">
                 @csrf
-                
-                <!-- إعدادات تعدد اللغات -->
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0">إعدادات تعدد اللغات</h6>
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">واجهة المستخدم</h5>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="multilingual" name="multilingual" value="1" {{ $settings['multilingual'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="multilingual">
+                                دعم تعدد اللغات
+                                <small class="d-block text-muted">تفعيل دعم اللغات المتعددة في النظام</small>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="dark_mode" name="dark_mode" value="1" {{ $settings['dark_mode'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="dark_mode">
+                                الوضع الداكن
+                                <small class="d-block text-muted">السماح للمستخدمين باستخدام الوضع الداكن</small>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="enhanced_ui" name="enhanced_ui" value="1" {{ $settings['enhanced_ui'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="enhanced_ui">
+                                واجهة مستخدم محسنة
+                                <small class="d-block text-muted">تفعيل الرسوم المتحركة والمؤثرات البصرية المتقدمة</small>
+                            </label>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="multilingual_enabled" 
-                                           name="multilingual[enabled]" value="1" 
-                                           {{ $settings['multilingual']['enabled'] ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="multilingual_enabled">تفعيل دعم تعدد اللغات</label>
-                                </div>
-                            </div>
+                    
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">المدفوعات والميزات المتقدمة</h5>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="payment_system" name="payment_system" value="1" {{ $settings['payment_system'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="payment_system">
+                                نظام الدفع
+                                <small class="d-block text-muted">تفعيل معالجة المدفوعات داخل النظام</small>
+                            </label>
                         </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-form-label">اللغة الافتراضية</label>
-                            <div class="col-md-9">
-                                <select name="multilingual[default_locale]" class="form-control">
-                                    <option value="ar" {{ $settings['multilingual']['default_locale'] == 'ar' ? 'selected' : '' }}>العربية</option>
-                                    <option value="en" {{ $settings['multilingual']['default_locale'] == 'en' ? 'selected' : '' }}>English</option>
-                                    <option value="fr" {{ $settings['multilingual']['default_locale'] == 'fr' ? 'selected' : '' }}>Français</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-form-label">اللغات المتاحة</label>
-                            <div class="col-md-9">
-                                <div class="custom-control custom-checkbox mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="locale_ar" 
-                                           name="multilingual[available_locales][]" value="ar"
-                                           {{ in_array('ar', $settings['multilingual']['available_locales'] ?? []) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="locale_ar">العربية</label>
-                                </div>
-                                <div class="custom-control custom-checkbox mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="locale_en" 
-                                           name="multilingual[available_locales][]" value="en" 
-                                           {{ in_array('en', $settings['multilingual']['available_locales'] ?? []) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="locale_en">English</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="locale_fr" 
-                                           name="multilingual[available_locales][]" value="fr" 
-                                           {{ in_array('fr', $settings['multilingual']['available_locales'] ?? []) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="locale_fr">Français</label>
-                                </div>
-                            </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="ai_features" name="ai_features" value="1" {{ $settings['ai_features'] ? 'checked' : '' }}>
+                            <label class="form-check-label" for="ai_features">
+                                ميزات الذكاء الاصطناعي
+                                <small class="d-block text-muted">تفعيل الذكاء الاصطناعي لتحسين تجربة المستخدم</small>
+                            </label>
                         </div>
                     </div>
                 </div>
                 
-                <!-- إعدادات الوضع المظلم -->
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0">إعدادات الوضع المظلم</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="dark_mode_enabled" 
-                                           name="dark_mode[enabled]" value="1" 
-                                           {{ $settings['dark_mode']['enabled'] ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="dark_mode_enabled">تفعيل الوضع المظلم</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-form-label">الوضع الافتراضي</label>
-                            <div class="col-md-9">
-                                <select name="dark_mode[default]" class="form-control">
-                                    <option value="light" {{ $settings['dark_mode']['default'] == 'light' ? 'selected' : '' }}>الوضع الفاتح</option>
-                                    <option value="dark" {{ $settings['dark_mode']['default'] == 'dark' ? 'selected' : '' }}>الوضع المظلم</option>
-                                    <option value="auto" {{ $settings['dark_mode']['default'] == 'auto' ? 'selected' : '' }}>تلقائي (حسب إعدادات النظام)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- إعدادات نظام الدفع -->
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0">إعدادات نظام الدفع</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="payment_system_enabled" 
-                                           name="payment_system[enabled]" value="1" 
-                                           {{ $settings['payment_system']['enabled'] ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="payment_system_enabled">تفعيل نظام الدفع</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-form-label">بوابات الدفع المتاحة</label>
-                            <div class="col-md-9">
-                                <div class="custom-control custom-checkbox mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="payment_stripe" 
-                                           name="payment_system[providers][]" value="stripe" 
-                                           {{ in_array('stripe', $settings['payment_system']['providers'] ?? []) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="payment_stripe">Stripe</label>
-                                </div>
-                                <div class="custom-control custom-checkbox mb-2">
-                                    <input type="checkbox" class="custom-control-input" id="payment_paypal" 
-                                           name="payment_system[providers][]" value="paypal" 
-                                           {{ in_array('paypal', $settings['payment_system']['providers'] ?? []) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="payment_paypal">PayPal</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="payment_bank" 
-                                           name="payment_system[providers][]" value="bank_transfer" 
-                                           {{ in_array('bank_transfer', $settings['payment_system']['providers'] ?? []) ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="payment_bank">التحويل البنكي</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- إعدادات واجهة المستخدم المحسنة -->
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0">إعدادات واجهة المستخدم المحسنة</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="enhanced_ui_enabled" 
-                                           name="enhanced_ui[enabled]" value="1" 
-                                           {{ $settings['enhanced_ui']['enabled'] ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="enhanced_ui_enabled">تفعيل واجهة المستخدم المحسنة</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- إعدادات ميزات الذكاء الاصطناعي -->
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0">إعدادات ميزات الذكاء الاصطناعي</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="ai_features_enabled" 
-                                           name="ai_features[enabled]" value="1" 
-                                           {{ $settings['ai_features']['enabled'] ? 'checked' : '' }}>
-                                    <label class="custom-control-label" for="ai_features_enabled">تفعيل ميزات الذكاء الاصطناعي</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary px-5">
-                        <i class="fas fa-save me-2"></i> حفظ الإعدادات
+                <div class="form-group text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> حفظ الإعدادات
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold">معلومات النظام</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-6">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <th>إصدار النظام:</th>
+                                <td>1.0</td>
+                            </tr>
+                            <tr>
+                                <th>إصدار PHP:</th>
+                                <td>{{ phpversion() }}</td>
+                            </tr>
+                            <tr>
+                                <th>إصدار Laravel:</th>
+                                <td>{{ app()->version() }}</td>
+                            </tr>
+                            <tr>
+                                <th>نوع قاعدة البيانات:</th>
+                                <td>{{ config('database.default') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="col-lg-6">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <th>مساحة التخزين المستخدمة:</th>
+                                <td>{{ round(disk_total_space(storage_path()) / 1024 / 1024, 2) }} MB</td>
+                            </tr>
+                            <tr>
+                                <th>مساحة التخزين الحرة:</th>
+                                <td>{{ round(disk_free_space(storage_path()) / 1024 / 1024, 2) }} MB</td>
+                            </tr>
+                            <tr>
+                                <th>الذاكرة المستخدمة:</th>
+                                <td>{{ round(memory_get_usage() / 1024 / 1024, 2) }} MB</td>
+                            </tr>
+                            <tr>
+                                <th>حالة السيرفر:</th>
+                                <td><span class="badge bg-success">يعمل</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold">أدوات النظام</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mx-auto mb-3 bg-primary">
+                                <i class="fas fa-database text-white"></i>
+                            </div>
+                            <h5 class="card-title">نسخ احتياطي</h5>
+                            <p class="card-text small">إنشاء نسخة احتياطية من قاعدة البيانات</p>
+                            <button class="btn btn-sm btn-primary">إنشاء نسخة</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mx-auto mb-3 bg-success">
+                                <i class="fas fa-broom text-white"></i>
+                            </div>
+                            <h5 class="card-title">تنظيف الذاكرة</h5>
+                            <p class="card-text small">حذف الملفات المؤقتة وتنظيف الذاكرة المخبأة</p>
+                            <button class="btn btn-sm btn-success">تنظيف الذاكرة</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mx-auto mb-3 bg-warning">
+                                <i class="fas fa-tasks text-white"></i>
+                            </div>
+                            <h5 class="card-title">مراقبة الأداء</h5>
+                            <p class="card-text small">عرض تقرير مفصل عن أداء النظام</p>
+                            <button class="btn btn-sm btn-warning">عرض التقرير</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="icon-circle mx-auto mb-3 bg-danger">
+                                <i class="fas fa-shield-alt text-white"></i>
+                            </div>
+                            <h5 class="card-title">فحص أمني</h5>
+                            <p class="card-text small">البحث عن الثغرات الأمنية المحتملة</p>
+                            <button class="btn btn-sm btn-danger">بدء الفحص</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

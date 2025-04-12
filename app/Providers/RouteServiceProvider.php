@@ -31,9 +31,8 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
-            // Load admin routes with proper web middleware
-            Route::middleware('web')
-                ->group(base_path('routes/admin.php'));
+            // تحميل مسارات المسؤول بشكل صحيح مع احترام تكوينها الداخلي
+            Route::group([], base_path('routes/admin.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

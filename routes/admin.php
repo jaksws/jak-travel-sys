@@ -13,7 +13,7 @@ Route::group([
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Users management
+    // Users management - تعديل أسماء المسارات لتتطابق مع البادئة admin.
     Route::get('/users', [DashboardController::class, 'users'])->name('users.index');
     Route::get('/users/{id}', [DashboardController::class, 'viewUser'])->name('users.show');
     Route::get('/users/{id}/edit', [DashboardController::class, 'editUser'])->name('users.edit');
@@ -28,7 +28,7 @@ Route::group([
     // System logs
     Route::get('/system/logs', [DashboardController::class, 'logs'])->name('system.logs');
     
-    // System settings - يجب أن يكون اسم المسار متطابقًا في جميع أنحاء التطبيق
+    // System settings
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
     Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
 });

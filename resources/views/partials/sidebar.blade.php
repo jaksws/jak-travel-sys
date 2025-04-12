@@ -265,7 +265,7 @@
                 </div>
                 <ul class="nav flex-column mb-3">
                     <li class="nav-item mb-1">
-                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('customer.support.*') ? 'active' : '' }}" href="{{ route('customer.support.index') }}">
+                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('customer.support') ? 'active' : '' }}" href="{{ route('customer.support') }}">
                             <div class="icon-circle flex-shrink-0 me-2">
                                 <i class="fas fa-question-circle fa-fw"></i>
                             </div>
