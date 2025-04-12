@@ -1,0 +1,4 @@
+name = "my-worker"
+main = "dist/index.js"
+compatibility_date = "2025-04-12"
+type = "javascript"
