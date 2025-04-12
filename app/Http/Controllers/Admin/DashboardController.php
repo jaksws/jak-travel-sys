@@ -11,7 +11,8 @@ class DashboardController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'admin']);
+        // The middleware is already applied in the route definitions
+        // $this->middleware(['auth', 'admin']);
     }
 
     public function index()

@@ -81,7 +81,7 @@ Route::prefix('agency')->middleware(['auth', \App\Http\Middleware\AgencyMiddlewa
     Route::resource('customers', CustomerController::class);
     Route::patch('/customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
     
-    // إدارة الخدمات
+    // إدارة الخدمات - Fix duplicate route name issue
     Route::resource('services', ServiceController::class);
     Route::patch('/services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
     
@@ -127,15 +127,6 @@ Route::prefix('agency')->middleware(['auth', \App\Http\Middleware\AgencyMiddlewa
     Route::patch('/settings/currencies/{currency}/toggle', [CurrencyController::class, 'toggleStatus'])->name('settings.currencies.toggle-status');
     Route::patch('/settings/currencies/{currency}/default', [CurrencyController::class, 'setAsDefault'])->name('settings.currencies.set-default');
     Route::delete('/settings/currencies/{currency}', [CurrencyController::class, 'destroy'])->name('settings.currencies.destroy');
-    
-    // الخدمات
-    Route::get('/services', [App\Http\Controllers\Agency\ServiceController::class, 'index'])->name('services.index');
-    Route::get('/services/create', [App\Http\Controllers\Agency\ServiceController::class, 'create'])->name('services.create');
-    Route::post('/services', [App\Http\Controllers\Agency\ServiceController::class, 'store'])->name('services.store');
-    Route::get('/services/{service}', [App\Http\Controllers\Agency\ServiceController::class, 'show'])->name('services.show');
-    Route::get('/services/{service}/edit', [App\Http\Controllers\Agency\ServiceController::class, 'edit'])->name('services.edit');
-    Route::put('/services/{service}', [App\Http\Controllers\Agency\ServiceController::class, 'update'])->name('services.update');
-    Route::delete('/services/{service}', [App\Http\Controllers\Agency\ServiceController::class, 'destroy'])->name('services.destroy');
     
     // الإشعارات
     Route::get('/notifications', [App\Http\Controllers\Agency\NotificationController::class, 'index'])->name('notifications.index');
@@ -243,4 +234,20 @@ Route::prefix('agent')->group(function () {
         $requests = [];
         return view('agent.requests.index', compact('requests'));
     })->name('agent.requests.index');
+});
+
+// Define admin routes directly in web.php to ensure they are registered
+Route::group([
+    'middleware' => ['web', 'auth', \App\Http\Middleware\AdminMiddleware::class],
+    'prefix' => 'admin',
+    'as' => 'admin.'
+], function () {
+    Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Users management
+    Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
+    
+    // System logs
+    Route::get('/system/logs', [\App\Http\Controllers\Admin\DashboardController::class, 'logs'])->name('system.logs');
 });

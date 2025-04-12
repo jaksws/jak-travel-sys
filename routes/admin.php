@@ -3,8 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 
-// Define admin routes with explicit web middleware
-Route::middleware(['web', 'auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+// Admin routes - explicitly defined with direct middleware class reference
+Route::group([
+    'middleware' => ['web', 'auth', \App\Http\Middleware\AdminMiddleware::class],
+    'prefix' => 'admin',
+    'as' => 'admin.'
+], function () {
+    // Dashboard routes
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
