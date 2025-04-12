@@ -212,7 +212,7 @@ class DashboardController extends Controller
         $query = TravelRequest::with(['user', 'service']);
 
         // البحث والتصفية
-        if ($request->has('search')) {
+        if ($request->has('search') && !empty($request->search)) {
             $query->where('title', 'like', "%{$request->search}%");
         }
 
@@ -225,6 +225,11 @@ class DashboardController extends Controller
         }
 
         $requests = $query->orderBy('created_at', 'desc')->paginate(15);
+        
+        // إضافة معلمات المحددة للاستعلام إلى عنوان الصفحات
+        $requests->appends($request->all());
+        
+        // جلب جميع الخدمات للفلترة
         $services = Service::all();
 
         return view('admin.requests.index', compact('requests', 'services'));

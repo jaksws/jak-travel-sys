@@ -28,7 +28,7 @@ Route::group([
     // System logs
     Route::get('/system/logs', [DashboardController::class, 'logs'])->name('system.logs');
     
-    // System settings - fix name to match 'admin.settings' as used in the view
-    Route::get('/settings', [DashboardController::class, 'settings'])->name('admin.settings');
-    Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('admin.settings.update');
+    // System settings - يجب أن يكون اسم المسار متطابقًا في جميع أنحاء التطبيق
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
+    Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
 });

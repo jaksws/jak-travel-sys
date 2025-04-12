@@ -4,50 +4,37 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\DatabaseNotification;
 
-class Notification extends Model
+class Notification extends DatabaseNotification
 {
     use HasFactory;
 
+    // تحديد جدول الإشعارات
+    protected $table = 'notifications';
+    
+    // تحديد نوع المفتاح الأساسي
+    protected $keyType = 'string';
+    
+    // تعطيل الزيادة التلقائية للمفتاح الأساسي
+    public $incrementing = false;
+    
+    // تعيين الأعمدة التي يمكن ملؤها
     protected $fillable = [
-        'user_id',
-        'title',
-        'message',
+        'id',
         'type',
-        'link',
-        'is_read',
+        'notifiable_type',
+        'notifiable_id',
         'data',
+        'read_at',
+        'user_id'
     ];
 
+    // تعيين قواعد تحويل البيانات
     protected $casts = [
-        'is_read' => 'boolean',
         'data' => 'array',
+        'read_at' => 'datetime',
     ];
-
-    /**
-     * التحقق من وجود جدول وإنشائه إذا لم يكن موجودًا
-     */
-    public static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($model) {
-            // نتأكد من أن العمود title موجود، وإذا لم يكن موجودًا نستخدم قيمة افتراضية
-            if (!isset($model->title)) {
-                $model->title = 'إشعار جديد';
-            }
-            
-            // نتأكد من العمود message
-            if (!isset($model->message)) {
-                $model->message = '';
-            }
-            
-            // نتأكد من العمود type
-            if (!isset($model->type)) {
-                $model->type = 'general';
-            }
-        });
-    }
 
     /**
      * Get the user that owns the notification.
@@ -62,7 +49,7 @@ class Notification extends Model
      */
     public function markAsRead()
     {
-        $this->update(['is_read' => true]);
+        $this->update(['read_at' => now()]);
     }
 
     /**
@@ -70,6 +57,6 @@ class Notification extends Model
      */
     public function scopeUnread($query)
     {
-        return $query->where('is_read', false);
+        return $query->whereNull('read_at');
     }
 }

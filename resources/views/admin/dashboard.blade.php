@@ -298,7 +298,7 @@
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="{{ route('admin.settings') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="/admin/settings" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
                                 <span><i class="fas fa-cog me-2"></i> إعدادات النظام</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
