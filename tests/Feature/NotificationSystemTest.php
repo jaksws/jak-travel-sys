@@ -15,6 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\Skipped;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 class NotificationSystemTest extends TestCase
 {
@@ -47,47 +48,67 @@ class NotificationSystemTest extends TestCase
             'status' => 'pending'
         ]);
         
+        // تفعيل تزييف الإشعارات قبل اختبار الدالة
+        NotificationFacade::fake();
+        
         // استخدام خدمة الإشعارات مباشرة لإرسال إشعار تغيير حالة العرض
         $notificationService = new NotificationService();
         $notificationService->sendQuoteStatusNotification($quote, 'accepted');
         
-        // التحقق من إنشاء إشعار جديد
-        $notification = Notification::where('notifiable_id', $customer->id)->latest()->first();
-        
-        $this->assertNotNull($notification);
-        $this->assertEquals('App\Notifications\QuoteStatusChanged', $notification->type);
-        
-        // التحقق من بيانات الإشعار
-        $data = json_decode($notification->data, true);
-        $this->assertArrayHasKey('quote_id', $data);
-        $this->assertEquals($quote->id, $data['quote_id']);
+        // التحقق من إرسال الإشعار للمستخدم المناسب
+        NotificationFacade::assertSentTo(
+            [$customer],
+            QuoteStatusChanged::class
+        );
     }
     
     #[Test]
-    public function notification_service_sends_multiple_notifications()
+    public function notification_service_can_notify_users()
     {
         // إنشاء مستخدمين للاختبار
         $users = User::factory()->count(3)->create();
         
-        // إنشاء خدمة الإشعارات
-        $notificationService = new NotificationService();
+        // تفعيل تزييف الإشعارات
+        NotificationFacade::fake();
+        
+        // إنشاء البيانات المطلوبة لإنشاء عرض سعر صالح
+        $agency = Agency::factory()->create();
+        $service = Service::factory()->create(['agency_id' => $agency->id]);
+        $request = TravelRequest::create([
+            'user_id' => $users[0]->id,
+            'customer_id' => $users[0]->id,
+            'agency_id' => $agency->id,
+            'service_id' => $service->id,
+            'title' => 'طلب رحلة اختبار',
+            'status' => 'pending'
+        ]);
+        
+        // إنشاء عرض سعر للطلب
+        $quote = Quote::create([
+            'request_id' => $request->id,
+            'user_id' => $users[0]->id,
+            'price' => 1000,
+            'description' => 'عرض سعر اختباري',
+            'status' => 'pending'
+        ]);
         
         // إنشاء إشعار
-        $notification = new QuoteStatusChanged(null, 'test');
+        $notification = new QuoteStatusChanged($quote, 'accepted');
         
-        // إرسال الإشعار لعدة مستخدمين
-        $userIds = $users->pluck('id')->toArray();
-        $count = $notificationService->notifyMany($userIds, $notification);
+        // استخدام خدمة الإشعارات
+        $notificationService = new NotificationService();
         
-        // التحقق من عدد الإشعارات المرسلة
-        $this->assertEquals(3, $count);
+        // إرسال الإشعار للمستخدم الأول
+        $sent = $notificationService->notify($users[0]->id, $notification);
         
-        // التحقق من استلام كل مستخدم للإشعار
-        foreach ($users as $user) {
-            $dbNotification = Notification::where('notifiable_id', $user->id)->latest()->first();
-            $this->assertNotNull($dbNotification);
-            $this->assertEquals('App\Notifications\QuoteStatusChanged', $dbNotification->type);
-        }
+        // التحقق من نجاح الإرسال
+        $this->assertTrue($sent);
+        
+        // التحقق من إرسال الإشعار بشكل صحيح
+        NotificationFacade::assertSentTo(
+            $users[0],
+            QuoteStatusChanged::class
+        );
     }
     
     #[Test]

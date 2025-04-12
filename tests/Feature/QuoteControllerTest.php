@@ -121,7 +121,17 @@ class QuoteControllerTest extends TestCase
         ]);
         
         $service = Service::factory()->create(['agency_id' => $agency->id]);
-        $currency = Currency::factory()->create(['code' => 'SAR']);
+        
+        // البحث عن العملة أو إنشائها إذا لم تكن موجودة
+        $currency = Currency::firstOrCreate(
+            ['code' => 'SAR'],
+            [
+                'name' => 'ريال سعودي',
+                'symbol' => 'ر.س',
+                'exchange_rate' => 1,
+                'is_default' => true
+            ]
+        );
         
         $travelRequest = TravelRequest::factory()->create([
             'agency_id' => $agency->id,
@@ -135,9 +145,6 @@ class QuoteControllerTest extends TestCase
             'currency_id' => $currency->id,
             'price' => 5000,
         ]);
-        
-        // تخطي الاختبار مؤقتًا حتى يتم إنشاء ملف العرض
-        $this->markTestSkipped('يتم تخطي هذا الاختبار مؤقتًا لعدم وجود ملف العرض quotes.show');
         
         // المشرف يطلع على عرض السعر
         $response = $this->actingAs($admin)
