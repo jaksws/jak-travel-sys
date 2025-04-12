@@ -95,6 +95,9 @@ npm run build
 
 # تشغيل التطبيق
 php artisan serve
+
+# نشر التطبيق
+npm run deploy
 ```
 
 > التطبيق سيكون متاحًا على: `http://localhost:8000`

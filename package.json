@@ -4,7 +4,8 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "build-debug": "vite build --config vite.config.debug.js"
+        "build-debug": "vite build --config vite.config.debug.js",
+        "deploy": "npx wrangler deploy --assets=./public/build"
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",

@@ -90,4 +90,7 @@ export default defineConfig({
         manifest: true,
         outDir: 'public/build',
     },
+    assets: {
+        directory: 'public/build'
+    }
 });
