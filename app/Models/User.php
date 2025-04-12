@@ -212,4 +212,52 @@ class User extends Authenticatable
         
         return null;
     }
+
+    /**
+     * Check if user has a specific notification preference
+     *
+     * @param string $key The preference key to check
+     * @param bool $default Default value if preference is not set
+     * @return bool
+     */
+    public function hasNotificationPreference(string $key, bool $default = false): bool
+    {
+        if (empty($this->notification_preferences)) {
+            return $default;
+        }
+
+        return isset($this->notification_preferences[$key]) 
+            ? (bool) $this->notification_preferences[$key] 
+            : $default;
+    }
+
+    /**
+     * Set a notification preference
+     *
+     * @param string $key The preference key
+     * @param bool $value The preference value
+     * @return $this
+     */
+    public function setNotificationPreference(string $key, bool $value): self
+    {
+        $preferences = $this->notification_preferences ?? [];
+        $preferences[$key] = $value;
+        $this->notification_preferences = $preferences;
+        
+        return $this;
+    }
+
+    /**
+     * Set multiple notification preferences at once
+     *
+     * @param array $preferences Array of preferences [key => value]
+     * @return $this
+     */
+    public function setNotificationPreferences(array $preferences): self
+    {
+        $currentPreferences = $this->notification_preferences ?? [];
+        $this->notification_preferences = array_merge($currentPreferences, $preferences);
+        
+        return $this;
+    }
 }
