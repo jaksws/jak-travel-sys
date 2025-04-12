@@ -31,9 +31,7 @@ use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\DataFixController;
 
 // صفحة الترحيب
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 // تسجيل مسارات المصادقة مرة واحدة فقط
 Auth::routes();

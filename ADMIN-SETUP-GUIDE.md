@@ -39,7 +39,7 @@ UPDATE users SET
   user_type = 'admin', 
   role = 'admin',
   is_admin = 1
-WHERE email = 'admin@jaksws.com';
+WHERE email = 'البريد_الإلكتروني_للمسؤول';
 
 # التحقق من التغييرات
 SELECT email, user_type, role, is_admin FROM users WHERE email = 'البريد_الإلكتروني_للمسؤول';
@@ -69,11 +69,71 @@ SELECT email, user_type, role, is_admin FROM users WHERE email = 'البريد_�
 
 ## حل مشكلة "Target class [admin] does not exist"
 
-إذا واجهتك رسالة الخطأ هذه، فهذا يشير إلى أن وسيط (middleware) `admin` غير معرف في النظام. تأكد من:
+إذا واجهتك رسالة الخطأ هذه، فهذا يشير إلى مشكلة في تسجيل وسيط (middleware) `admin` في النظام. لحل المشكلة، اتبع الخطوات التالية:
 
-1. وجود ملف وسيط `AdminMiddleware.php` في المسار `app/Http/Middleware/`
-2. تسجيل الوسيط في ملف `app/Http/Kernel.php` ضمن مصفوفة `$routeMiddleware`
-3. تعريف المسارات الإدارية بشكل صحيح في ملف `routes/admin.php`
+1. تأكد من وجود ملف الوسيط في المسار الصحيح:
+   ```
+   app/Http/Middleware/AdminMiddleware.php
+   ```
+
+2. تحقق من أن الملف يحتوي على تعريف الصف الصحيح:
+   ```php
+   <?php
+
+   namespace App\Http\Middleware;
+
+   use Closure;
+   use Illuminate\Http\Request;
+   use Illuminate\Support\Facades\Auth;
+
+   class AdminMiddleware
+   {
+       public function handle(Request $request, Closure $next)
+       {
+           if (!Auth::check() || 
+               Auth::user()->user_type !== 'admin' && 
+               Auth::user()->role !== 'admin' && 
+               Auth::user()->is_admin !== 1) {
+               return redirect('/')->with('error', 'لا تملك صلاحية الوصول');
+           }
+           
+           return $next($request);
+       }
+   }
+   ```
+
+3. تأكد من تسجيل الوسيط بشكل صحيح في `app/Http/Kernel.php`:
+   ```php
+   protected $routeMiddleware = [
+       // ... الوسطاء الأخرى ...
+       'admin' => \App\Http\Middleware\AdminMiddleware::class,
+   ];
+   ```
+
+4. أعد تشغيل ذاكرة التخزين المؤقت للتطبيق:
+   ```bash
+   php artisan optimize:clear
+   ```
+
+5. تأكد من أن مسارات الإدارة تستخدم الوسيط بشكل صحيح في ملف `routes/admin.php`:
+   ```php
+   Route::middleware(['web', 'auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+       // ... المسارات ...
+   });
+   ```
+
+6. تأكد من تحميل ملف `routes/admin.php` في مزود خدمة التوجيه:
+   ```bash
+   # افتح ملف مزود خدمة التوجيه
+   nano app/Providers/RouteServiceProvider.php
+   
+   # تأكد من تحميل ملف المسارات الإدارية
+   $this->routes(function () {
+       // ... المسارات الأخرى ...
+       Route::middleware('web')
+           ->group(base_path('routes/admin.php'));
+   });
+   ```
 
 ## التوجيه بعد تسجيل الدخول
 
@@ -84,3 +144,23 @@ SELECT email, user_type, role, is_admin FROM users WHERE email = 'البريد_�
 وتأكد من تعريف المسار `HOME` بشكل صحيح، أو تعديل منطق التوجيه في:
 
 `app/Http/Controllers/Auth/LoginController.php`
+
+## خطوات سريعة لإصلاح جميع المشكلات
+
+لحل جميع المشكلات المتعلقة بالمسؤول دفعة واحدة، نفذ الأوامر التالية:
+
+```bash
+# مسح ذاكرة التخزين المؤقت
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan optimize:clear
+
+# تحديث المستخدم الحالي ليكون مسؤولاً
+# استبدل 'your-email@example.com' بالبريد الإلكتروني الخاص بك
+sqlite3 database/database.sqlite "UPDATE users SET user_type='admin', role='admin', is_admin=1 WHERE email='your-email@example.com'"
+
+# إعادة تشغيل خادم التطوير
+php artisan serve
+```

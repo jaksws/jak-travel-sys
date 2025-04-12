@@ -16,18 +16,19 @@ class DashboardController extends Controller
 
     public function index()
     {
-        // إحصائيات النظام الأساسية
+        // Get basic system statistics
         $stats = [
-            'users_count' => User::count(),
+            'users_count' => DB::table('users')->count(),
             'agencies_count' => $this->getAgenciesCount(),
-            'recent_activities' => $this->getRecentActivities(),
+            'services_count' => $this->getServicesCount(),
+            'requests_count' => $this->getRequestsCount(),
         ];
         
         return view('admin.dashboard', compact('stats'));
     }
     
     /**
-     * عرض صفحة إدارة المستخدمين
+     * Show users management page
      */
     public function users()
     {
@@ -36,7 +37,7 @@ class DashboardController extends Controller
     }
     
     /**
-     * عرض سجلات النظام
+     * Show system logs
      */
     public function logs()
     {
@@ -44,7 +45,7 @@ class DashboardController extends Controller
     }
     
     /**
-     * الحصول على عدد الوكالات
+     * Get agencies count
      */
     private function getAgenciesCount()
     {
@@ -56,11 +57,26 @@ class DashboardController extends Controller
     }
     
     /**
-     * الحصول على أحدث النشاطات في النظام
+     * Get services count
      */
-    private function getRecentActivities()
+    private function getServicesCount()
     {
-        // يمكن إضافة استعلامات للحصول على أحدث النشاطات
-        return [];
+        try {
+            return DB::table('services')->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+    
+    /**
+     * Get requests count
+     */
+    private function getRequestsCount()
+    {
+        try {
+            return DB::table('requests')->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 }

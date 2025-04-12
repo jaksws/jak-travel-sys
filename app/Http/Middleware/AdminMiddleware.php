@@ -22,13 +22,11 @@ class AdminMiddleware
         
         $user = Auth::user();
         
-        // Check if user has admin role - try different column names that might be used
+        // Check user is admin using the correct fields from the database schema
         if (
-            (isset($user->role) && in_array($user->role, ['admin', 'superadmin', 'administrator'])) ||
-            (isset($user->user_type) && in_array($user->user_type, ['admin', 'superadmin', 'administrator'])) ||
-            (isset($user->type) && in_array($user->type, ['admin', 'superadmin', 'administrator'])) ||
-            (isset($user->is_admin) && $user->is_admin) ||
-            (isset($user->is_superadmin) && $user->is_superadmin)
+            ($user->user_type === 'admin') || 
+            ($user->role === 'admin') || 
+            ($user->is_admin == 1)
         ) {
             return $next($request);
         }

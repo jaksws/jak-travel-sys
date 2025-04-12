@@ -37,14 +37,17 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        if ($user->isAgency()) {
+        // Check if user is admin first
+        if ($user->user_type === 'admin' || $user->role === 'admin' || $user->is_admin == 1) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->user_type === 'agency') {
             return redirect()->route('agency.dashboard');
-        } elseif ($user->isSubagent()) {
+        } elseif ($user->user_type === 'subagent') {
             return redirect()->route('subagent.dashboard');
-        } elseif ($user->isCustomer()) {
+        } elseif ($user->user_type === 'customer') {
             return redirect()->route('customer.dashboard');
         }
         
-        return redirect()->intended($this->redirectPath());
+        return redirect($this->redirectPath());
     }
 }
