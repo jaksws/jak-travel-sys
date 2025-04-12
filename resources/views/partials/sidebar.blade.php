@@ -37,7 +37,66 @@
         
         <!-- قائمة حسب نوع المستخدم -->
         <div class="sidebar-menu">
-            @if(auth()->user()->isAgency())
+            @if(auth()->user()->isAdmin())
+                <!-- قائمة المسؤول -->
+                <div class="sidebar-heading">
+                    <small class="text-uppercase opacity-75 fw-bold fs-8">نظرة عامة</small>
+                </div>
+                <ul class="nav flex-column mb-3">
+                    <li class="nav-item mb-1">
+                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                            <div class="icon-circle flex-shrink-0 me-2">
+                                <i class="fas fa-tachometer-alt fa-fw"></i>
+                            </div>
+                            <span>لوحة التحكم</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="sidebar-heading">
+                    <small class="text-uppercase opacity-75 fw-bold fs-8">إدارة النظام</small>
+                </div>
+                <ul class="nav flex-column mb-3">
+                    <li class="nav-item mb-1">
+                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
+                            <div class="icon-circle flex-shrink-0 me-2">
+                                <i class="fas fa-users fa-fw"></i>
+                            </div>
+                            <span>إدارة المستخدمين</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1">
+                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.requests.*') ? 'active' : '' }}" href="{{ route('admin.requests.index') }}">
+                            <div class="icon-circle flex-shrink-0 me-2">
+                                <i class="fas fa-clipboard-list fa-fw"></i>
+                            </div>
+                            <span>إدارة الطلبات</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="sidebar-heading">
+                    <small class="text-uppercase opacity-75 fw-bold fs-8">النظام</small>
+                </div>
+                <ul class="nav flex-column mb-3">
+                    <li class="nav-item mb-1">
+                        <a class="nav-link d-flex align-items-center {{ request()->is('admin/settings*') ? 'active' : '' }}" href="/admin/settings">
+                            <div class="icon-circle flex-shrink-0 me-2">
+                                <i class="fas fa-cog fa-fw"></i>
+                            </div>
+                            <span>الإعدادات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1">
+                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.system.logs') ? 'active' : '' }}" href="{{ route('admin.system.logs') }}">
+                            <div class="icon-circle flex-shrink-0 me-2">
+                                <i class="fas fa-file-alt fa-fw"></i>
+                            </div>
+                            <span>سجلات النظام</span>
+                        </a>
+                    </li>
+                </ul>
+            @elseif(auth()->user()->isAgency())
                 <!-- قائمة الوكيل الأساسي -->
                 <div class="sidebar-heading">
                     <small class="text-uppercase opacity-75 fw-bold fs-8">نظرة عامة</small>

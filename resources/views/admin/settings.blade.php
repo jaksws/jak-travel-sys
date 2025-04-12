@@ -25,7 +25,7 @@
             <h6 class="m-0 font-weight-bold">تعديل الإعدادات العامة</h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.settings.update') }}" method="POST" class="mb-0">
+            <form action="/admin/settings" method="POST" class="mb-0">
                 @csrf
                 <div class="row mb-4">
                     <div class="col-lg-6">

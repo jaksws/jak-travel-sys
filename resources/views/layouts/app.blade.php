@@ -217,7 +217,7 @@
         @include('partials.header')
 
         <main class="py-4">
-            @if(request()->routeIs('agency.*') || request()->routeIs('subagent.*') || request()->routeIs('customer.*'))
+            @if(request()->routeIs('agency.*') || request()->routeIs('subagent.*') || request()->routeIs('customer.*') || request()->routeIs('admin.*'))
                 <div class="container-fluid">
                     <div class="row">
                         <!-- Sidebar -->
@@ -230,7 +230,13 @@
                             <!-- Breadcrumb -->
                             <nav aria-label="breadcrumb" class="mb-4">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('/') }}">{{ __('v2.dashboard') }}</a></li>
+                                    <li class="breadcrumb-item">
+                                        @if(request()->routeIs('admin.*'))
+                                            <a href="{{ route('admin.dashboard') }}">{{ __('v2.dashboard') }}</a>
+                                        @else
+                                            <a href="{{ url('/') }}">{{ __('v2.dashboard') }}</a>
+                                        @endif
+                                    </li>
                                     @yield('breadcrumb')
                                 </ol>
                             </nav>

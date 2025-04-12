@@ -31,8 +31,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
-            // تحميل مسارات المسؤول بشكل صحيح مع احترام تكوينها الداخلي
-            Route::group([], base_path('routes/admin.php'));
+            // تحميل مسارات المسؤول بشكل صريح مع إعادة تعريف البادئة والمجموعة
+            Route::middleware(['web', 'auth', \App\Http\Middleware\AdminMiddleware::class])
+                ->prefix('admin')
+                ->name('admin.')
+                ->group(base_path('routes/admin.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

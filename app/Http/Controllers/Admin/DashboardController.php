@@ -275,4 +275,51 @@ class DashboardController extends Controller
         
         return view('admin.settings', compact('settings'));
     }
+
+    /**
+     * تحديث إعدادات النظام
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateSettings(Request $request)
+    {
+        // تحديث الإعدادات
+        $settings = [
+            'multilingual' => $request->has('multilingual'),
+            'dark_mode' => $request->has('dark_mode'),
+            'payment_system' => $request->has('payment_system'),
+            'enhanced_ui' => $request->has('enhanced_ui'),
+            'ai_features' => $request->has('ai_features'),
+        ];
+        
+        // حفظ الإعدادات في ملف التكوين
+        $configPath = config_path('v1_features.php');
+        $configContent = "<?php\n\nreturn [\n";
+        
+        foreach ($settings as $key => $value) {
+            $configContent .= "    '{$key}' => " . ($value ? 'true' : 'false') . ",\n";
+        }
+        
+        // الحفاظ على الإعدادات الأخرى
+        $currentSettings = config('v1_features');
+        foreach ($currentSettings as $key => $value) {
+            if (!array_key_exists($key, $settings)) {
+                $boolValue = $value ? 'true' : 'false';
+                if (!is_bool($value)) {
+                    $boolValue = is_array($value) ? var_export($value, true) : "'{$value}'";
+                }
+                $configContent .= "    '{$key}' => {$boolValue},\n";
+            }
+        }
+        
+        $configContent .= "];\n";
+        
+        file_put_contents($configPath, $configContent);
+        
+        // مسح ذاكرة التخزين المؤقت للتكوين
+        \Artisan::call('config:clear');
+        
+        return redirect('/admin/settings')->with('success', 'تم تحديث إعدادات النظام بنجاح');
+    }
 }
