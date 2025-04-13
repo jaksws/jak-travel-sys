@@ -37,6 +37,14 @@ class Notification extends DatabaseNotification
     ];
 
     /**
+     * Get the notifiable entity that the notification belongs to.
+     */
+    public function notifiable()
+    {
+        return $this->morphTo();
+    }
+
+    /**
      * Get the user that owns the notification.
      */
     public function user()
