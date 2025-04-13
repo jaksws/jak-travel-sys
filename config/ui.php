@@ -1,46 +1,91 @@
 <?php
 
 return array (
-  'home_page_sections' => 
-  array (
-    'hero' => 
-    array (
-      'title' => 'قسم الترحيب',
-      'description' => 'القسم الرئيسي في الصفحة الرئيسية',
-      'active' => true,
-    ),
-    'services' => 
-    array (
-      'title' => 'الخدمات',
-      'description' => 'عرض الخدمات الرئيسية',
-      'active' => true,
-    ),
-    'testimonials' => 
-    array (
-      'title' => 'آراء العملاء',
-      'description' => 'عرض آراء وتقييمات العملاء',
-      'active' => true,
-    ),
-  ),
   'colors' => 
   array (
     'primary' => '#3b82f6',
     'secondary' => '#64748b',
     'accent' => '#10b981',
   ),
-  'fonts' => 
-  array (
-    'primary' => 'Cairo',
-    'secondary' => 'Tajawal',
-  ),
   'logos' => 
   array (
-    'main' => 'logos/main-logo.png',
-    'small' => 'logos/small-logo.png',
+    'main' => 'logos/default-logo.png',
   ),
-  'test_key' => 'test_value',
-  'test_array' => 
+  'home_page_sections' => 
   array (
-    'key' => 'value',
+    'hero' => 
+    array (
+      'active' => true,
+    ),
+    'features' => 
+    array (
+      'active' => true,
+    ),
+    'services' => 
+    array (
+      'active' => false,
+    ),
+  ),
+  'section_order' => 'hero,features,services,testimonials',
+  'test_key' => 'test_value',
+  'navigation' => 
+  array (
+    0 => 
+    array (
+      'title' => 'Home',
+      'url' => '/',
+      'icon' => 'home',
+      'active' => true,
+    ),
+    1 => 
+    array (
+      'title' => 'Services',
+      'url' => '/services',
+      'icon' => 'list',
+      'active' => true,
+    ),
+  ),
+  'pages' => 
+  array (
+  ),
+  'banners' => 
+  array (
+    0 => 
+    array (
+      'title' => 'Special Offer',
+      'content' => 'Get 20% discount this month',
+      'active' => true,
+    ),
+  ),
+  'alerts' => 
+  array (
+    0 => 
+    array (
+      'message' => 'Important: System maintenance scheduled',
+      'type' => 'info',
+      'active' => true,
+      'expiry' => NULL,
+    ),
+  ),
+  'footer' => 
+  array (
+    'text' => 'All rights reserved',
+    'links' => 
+    array (
+      0 => 
+      array (
+        'text' => 'Privacy Policy',
+        'url' => '/privacy',
+      ),
+    ),
+    'social' => 
+    array (
+      0 => 
+      array (
+        'name' => 'Twitter',
+        'url' => 'https://twitter.com',
+        'icon' => 'twitter',
+      ),
+    ),
   ),
 );
