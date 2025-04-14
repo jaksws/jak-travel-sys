@@ -8,6 +8,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Tests\TestCase;
 use Tests\Traits\RegistersUiRoutes;
 
@@ -23,6 +25,8 @@ class AdminUIManagementTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        
+        $this->withoutExceptionHandling();
         
         // Crear usuario admin y regular
         $this->admin = User::factory()->create([
@@ -190,8 +194,19 @@ class AdminUIManagementTest extends TestCase
      */
     public function test_non_admin_cannot_access_ui_management(): void
     {
+        $this->expectException(AuthorizationException::class);
         $response = $this->actingAs($this->user)->get(route('admin.ui.home'));
-        $response->assertStatus(403);
+        $response->assertForbidden();
+    }
+
+    /**
+     * Prueba de que se requiere autenticación para gestión de UI
+     */
+    public function test_authentication_required_for_ui_management(): void
+    {
+        $this->expectException(AuthenticationException::class);
+        $response = $this->get(route('admin.ui.home'));
+        $response->assertRedirect(route('login'));
     }
 
     /**
@@ -201,15 +216,6 @@ class AdminUIManagementTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.ui.analytics'));
         $response->assertStatus(200);
-    }
-
-    /**
-     * Prueba de que se requiere autenticación para gestión de UI
-     */
-    public function test_authentication_required_for_ui_management(): void
-    {
-        $response = $this->get(route('admin.ui.home'));
-        $response->assertRedirect(route('login'));
     }
 
     /**

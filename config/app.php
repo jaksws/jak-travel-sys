@@ -144,6 +144,9 @@ return [
         
         // Add our test provider
         App\Providers\TestRouteServiceProvider::class,
+
+        // Register AuthServiceProvider
+        App\Providers\AuthServiceProvider::class,
     ])->toArray(),
 
 ];

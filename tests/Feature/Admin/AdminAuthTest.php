@@ -4,9 +4,16 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Auth\AuthenticationException;
 
 class AdminAuthTest extends AdminTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutExceptionHandling();
+    }
+
     /**
      * Test that admin can access dashboard.
      *
@@ -14,7 +21,15 @@ class AdminAuthTest extends AdminTestCase
      */
     public function test_admin_can_access_dashboard()
     {
-        $this->markTestSkipped('تم تخطي اختبار وصول المسؤول للوحة التحكم مؤقتًا حتى يتم اكتمال تطوير الميزة');
+        // إنشاء مستخدم أدمن
+        $admin = User::factory()->create([
+            'role' => 'admin'
+        ]);
+
+        // محاولة الوصول إلى لوحة التحكم
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertStatus(200); // توقع حالة HTTP 200
     }
     
     /**
@@ -30,11 +45,9 @@ class AdminAuthTest extends AdminTestCase
         ]);
         
         // محاولة الوصول إلى لوحة التحكم
-        // تم تعديل التوقع من 403 إلى 302 لتوافق المسار الحالي للتطبيق
         $this->actingAs($user)
             ->get(route('admin.dashboard'))
-            ->assertStatus(302)  // يقوم middleware بإعادة التوجيه بدلاً من رفض الوصول
-            ->assertRedirect(route('home'));
+            ->assertStatus(403); // تعديل التوقع ليكون 403 بدلاً من 302
     }
     
     /**
@@ -44,6 +57,11 @@ class AdminAuthTest extends AdminTestCase
      */
     public function test_unauthenticated_users_cannot_access_admin_pages()
     {
-        $this->markTestSkipped('تم تخطي اختبار منع المستخدمين غير المصرح لهم مؤقتًا حتى يتم اكتمال تطوير الميزة');
+        // توقع استثناء AuthenticationException
+        $this->expectException(AuthenticationException::class);
+
+        // محاولة الوصول إلى لوحة التحكم بدون تسجيل دخول
+        $this->get(route('admin.dashboard'))
+            ->assertRedirect(route('login')); // توقع إعادة التوجيه إلى صفحة تسجيل الدخول
     }
 }

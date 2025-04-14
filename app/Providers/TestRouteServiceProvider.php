@@ -32,7 +32,7 @@ class TestRouteServiceProvider extends ServiceProvider
      */
     protected function registerUiTestRoutes(): void
     {
-        Route::group(['middleware' => ['web']], function () {
+        Route::group(['middleware' => ['web', 'auth', 'can:access-admin-ui']], function () {
             // Admin UI home routes
             Route::get('admin/ui/home', function () {
                 return response()->json(['success' => true]);
