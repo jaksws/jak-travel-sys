@@ -72,29 +72,33 @@ class NotificationService
      */
     public function sendQuoteStatusNotification($userOrQuote, $quoteDataOrStatus): void
     {
-        if ($userOrQuote instanceof User) {
-            // Handle case where first parameter is a User
-            $user = $userOrQuote;
-            $quoteData = $quoteDataOrStatus;
-            
-            $user->notify(new QuoteStatusChanged($quoteData['quote'], $quoteData['status']));
-        } 
-        elseif ($userOrQuote instanceof Quote) {
-            // Handle case where first parameter is a Quote
-            $quote = $userOrQuote;
-            $status = $quoteDataOrStatus;
-            
-            $notification = new QuoteStatusChanged($quote, $status);
-            
-            // Notify the quote owner/customer
-            if ($quote->user) {
-                $quote->user->notify($notification);
+        try {
+            if ($userOrQuote instanceof User) {
+                // Handle case where first parameter is a User
+                $user = $userOrQuote;
+                $quoteData = $quoteDataOrStatus;
+                
+                $user->notify(new QuoteStatusChanged($quoteData['quote'], $quoteData['status']));
+            } 
+            elseif ($userOrQuote instanceof Quote) {
+                // Handle case where first parameter is a Quote
+                $quote = $userOrQuote;
+                $status = $quoteDataOrStatus;
+                
+                $notification = new QuoteStatusChanged($quote, $status);
+                
+                // Notify the quote owner/customer
+                if ($quote->user) {
+                    $quote->user->notify($notification);
+                }
+                
+                // Notify subagent if applicable
+                if ($quote->subagent) {
+                    $quote->subagent->notify($notification);
+                }
             }
-            
-            // Notify subagent if applicable
-            if ($quote->subagent) {
-                $quote->subagent->notify($notification);
-            }
+        } catch (\Exception $e) {
+            Log::error('Error sending notification: ' . $e->getMessage());
         }
     }
 
