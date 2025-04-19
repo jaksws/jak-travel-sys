@@ -1,28 +1,67 @@
 #!/bin/bash
 
-# مسار بسيط لتشغيل جميع الاختبارات مع إظهار التقارير التفصيلية
-# قم بتنفيذ هذا الملف عند الحاجة للتأكد من عمل جميع عناصر النظام بشكل صحيح
+# اكتشاف نظام التشغيل
+OS=$(uname -s)
+case "$OS" in
+  Linux*)     OS_TYPE="Linux";;
+  Darwin*)    OS_TYPE="macOS";;
+  CYGWIN*|MINGW*|MSYS*) OS_TYPE="Windows";;
+  *)          OS_TYPE="Unknown";;
+esac
 
 echo "========== بدء تشغيل اختبارات نظام وكالات السفر =========="
+echo "نظام التشغيل: $OS_TYPE"
+
+# التحقق من وجود PHP في البيئة
+PHP_EXECUTABLE=$(command -v php || echo "/e/laragon-6.0.0/bin/php/php-8.2.6-Win32-vs16-x64/php.exe")
+
+if [ ! -x "$PHP_EXECUTABLE" ]; then
+  echo "خطأ: لم يتم العثور على PHP في البيئة الحالية. تأكد من تثبيت PHP وإضافته إلى PATH."
+  exit 1
+fi
+
+echo "استخدام PHP من: $PHP_EXECUTABLE"
 
 # تنظيف ذاكرة التخزين المؤقت قبل تشغيل الاختبارات
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+$PHP_EXECUTABLE artisan cache:clear
+$PHP_EXECUTABLE artisan config:clear
+$PHP_EXECUTABLE artisan route:clear
+$PHP_EXECUTABLE artisan view:clear
 
-# التحقق من وجود Xdebug أو PCOV
-if php -r "echo (int)(extension_loaded('xdebug') || extension_loaded('pcov'));" | grep -q 1; then
-  # تشغيل الاختبارات مع تقرير تغطية الشفرة
+# التحقق من وجود Composer
+COMPOSER_EXECUTABLE=$(command -v composer || echo "composer")
+if [ ! -x "$COMPOSER_EXECUTABLE" ]; then
+  echo "خطأ: لم يتم العثور على Composer. تأكد من تثبيته."
+  exit 1
+fi
+
+echo "استخدام Composer من: $COMPOSER_EXECUTABLE"
+
+# تثبيت الاعتماديات
+$COMPOSER_EXECUTABLE install
+
+# التحقق من وجود Node.js
+NODE_EXECUTABLE=$(command -v node || echo "node")
+if [ ! -x "$NODE_EXECUTABLE" ]; then
+  echo "خطأ: لم يتم العثور على Node.js. تأكد من تثبيته."
+  exit 1
+fi
+
+echo "استخدام Node.js من: $NODE_EXECUTABLE"
+
+# تثبيت الاعتماديات الأمامية
+npm install
+
+# تشغيل الاختبارات
+if $PHP_EXECUTABLE -r "echo (int)(extension_loaded('xdebug') || extension_loaded('pcov'));" | grep -q 1; then
   echo ""
   echo "وجدت أداة لتغطية الشفرة (Xdebug/PCOV). سيتم إنشاء تقرير التغطية."
-  php artisan test --coverage --min=80
+  $PHP_EXECUTABLE artisan test --coverage --min=80
 else
-  # تشغيل الاختبارات بدون تقرير تغطية الشفرة
   echo ""
   echo "لم يتم العثور على أداة لتغطية الشفرة (Xdebug/PCOV). سيتم تشغيل الاختبارات بدون تقرير تغطية."
-  php artisan test
-  
+  $PHP_EXECUTABLE artisan test
+
   echo ""
   echo "لإضافة دعم تغطية الشفرة، يمكنك تثبيت Xdebug باستخدام الأمر:"
   echo "sudo apt-get install php-xdebug"
@@ -34,14 +73,4 @@ fi
 # عرض تقرير مختصر بعد انتهاء الاختبارات
 echo ""
 echo "========== ملخص الاختبارات =========="
-echo "تم تشغيل الاختبارات التالية:"
-echo "- اختبارات النماذج (User, Agency, Service, Request, Quote)"
-echo "- اختبارات المساعدين (CurrencyHelper, ServiceTypeHelper)"
-echo "- اختبارات الخدمات (PaymentService, NotificationService)"
-echo "- اختبارات الميزات (RequestManagement, Notifications)"
-echo "- اختبارات واجهة برمجة التطبيقات API"
-echo ""
-if php -r "echo (int)(extension_loaded('xdebug') || extension_loaded('pcov'));" | grep -q 1; then
-  echo "للمزيد من التفاصيل قم بالاطلاع على تقرير التغطية في المسار:"
-  echo "tests/coverage/index.html"
-fi
+echo "تم تشغيل الاختبارات بنجاح."

@@ -68,11 +68,27 @@ class Quote extends Model
     }
 
     /**
+     * Get the user that created the quote.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * Get the subagent that owns the quote.
      */
     public function subagent()
     {
         return $this->belongsTo(User::class, 'subagent_id');
+    }
+
+    /**
+     * Get the currency associated with the quote.
+     */
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
     }
 
     /**

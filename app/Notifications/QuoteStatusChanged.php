@@ -15,6 +15,7 @@ class QuoteStatusChanged extends Notification implements ShouldQueue
     protected $quote;
     protected $status;
     protected $title;
+    protected $message;
     
     /**
      * Create a new notification instance.
@@ -24,8 +25,9 @@ class QuoteStatusChanged extends Notification implements ShouldQueue
         $this->quote = $quote;
         $this->status = $status;
         
-        // إعداد عنوان الإشعار بناءً على حالة عرض السعر
+        // Set title and message based on status
         $this->title = $this->generateTitle($status);
+        $this->message = $this->generateMessage($status);
     }
 
     /**
@@ -35,7 +37,15 @@ class QuoteStatusChanged extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        // Check notification preferences if available
+        $channels = ['database'];
+        
+        // Add mail channel if user has email notifications enabled
+        if ($notifiable->hasNotificationPreference('email_notifications', true)) {
+            $channels[] = 'mail';
+        }
+        
+        return $channels;
     }
 
     /**
@@ -43,13 +53,14 @@ class QuoteStatusChanged extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $url = route('quotes.show', $this->quote->id);
+        
         return (new MailMessage)
             ->subject($this->title)
-            ->greeting('مرحبا ' . $notifiable->name)
-            ->line($this->title)
-            ->line('تم تغيير حالة عرض السعر الخاص بالخدمة ' . $this->quote->service->name . ' إلى ' . $this->getStatusArabicName())
-            ->action('عرض التفاصيل', url('/quotes/' . $this->quote->id))
-            ->line('شكرًا لاستخدامك نظام جاك للسفر والسياحة!');
+            ->greeting('مرحباً ' . $notifiable->name)
+            ->line($this->message)
+            ->action('عرض التفاصيل', $url)
+            ->line('شكرًا لاستخدامك نظام جاك للسفر');
     }
 
     /**
@@ -59,65 +70,52 @@ class QuoteStatusChanged extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        return [
-            'quote_id' => $this->quote->id,
-            'status' => $this->status,
-            'title' => $this->title,
-            'message' => 'تم تغيير حالة عرض السعر إلى ' . $this->getStatusArabicName(),
-            'service_name' => $this->quote->service->name ?? 'خدمة غير محددة',
-        ];
-    }
-    
-    /**
-     * Save notification to the database.
-     * 
-     * @param mixed $notifiable
-     * @return array
-     */
-    public function toDatabase($notifiable)
-    {
-        return [
-            'quote_id' => $this->quote->id,
-            'status' => $this->status,
-            'message' => 'تم تغيير حالة عرض السعر إلى ' . $this->getStatusArabicName(),
-        ];
-    }
-    
-    /**
-     * الحصول على النسخة العربية من حالة عرض السعر
-     */
-    protected function getStatusArabicName(): string
-    {
-        $statusNames = [
-            'pending' => 'قيد الانتظار',
-            'accepted' => 'مقبول',
-            'rejected' => 'مرفوض',
-            'expired' => 'منتهي الصلاحية',
-            'paid' => 'مدفوع',
-            'cancelled' => 'ملغي',
-        ];
+        $url = route('quotes.show', $this->quote->id);
         
-        return $statusNames[$this->status] ?? $this->status;
+        return [
+            'title' => $this->title,
+            'message' => $this->message,
+            'quote_id' => $this->quote->id,
+            'status' => $this->status,
+            'url' => $url,
+        ];
     }
     
     /**
-     * توليد عنوان الإشعار بناءً على الحالة
+     * Generate a title based on the status
      */
-    protected function generateTitle(string $status): string
+    private function generateTitle(string $status): string
     {
-        switch ($status) {
-            case 'accepted':
-                return 'تم قبول عرض السعر';
-            case 'rejected':
-                return 'تم رفض عرض السعر';
-            case 'expired':
-                return 'انتهت صلاحية عرض السعر';
-            case 'paid':
-                return 'تم دفع قيمة عرض السعر';
-            case 'cancelled':
-                return 'تم إلغاء عرض السعر';
-            default:
-                return 'تم تحديث حالة عرض السعر';
-        }
+        return match ($status) {
+            'pending' => 'تم إنشاء عرض سعر جديد',
+            'accepted' => 'تم قبول عرض السعر',
+            'rejected' => 'تم رفض عرض السعر',
+            'expired' => 'انتهت صلاحية عرض السعر',
+            'revised' => 'تم تعديل عرض السعر',
+            'agency_approved' => 'تم الموافقة على عرض السعر من الوكالة',
+            'admin_review' => 'عرض السعر قيد المراجعة',
+            'cancelled' => 'تم إلغاء عرض السعر',
+            default => 'تحديث على حالة عرض السعر',
+        };
+    }
+    
+    /**
+     * Generate a message based on the status
+     */
+    private function generateMessage(string $status): string
+    {
+        $quoteId = $this->quote->id;
+        
+        return match ($status) {
+            'pending' => "تم إنشاء عرض سعر جديد برقم #{$quoteId}. يُرجى مراجعته.",
+            'accepted' => "تم قبول عرض السعر #{$quoteId}. يمكنك متابعة الإجراءات.",
+            'rejected' => "تم رفض عرض السعر #{$quoteId}. يمكنك مراجعة التفاصيل.",
+            'expired' => "انتهت صلاحية عرض السعر #{$quoteId}. يُرجى تحديثه إذا كنت لا تزال مهتمًا.",
+            'revised' => "تم تعديل عرض السعر #{$quoteId}. يُرجى مراجعة التغييرات.",
+            'agency_approved' => "تمت الموافقة على عرض السعر #{$quoteId} من قبل الوكالة.",
+            'admin_review' => "عرض السعر #{$quoteId} قيد المراجعة من قبل الإدارة.",
+            'cancelled' => "تم إلغاء عرض السعر #{$quoteId}.",
+            default => "تم تحديث حالة عرض السعر #{$quoteId} إلى {$status}.",
+        };
     }
 }

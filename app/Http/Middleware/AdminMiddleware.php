@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class AdminMiddleware
 {
@@ -28,9 +29,13 @@ class AdminMiddleware
             ($user->role === 'admin') || 
             ($user->is_admin == 1)
         ) {
-            return $next($request);
+            try {
+                return $next($request);
+            } catch (AuthorizationException $e) {
+                return response()->json(['error' => $e->getMessage()], 403);
+            }
         }
         
-        return redirect()->route('home')->with('error', 'لا تملك صلاحية الوصول لهذه الصفحة');
+        return response()->json(['error' => 'Forbidden'], 403);
     }
 }

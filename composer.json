@@ -7,6 +7,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-pdo_mysql": "*",
+        "ext-zip": "*",
+        "ext-gd": "*",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
