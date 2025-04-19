@@ -31,6 +31,16 @@ class SafeMigrate extends Command
     {
         $this->info('Starting safe migration process...');
         
+        // Pre-migration validation
+        $validationIssues = $this->preMigrationValidation();
+        if (!empty($validationIssues)) {
+            $this->error('Pre-migration validation failed:');
+            foreach ($validationIssues as $issue) {
+                $this->error("- {$issue}");
+            }
+            return Command::FAILURE;
+        }
+        
         // Get all migration files
         $migrationFiles = $this->getMigrationFiles();
         
@@ -131,5 +141,52 @@ class SafeMigrate extends Command
         }
         
         $this->call($command);
+    }
+    
+    /**
+     * Perform pre-migration validation.
+     */
+    private function preMigrationValidation()
+    {
+        $issues = [];
+        
+        // Validate the existence of required tables
+        $requiredTables = ['users', 'agencies', 'services', 'requests', 'quotes'];
+        foreach ($requiredTables as $table) {
+            if (!Schema::hasTable($table)) {
+                $issues[] = "Required table '{$table}' does not exist.";
+            }
+        }
+        
+        // Validate the existence of required columns
+        $requiredColumns = [
+            'users' => ['id', 'name', 'email'],
+            'agencies' => ['id', 'name'],
+            'services' => ['id', 'name'],
+            'requests' => ['id', 'title'],
+            'quotes' => ['id', 'price']
+        ];
+        foreach ($requiredColumns as $table => $columns) {
+            foreach ($columns as $column) {
+                if (!Schema::hasColumn($table, $column)) {
+                    $issues[] = "Required column '{$column}' does not exist in table '{$table}'.";
+                }
+            }
+        }
+        
+        // Validate the existence of required constraints
+        $requiredConstraints = [
+            'requests' => ['user_id', 'customer_id', 'agency_id', 'service_id'],
+            'quotes' => ['request_id', 'user_id', 'subagent_id', 'currency_id']
+        ];
+        foreach ($requiredConstraints as $table => $columns) {
+            foreach ($columns as $column) {
+                if (!Schema::hasColumn($table, $column)) {
+                    $issues[] = "Required constraint '{$column}' does not exist in table '{$table}'.";
+                }
+            }
+        }
+        
+        return $issues;
     }
 }
