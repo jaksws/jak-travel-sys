@@ -1,12 +1,12 @@
-name: Debug Vite Build
-
-on:
-  workflow_dispatch:
-
 jobs:
   debug:
     runs-on: ubuntu-latest
     
+    # Add least-privilege permissions
+    permissions:
+      contents: read  # only need read access to checkout code
+      packages: read  # if you need to read from GitHub Packages
+      
     steps:
       - uses: actions/checkout@v3
       
