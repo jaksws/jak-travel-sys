@@ -200,4 +200,41 @@ class AdminRequestManagementTest extends AdminTestCase
             $this->assertTrue($viewRequests->contains($request));
         }
     }
+
+    /**
+     * Test that admin can create a new request with all necessary columns.
+     *
+     * @return void
+     */
+    public function test_admin_can_create_request_with_all_columns()
+    {
+        $this->loginAsAdmin();
+
+        $service = Service::factory()->create();
+        $user = User::factory()->create();
+
+        $requestData = [
+            'service_id' => $service->id,
+            'user_id' => $user->id,
+            'title' => 'Test Request Title',
+            'description' => 'Test Request Description',
+            'required_date' => now()->addDays(10)->format('Y-m-d'),
+            'notes' => 'Test Request Notes',
+            'status' => 'pending'
+        ];
+
+        $response = $this->post(route('admin.requests.store'), $requestData);
+        $response->assertStatus(302);
+        $response->assertRedirect(route('admin.requests.index'));
+
+        $this->assertDatabaseHas('requests', [
+            'service_id' => $service->id,
+            'user_id' => $user->id,
+            'title' => 'Test Request Title',
+            'description' => 'Test Request Description',
+            'required_date' => now()->addDays(10)->format('Y-m-d'),
+            'notes' => 'Test Request Notes',
+            'status' => 'pending'
+        ]);
+    }
 }
