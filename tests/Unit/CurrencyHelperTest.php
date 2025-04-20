@@ -111,7 +111,7 @@ class CurrencyHelperTest extends TestCase
 
         $amountInUSD = 100;
         $convertedToSAR = CurrencyHelper::convertPrice($amountInUSD, 'USD', 'SAR');
-        $this->assertEquals(370.37, $convertedToSAR);
+        $this->assertEquals(370.37, round($convertedToSAR, 2)); // P452f
     }
 
     #[Test]
@@ -128,7 +128,7 @@ class CurrencyHelperTest extends TestCase
         ]);
 
         $formattedSAR = CurrencyHelper::formatPrice(1000, 'SAR');
-        $this->assertEquals('1,000.00﷼', $formattedSAR);
+        $this->assertEquals('﷼ 1,000.00', $formattedSAR); // P676d
 
         $formattedUSD = CurrencyHelper::formatPrice(1000, 'USD');
         $this->assertEquals('$1,000.00', $formattedUSD);

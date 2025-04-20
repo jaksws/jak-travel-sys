@@ -40,7 +40,7 @@ class PHP83Fixes
     private static function prepareModelProperties()
     {
         // قائمة بالنماذج التي نحتاج لتجهيزها
-        $modelsPath = base_path('app/Models'); // Adjusted from app_path('Models/*.php')
+        $modelsPath = self::basePath('app/Models'); // Adjusted from app_path('Models/*.php')
         
         // Retrieve the list of model files
         $modelsList = glob($modelsPath . '/*.php');
@@ -137,5 +137,13 @@ class PHP83Fixes
                 };
             });
         }
+    }
+
+    /**
+     * Define the basePath method manually
+     */
+    private static function basePath($path = '')
+    {
+        return app()->basePath($path);
     }
 }

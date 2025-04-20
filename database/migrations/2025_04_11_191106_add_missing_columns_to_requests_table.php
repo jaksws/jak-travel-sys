@@ -11,7 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('requests')) {
+        if (!Schema::hasTable('requests')) {
+            Schema::create('requests', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+                $table->foreignId('customer_id')->nullable()->constrained('users')->onDelete('cascade');
+                $table->foreignId('agency_id')->nullable()->constrained('agencies')->onDelete('cascade');
+                $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('cascade');
+                $table->string('title')->nullable();
+                $table->text('description')->nullable();
+                $table->text('details')->nullable();
+                $table->string('status')->default('pending');
+                $table->date('required_date')->nullable();
+                $table->date('requested_date')->nullable();
+                $table->string('priority')->nullable();
+                $table->text('notes')->nullable();
+                $table->timestamps();
+            });
+        } else {
             // Add user_id column if it doesn't exist
             if (!Schema::hasColumn('requests', 'user_id')) {
                 Schema::table('requests', function (Blueprint $table) {
@@ -95,8 +112,6 @@ return new class extends Migration
                     $table->text('notes')->nullable();
                 });
             }
-        } else {
-            throw new \Exception('The "requests" table does not exist.');
         }
     }
 
