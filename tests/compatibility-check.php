@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Check PHP 8.3 compatibility
+ * Check PHP 8.2, 8.3, and 8.4 compatibility
  * 
- * This script can be used to identify common PHP 8.3 compatibility issues
+ * This script can be used to identify common PHP 8.2, 8.3, and 8.4 compatibility issues
  * and verify system requirements for نظام وكالات السفر (RTLA)
  */
 
@@ -14,7 +14,7 @@ echo "===================================================\n\n";
 // Check PHP version
 $phpVersion = phpversion();
 $minVersion = '8.2.0';
-$recommendedVersion = '8.3.0';
+$recommendedVersion = '8.4.0';
 $isVersionOk = version_compare($phpVersion, $minVersion, '>=');
 
 echo "• PHP الإصدار: $phpVersion\n";

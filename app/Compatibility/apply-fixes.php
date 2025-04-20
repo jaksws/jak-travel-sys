@@ -5,8 +5,12 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\Compatibility\PHP83Fixes;
+use App\Compatibility\PHP84Fixes;
 
 // Apply PHP 8.3 compatibility fixes
 PHP83Fixes::apply();
 
-echo "Applied PHP 8.3 compatibility fixes.\n";
+// Apply PHP 8.4 compatibility fixes
+PHP84Fixes::apply();
+
+echo "Applied PHP 8.3 and PHP 8.4 compatibility fixes.\n";
