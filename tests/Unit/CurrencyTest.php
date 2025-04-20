@@ -151,4 +151,28 @@ class CurrencyTest extends TestCase
             'is_default' => 1
         ]);
     }
+
+    #[Test]
+    public function it_can_update_a_currency()
+    {
+        $currency = Currency::factory()->create([
+            'name' => 'دينار كويتي',
+            'code' => 'KWD',
+            'symbol' => 'د.ك',
+            'exchange_rate' => 0.82,
+            'is_default' => false
+        ]);
+
+        $currency->update([
+            'name' => 'دينار كويتي محدث',
+            'exchange_rate' => 0.85
+        ]);
+
+        $this->assertDatabaseHas('currencies', [
+            'name' => 'دينار كويتي محدث',
+            'code' => 'KWD',
+            'symbol' => 'د.ك',
+            'exchange_rate' => 0.85
+        ]);
+    }
 }

@@ -40,10 +40,12 @@ class PHP83Fixes
     private static function prepareModelProperties()
     {
         // قائمة بالنماذج التي نحتاج لتجهيزها
-        $modelsList = glob(app_path('Models/*.php'));
+        $modelsPath = self::basePath('app/Models'); // Adjusted from app_path('Models/*.php')
+        
+        // Retrieve the list of model files
+        $modelsList = glob($modelsPath . '/*.php');
         $models = [];
         
-        // استخراج أسماء النماذج من المسارات
         foreach ($modelsList as $modelFile) {
             $modelName = basename($modelFile, '.php');
             $modelClass = "App\\Models\\{$modelName}";
@@ -53,18 +55,16 @@ class PHP83Fixes
                     $models[] = $modelClass;
                 }
             } catch (\Exception $e) {
-                // تجاهل الأخطاء لتجنب توقف السكريبت
+                // Ignore exceptions to prevent script failures
                 continue;
             }
         }
 
-        // تجهيز الخصائص لكل نموذج
         foreach ($models as $modelClass) {
             try {
                 $model = new $modelClass;
                 self::registerModelDynamicProperties($model);
             } catch (\Exception $e) {
-                // تجاهل الأخطاء لتجنب توقف السكريبت
                 continue;
             }
         }
@@ -137,5 +137,13 @@ class PHP83Fixes
                 };
             });
         }
+    }
+
+    /**
+     * Define the basePath method manually
+     */
+    private static function basePath($path = '')
+    {
+        return app()->basePath($path);
     }
 }

@@ -98,4 +98,21 @@ class PaymentTest extends TestCase
         $this->assertEquals('failed', $payment->status);
         $this->assertEquals('رفض البنك عملية الدفع', $payment->error_message);
     }
+
+    #[Test]
+    public function it_can_update_a_payment()
+    {
+        $payment = Payment::factory()->create([
+            'status' => 'pending',
+            'completed_at' => null
+        ]);
+
+        $payment->update([
+            'status' => 'completed',
+            'completed_at' => now()
+        ]);
+
+        $this->assertEquals('completed', $payment->status);
+        $this->assertNotNull($payment->completed_at);
+    }
 }

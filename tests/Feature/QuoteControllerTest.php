@@ -318,4 +318,98 @@ class QuoteControllerTest extends TestCase
             QuoteStatusChanged::class
         );
     }
+
+    #[Test]
+    public function it_checks_if_quotes_are_created_correctly()
+    {
+        Notification::fake();
+
+        $agency = Agency::factory()->create();
+        $subagent = User::factory()->create([
+            'agency_id' => $agency->id,
+            'role' => 'subagent',
+            'user_type' => 'subagent'
+        ]);
+
+        $service = Service::factory()->create(['agency_id' => $agency->id]);
+        $travelRequest = TravelRequest::factory()->create([
+            'agency_id' => $agency->id,
+            'service_id' => $service->id
+        ]);
+
+        $currency = Currency::factory()->create(['code' => 'SAR']);
+
+        $quoteData = [
+            'request_id' => $travelRequest->id,
+            'price' => 5000,
+            'currency_id' => $currency->id,
+            'description' => 'عرض سعر شامل لجميع الخدمات',
+            'valid_until' => now()->addDays(14)->format('Y-m-d')
+        ];
+
+        $response = $this->actingAs($subagent)
+                         ->post(route('quotes.store'), $quoteData);
+
+        $response->assertStatus(302);
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('quotes', [
+            'request_id' => $travelRequest->id,
+            'user_id' => $subagent->id,
+            'price' => 5000,
+            'description' => 'عرض سعر شامل لجميع الخدمات',
+            'status' => 'pending'
+        ]);
+    }
+
+    #[Test]
+    public function it_checks_if_quotes_are_updated_correctly()
+    {
+        Notification::fake();
+
+        $agency = Agency::factory()->create();
+        $client = User::factory()->create([
+            'agency_id' => $agency->id,
+            'role' => 'client',
+            'user_type' => 'customer'
+        ]);
+
+        $subagent = User::factory()->create([
+            'agency_id' => $agency->id,
+            'role' => 'subagent',
+            'user_type' => 'subagent'
+        ]);
+
+        $service = Service::factory()->create(['agency_id' => $agency->id]);
+        $travelRequest = TravelRequest::factory()->create([
+            'agency_id' => $agency->id,
+            'service_id' => $service->id,
+            'user_id' => $client->id,
+            'status' => 'pending'
+        ]);
+
+        $quote = Quote::factory()->create([
+            'request_id' => $travelRequest->id,
+            'user_id' => $subagent->id,
+            'subagent_id' => $subagent->id,
+            'status' => 'pending'
+        ]);
+
+        $updatedQuoteData = [
+            'price' => 6000,
+            'description' => 'عرض سعر محدث',
+            'valid_until' => now()->addDays(14)->format('Y-m-d')
+        ];
+
+        $response = $this->actingAs($subagent)
+                         ->patch(route('quotes.update', $quote), $updatedQuoteData);
+
+        $response->assertStatus(302);
+        $response->assertRedirect();
+
+        $quote->refresh();
+
+        $this->assertEquals(6000, $quote->price);
+        $this->assertEquals('عرض سعر محدث', $quote->description);
+    }
 }

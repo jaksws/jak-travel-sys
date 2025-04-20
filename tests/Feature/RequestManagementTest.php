@@ -157,4 +157,39 @@ class RequestManagementTest extends TestCase
         $requestsCount = TravelRequest::count();
         $this->assertEquals(10, $requestsCount);
     }
+
+    #[Test]
+    public function client_can_update_request()
+    {
+        // تجهيز بيانات الاختبار
+        $client = User::factory()->create(['role' => 'client']);
+        $request = TravelRequest::factory()->create([
+            'user_id' => $client->id,
+            'status' => 'pending'
+        ]);
+
+        $updatedData = [
+            'title' => 'طلب حجز رحلة حج',
+            'description' => 'أرغب في حجز رحلة حج لعائلة مكونة من 5 أفراد في شهر ذو الحجة',
+            'required_date' => now()->addMonths(6)->format('Y-m-d'),
+            'notes' => 'أفضل السكن القريب من الحرم المكي'
+        ];
+
+        // تنفيذ الاختبار
+        $response = $this->actingAs($client)
+                         ->patch(route('requests.update', $request->id), $updatedData);
+
+        // التحقق من النتائج
+        $response->assertStatus(302);
+        $response->assertRedirect();
+
+        // التحقق من تحديث الطلب في قاعدة البيانات
+        $this->assertDatabaseHas('requests', [
+            'id' => $request->id,
+            'title' => 'طلب حجز رحلة حج',
+            'description' => 'أرغب في حجز رحلة حج لعائلة مكونة من 5 أفراد في شهر ذو الحجة',
+            'required_date' => now()->addMonths(6)->format('Y-m-d'),
+            'notes' => 'أفضل السكن القريب من الحرم المكي'
+        ]);
+    }
 }

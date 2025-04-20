@@ -91,4 +91,46 @@ class CurrencyHelperTest extends TestCase
         $this->assertEquals($sar->id, $defaultCurrency->id);
         $this->assertEquals('SAR', $defaultCurrency->code);
     }
+
+    #[Test]
+    public function it_checks_currency_conversion()
+    {
+        $sar = Currency::factory()->create([
+            'code' => 'SAR',
+            'exchange_rate' => 1.0,
+        ]);
+
+        $usd = Currency::factory()->create([
+            'code' => 'USD',
+            'exchange_rate' => 0.27,
+        ]);
+
+        $amountInSAR = 1000;
+        $convertedToUSD = CurrencyHelper::convertPrice($amountInSAR, 'SAR', 'USD');
+        $this->assertEquals(270, $convertedToUSD);
+
+        $amountInUSD = 100;
+        $convertedToSAR = CurrencyHelper::convertPrice($amountInUSD, 'USD', 'SAR');
+        $this->assertEquals(370.37, round($convertedToSAR, 2)); // P452f
+    }
+
+    #[Test]
+    public function it_checks_currency_formatting()
+    {
+        $sar = Currency::factory()->create([
+            'code' => 'SAR',
+            'symbol' => '﷼',
+        ]);
+
+        $usd = Currency::factory()->create([
+            'code' => 'USD',
+            'symbol' => '$',
+        ]);
+
+        $formattedSAR = CurrencyHelper::formatPrice(1000, 'SAR');
+        $this->assertEquals('﷼ 1,000.00', $formattedSAR); // P676d
+
+        $formattedUSD = CurrencyHelper::formatPrice(1000, 'USD');
+        $this->assertEquals('$1,000.00', $formattedUSD);
+    }
 }

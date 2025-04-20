@@ -70,4 +70,29 @@ class AgencyTest extends TestCase
         $this->assertTrue($suspendedAgency->isSuspended());
         $this->assertFalse($suspendedAgency->isActive());
     }
+
+    #[Test]
+    public function it_can_update_an_agency()
+    {
+        $agency = Agency::factory()->create([
+            'name' => 'وكالة الرحلات السعيدة',
+            'license_number' => 'AG12345',
+            'email' => 'agency@example.com',
+            'phone' => '+966512345678',
+            'address' => 'الرياض، شارع الملك فهد',
+            'status' => 'active'
+        ]);
+
+        $agency->update([
+            'name' => 'وكالة الرحلات السعيدة المحدّثة',
+            'phone' => '+966512345679',
+            'address' => 'جدة، شارع الأمير سلطان'
+        ]);
+
+        $this->assertDatabaseHas('agencies', [
+            'name' => 'وكالة الرحلات السعيدة المحدّثة',
+            'phone' => '+966512345679',
+            'address' => 'جدة، شارع الأمير سلطان'
+        ]);
+    }
 }

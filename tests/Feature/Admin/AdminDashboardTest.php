@@ -200,4 +200,58 @@ class AdminDashboardTest extends AdminTestCase
         $this->assertCount(6, $revenueData['months']);
         $this->assertCount(6, $revenueData['revenue']);
     }
+
+    /**
+     * Test that the dashboard loads successfully.
+     *
+     * @return void
+     */
+    public function test_dashboard_loads_successfully()
+    {
+        // Login as admin
+        $this->loginAsAdmin();
+
+        // Access the dashboard
+        $response = $this->get(route('admin.dashboard'));
+
+        // Assert the dashboard loads successfully
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test that the dashboard displays the correct data.
+     *
+     * @return void
+     */
+    public function test_dashboard_displays_correct_data()
+    {
+        // Create test data
+        $agency = Agency::factory()->create();
+        $users = User::factory()->count(3)->create(['user_type' => 'customer']);
+        $services = Service::factory()->count(2)->create(['agency_id' => $agency->id]);
+        $requests = TravelRequest::factory()->count(4)->create(['service_id' => $services[0]->id]);
+        $quotes = Quote::factory()->count(2)->create(['request_id' => $requests[0]->id]);
+        Transaction::factory()->count(3)->create(['quote_id' => $quotes[0]->id]);
+
+        // Login as admin
+        $this->loginAsAdmin();
+
+        // Access the dashboard
+        $response = $this->get(route('admin.dashboard'));
+
+        // Assert the dashboard displays the correct data
+        $response->assertStatus(200);
+        $response->assertViewHas('stats');
+
+        // Get the stats variable
+        $stats = $response->viewData('stats');
+
+        // Assert the correct data is displayed
+        $this->assertGreaterThanOrEqual(3, $stats['users']);
+        $this->assertGreaterThanOrEqual(1, $stats['agencies']);
+        $this->assertGreaterThanOrEqual(2, $stats['services']);
+        $this->assertGreaterThanOrEqual(4, $stats['requests']);
+        $this->assertGreaterThanOrEqual(2, $stats['quotes']);
+        $this->assertGreaterThanOrEqual(3, $stats['transactions']);
+    }
 }

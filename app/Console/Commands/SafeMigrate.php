@@ -48,6 +48,12 @@ class SafeMigrate extends Command
             $this->warn('Skipping pre-migration validation as requested.');
         }
         
+        // Backup database before running migrations
+        $this->call('app:database-backup');
+        
+        // Check application status before running migrations
+        $this->call('app:check-status');
+        
         // Get all migration files
         $migrationFiles = $this->getMigrationFiles();
         
