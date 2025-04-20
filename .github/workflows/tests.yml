@@ -39,6 +39,10 @@ jobs:
             # Apply PHP 8.3 specific fixes if needed
             php -f app/Compatibility/apply-fixes.php
           fi
+          if [[ "${{ matrix.php }}" == "8.4" ]]; then
+            # Apply PHP 8.4 specific fixes if needed
+            php -f app/Compatibility/apply-fixes.php
+          fi
 
       - name: Copy environment file
         run: cp .env.example .env
