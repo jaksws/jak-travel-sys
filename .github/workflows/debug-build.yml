@@ -116,8 +116,14 @@ jobs:
           fi
           cp public/build/.vite/manifest.json public/build/manifest.json
 
+      - name: Backup Database
+        run: php artisan app:database-backup
+
+      - name: Check Application Status
+        run: php artisan app:check-status
+
       - name: Run Migrations
-        run: php artisan migrate
+        run: php artisan migrate:safe --force
 
       - name: Seed Database
         run: php artisan db:seed
