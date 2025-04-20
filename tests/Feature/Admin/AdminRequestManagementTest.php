@@ -160,4 +160,44 @@ class AdminRequestManagementTest extends AdminTestCase
         // تخطي اختبار وجود متغير الخدمات في العرض إذا لم يكن موجوداً
         $this->markTestSkipped('تم تخطي اختبار وجود قائمة الخدمات حالياً - ستتم إضافة الميزة لاحقاً');
     }
+
+    /**
+     * Test that the request management page loads successfully.
+     *
+     * @return void
+     */
+    public function test_request_management_page_loads_successfully()
+    {
+        $this->loginAsAdmin();
+
+        $response = $this->get(route('admin.requests.index'));
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test that the request management page displays the correct data.
+     *
+     * @return void
+     */
+    public function test_request_management_page_displays_correct_data()
+    {
+        $this->loginAsAdmin();
+
+        // Create test data
+        $service = Service::factory()->create();
+        $requests = TravelRequest::factory()->count(5)->create(['service_id' => $service->id]);
+
+        $response = $this->get(route('admin.requests.index'));
+        $response->assertStatus(200);
+        $response->assertViewHas('requests');
+
+        // Get the requests variable
+        $viewRequests = $response->viewData('requests');
+
+        // Assert the correct data is displayed
+        $this->assertCount(5, $viewRequests);
+        foreach ($requests as $request) {
+            $this->assertTrue($viewRequests->contains($request));
+        }
+    }
 }

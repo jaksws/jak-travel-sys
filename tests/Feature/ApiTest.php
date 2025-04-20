@@ -192,4 +192,68 @@ class ApiTest extends TestCase
         // $response = $this->getJson('/api/v1/services/guest');
         // $response->assertStatus(401);
     }
+
+    #[Test]
+    public function it_checks_if_api_returns_correct_data()
+    {
+        // إنشاء بيانات اختبار
+        $agency = Agency::factory()->create();
+        $client = User::factory()->create([
+            'role' => 'client',
+            'agency_id' => $agency->id
+        ]);
+
+        $service = Service::factory()->create([
+            'agency_id' => $agency->id
+        ]);
+
+        // تجهيز المستخدم مع توكن API
+        Sanctum::actingAs($client, ['*']);
+
+        // بيانات الطلب
+        $requestData = [
+            'service_id' => $service->id,
+            'user_id' => $client->id,
+            'title' => 'طلب خدمة عبر API',
+            'description' => 'وصف تفصيلي للطلب المرسل عبر API',
+            'required_date' => now()->addMonth()->format('Y-m-d'),
+            'notes' => 'ملاحظات إضافية للطلب'
+        ];
+
+        // تنفيذ الطلب
+        $response = $this->postJson('/api/v1/requests', $requestData);
+
+        // التحقق من النتائج
+        $response->assertStatus(201);
+        $response->assertJson([
+            'data' => [
+                'title' => 'طلب خدمة عبر API',
+                'description' => 'وصف تفصيلي للطلب المرسل عبر API',
+                'status' => 'pending'
+            ]
+        ]);
+    }
+
+    #[Test]
+    public function it_checks_if_api_handles_errors_correctly()
+    {
+        // تجهيز المستخدم مع توكن API
+        $client = User::factory()->create(['role' => 'client']);
+        Sanctum::actingAs($client, ['*']);
+
+        // بيانات الطلب غير مكتملة
+        $requestData = [
+            'title' => 'طلب خدمة عبر API',
+            'description' => 'وصف تفصيلي للطلب المرسل عبر API'
+        ];
+
+        // تنفيذ الطلب
+        $response = $this->postJson('/api/v1/requests', $requestData);
+
+        // التحقق من النتائج
+        $response->assertStatus(422); // خطأ في التحقق من البيانات
+        $response->assertJsonStructure([
+            'message', 'errors' => ['service_id', 'required_date']
+        ]);
+    }
 }

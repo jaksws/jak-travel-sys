@@ -154,4 +154,79 @@ class PaymentServiceTest extends TestCase
             'status' => 'refunded'
         ]);
     }
+
+    #[Test]
+    public function it_processes_payment_correctly()
+    {
+        // تجهيز البيانات الأساسية
+        $user = User::factory()->create(['role' => 'client']);
+        $currency = Currency::factory()->create(['code' => 'SAR']);
+        $quote = Quote::factory()->create([
+            'price' => 1000,
+            'currency_id' => $currency->id,
+            'status' => 'accepted'
+        ]);
+        
+        // محاكاة عملية تحقق ناجحة من بيانات الدفع
+        $this->validator->shouldReceive('validate')
+            ->once()
+            ->andReturn(true);
+            
+        // بيانات الدفع
+        $paymentData = [
+            'amount' => 1000,
+            'currency' => 'SAR',
+            'payment_method' => 'credit_card',
+            'card_number' => '4242424242424242',
+            'expiry_date' => '12/25',
+            'cvv' => '123',
+            'cardholder_name' => 'محمد أحمد'
+        ];
+        
+        // تنفيذ عملية الدفع
+        $result = $this->paymentService->processPayment($user, $quote, $paymentData);
+        
+        // التحقق من نجاح العملية
+        $this->assertTrue($result['success']);
+        $this->assertArrayHasKey('transaction_id', $result);
+        
+        // التحقق من إنشاء سجل معاملة في قاعدة البيانات
+        $this->assertDatabaseHas('transactions', [
+            'user_id' => $user->id,
+            'quote_id' => $quote->id,
+            'amount' => 1000,
+            'currency_id' => $currency->id,
+            'status' => 'completed',
+            'payment_method' => 'credit_card'
+        ]);
+    }
+
+    #[Test]
+    public function it_refunds_payment_correctly()
+    {
+        // إنشاء معاملة تمت بنجاح
+        $user = User::factory()->create();
+        $quote = Quote::factory()->create();
+        $transaction = Transaction::factory()->create([
+            'user_id' => $user->id,
+            'quote_id' => $quote->id,
+            'amount' => 1000,
+            'status' => 'completed',
+            'payment_method' => 'credit_card',
+            'reference_id' => 'txn_' . uniqid(),
+            'type' => 'payment' // Add the type field
+        ]);
+        
+        // تنفيذ عملية استرداد المبلغ
+        $result = $this->paymentService->refundPayment($transaction, 'طلب العميل');
+        
+        // التحقق من نجاح العملية
+        $this->assertTrue($result['success']);
+        
+        // التأكد من تحديث حالة المعاملة
+        $this->assertDatabaseHas('transactions', [
+            'id' => $transaction->id,
+            'status' => 'refunded'
+        ]);
+    }
 }
