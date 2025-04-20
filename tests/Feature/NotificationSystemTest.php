@@ -209,7 +209,7 @@ class NotificationSystemTest extends TestCase
         );
 
         // التحقق من عرض الإشعار بشكل صحيح
-        $notifications = $customer->notifications;
+        $notifications = $customer->notifications()->get();
         $this->assertCount(1, $notifications);
         $this->assertEquals('accepted', $notifications->first()->data['status']);
     }
