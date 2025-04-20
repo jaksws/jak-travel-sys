@@ -1,3 +1,12 @@
+name: Debug Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
   debug:
     runs-on: ubuntu-latest
@@ -7,6 +16,17 @@ jobs:
       contents: read  # only need read access to checkout code
       packages: read  # if you need to read from GitHub Packages
       
+    # Database service for testing
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
     steps:
       - uses: actions/checkout@v3
       
@@ -15,9 +35,10 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, mysql, pdo_mysql
           coverage: none
           tools: composer:v2
+          ini-values: memory_limit=-1
           
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -27,6 +48,12 @@ jobs:
           
       - name: Install PHP dependencies
         timeout-minutes: 10
+        env:
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: root
         run: |
           echo "PHP Version: $(php -v)"
           echo "Composer Version: $(composer -V)"
