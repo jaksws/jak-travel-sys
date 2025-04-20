@@ -40,7 +40,7 @@ class PHP83Fixes
     private static function prepareModelProperties()
     {
         // قائمة بالنماذج التي نحتاج لتجهيزها
-        $modelsPath = base_path('app/Models'); // Adjusted from app_path('Models/*.php')
+        $modelsPath = app()->basePath('app/Models'); // Adjusted from app_path('Models/*.php')
         
         // Retrieve the list of model files
         $modelsList = glob($modelsPath . '/*.php');
