@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Finder\SplFileInfo;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
+use Throwable;
 
 class SafeMigrate extends Command
 {
@@ -15,16 +18,14 @@ class SafeMigrate extends Command
      *
      * @var string
      */
-    protected $signature = 'migrate:safe 
-                            {--force : Force the operation to run in production}
-                            {--skip-validation : Skip pre-migration validation checks}';
+    protected $signature = 'migrate:safe {--force : Force the operation to run in production} {--retries=3 : Number of retries for failed migrations} {--delay=5 : Delay in seconds between retries}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Run migrations safely, skipping migrations for tables that already exist with optional validation';
+    protected $description = 'Run migrations safely, skipping migrations for tables that already exist';
 
     /**
      * Execute the console command.
@@ -33,26 +34,15 @@ class SafeMigrate extends Command
     {
         $this->info('Starting safe migration process...');
         
-        // Pre-migration validation (unless skipped)
-        if (!$this->option('skip-validation')) {
-            $validationIssues = $this->preMigrationValidation();
-            if (!empty($validationIssues)) {
-                $this->error('Pre-migration validation failed:');
-                foreach ($validationIssues as $issue) {
-                    $this->error("- {$issue}");
-                }
-                return Command::FAILURE;
+        // Pre-migration validation
+        $validationIssues = $this->preMigrationValidation();
+        if (!empty($validationIssues)) {
+            $this->error('Pre-migration validation failed:');
+            foreach ($validationIssues as $issue) {
+                $this->error("- {$issue}");
             }
-            $this->info('Pre-migration validation passed successfully.');
-        } else {
-            $this->warn('Skipping pre-migration validation as requested.');
+            return Command::FAILURE;
         }
-        
-        // Backup database before running migrations
-        $this->call('app:database-backup');
-        
-        // Check application status before running migrations
-        $this->call('app:check-status');
         
         // Get all migration files
         $migrationFiles = $this->getMigrationFiles();
@@ -65,34 +55,23 @@ class SafeMigrate extends Command
         
         $skipped = 0;
         $migrated = 0;
-        $errors = 0;
         
         foreach ($migrationFiles as $migration) {
-            try {
-                $tableName = $this->getTableFromMigration($migration);
-                $migrationPath = $migration->getPathname();
-                $relativePath = str_replace(database_path('migrations') . '/', '', $migrationPath);
-                
-                if ($tableName && in_array($tableName, $existingTables)) {
-                    $this->warn("Skipping migration for table '{$tableName}' which already exists.");
-                    $skipped++;
-                } else {
-                    $this->info("Migrating: {$relativePath}");
-                    $this->runMigration($migrationPath);
-                    $migrated++;
-                }
-            } catch (\Exception $e) {
-                $this->error("Migration failed for {$relativePath}: " . $e->getMessage());
-                $errors++;
+            $tableName = $this->getTableFromMigration($migration);
+            $migrationPath = $migration->getPathname();
+            $relativePath = str_replace(database_path('migrations') . '/', '', $migrationPath);
+            
+            if ($tableName && in_array($tableName, $existingTables)) {
+                $this->warn("Skipping migration for table '{$tableName}' which already exists.");
+                $skipped++;
+            } else {
+                $this->info("Migrating: {$relativePath}");
+                $this->runMigrationWithRetry($migrationPath, $relativePath);
+                $migrated++;
             }
         }
         
-        if ($errors > 0) {
-            $this->error("Migration completed with {$errors} error(s): {$migrated} tables migrated, {$skipped} tables skipped.");
-            return Command::FAILURE;
-        }
-        
-        $this->info("Migration completed successfully: {$migrated} tables migrated, {$skipped} tables skipped.");
+        $this->info("Migration complete: {$migrated} tables migrated, {$skipped} tables skipped.");
         
         return Command::SUCCESS;
     }
@@ -103,9 +82,6 @@ class SafeMigrate extends Command
     private function getMigrationFiles()
     {
         return collect(File::files(database_path('migrations')))
-            ->sortBy(function (SplFileInfo $file) {
-                return $file->getFilename();
-            })
             ->filter(function (SplFileInfo $file) {
                 return $file->getExtension() === 'php';
             })
@@ -120,20 +96,16 @@ class SafeMigrate extends Command
     {
         $tables = [];
         
-        try {
-            if (DB::connection()->getDriverName() === 'sqlite') {
-                $rows = DB::select("SELECT name FROM sqlite_master WHERE type='table'");
-                foreach ($rows as $row) {
-                    $tables[] = $row->name;
-                }
-            } else {
-                $rows = DB::select('SHOW TABLES');
-                foreach ($rows as $row) {
-                    $tables[] = reset($row);
-                }
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            $rows = DB::select("SELECT name FROM sqlite_master WHERE type='table'");
+            foreach ($rows as $row) {
+                $tables[] = $row->name;
             }
-        } catch (\Exception $e) {
-            $this->error('Failed to retrieve existing tables: ' . $e->getMessage());
+        } else {
+            $rows = DB::select('SHOW TABLES');
+            foreach ($rows as $row) {
+                $tables[] = reset($row);
+            }
         }
         
         return $tables;
@@ -147,12 +119,12 @@ class SafeMigrate extends Command
         $content = file_get_contents($file->getPathname());
         
         // Look for Schema::create('table_name', function...
-        if (preg_match("/Schema::create\\(['\"]([^'\"]+)['\"]/", $content, $matches)) {
+        if (preg_match("/Schema::create\('([^']+)'/", $content, $matches)) {
             return $matches[1];
         }
         
-        // Look for Schema::table('table_name', function...
-        if (preg_match("/Schema::table\\(['\"]([^'\"]+)['\"]/", $content, $matches)) {
+        // Alternative syntax: Schema::create("table_name", function...
+        if (preg_match('/Schema::create\("([^"]+)"/', $content, $matches)) {
             return $matches[1];
         }
         
@@ -181,14 +153,6 @@ class SafeMigrate extends Command
     {
         $issues = [];
         
-        // Validate database connection first
-        try {
-            DB::connection()->getPdo();
-        } catch (\Exception $e) {
-            $issues[] = "Database connection failed: " . $e->getMessage();
-            return $issues;
-        }
-        
         // Validate the existence of required tables
         $requiredTables = ['users', 'agencies', 'services', 'requests', 'quotes'];
         foreach ($requiredTables as $table) {
@@ -205,10 +169,7 @@ class SafeMigrate extends Command
             'requests' => ['id', 'title'],
             'quotes' => ['id', 'price']
         ];
-        
         foreach ($requiredColumns as $table => $columns) {
-            if (!Schema::hasTable($table)) continue;
-            
             foreach ($columns as $column) {
                 if (!Schema::hasColumn($table, $column)) {
                     $issues[] = "Required column '{$column}' does not exist in table '{$table}'.";
@@ -216,6 +177,47 @@ class SafeMigrate extends Command
             }
         }
         
+        // Validate the existence of required constraints
+        $requiredConstraints = [
+            'requests' => ['user_id', 'customer_id', 'agency_id', 'service_id'],
+            'quotes' => ['request_id', 'user_id', 'subagent_id', 'currency_id']
+        ];
+        foreach ($requiredConstraints as $table => $columns) {
+            foreach ($columns as $column) {
+                if (!Schema::hasColumn($table, $column)) {
+                    $issues[] = "Required constraint '{$column}' does not exist in table '{$table}'.";
+                }
+            }
+        }
+        
         return $issues;
+    }
+
+    /**
+     * Run a single migration with retry mechanism.
+     */
+    private function runMigrationWithRetry($path, $relativePath)
+    {
+        $retries = (int) $this->option('retries');
+        $delay = (int) $this->option('delay');
+        $attempt = 0;
+
+        while ($attempt <= $retries) {
+            try {
+                $this->runMigration($path);
+                Log::info("Migration successful: {$relativePath}");
+                return;
+            } catch (Throwable $e) {
+                $attempt++;
+                Log::error("Migration failed: {$relativePath}, Attempt: {$attempt}, Error: {$e->getMessage()}");
+
+                if ($attempt > $retries) {
+                    $this->error("Migration failed after {$retries} retries: {$relativePath}");
+                    return;
+                }
+
+                sleep($delay);
+            }
+        }
     }
 }

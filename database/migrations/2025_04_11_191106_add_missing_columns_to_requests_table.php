@@ -11,107 +11,88 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('requests')) {
-            Schema::create('requests', function (Blueprint $table) {
-                $table->id();
+        // Add user_id column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'user_id')) {
+            Schema::table('requests', function (Blueprint $table) {
                 $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
-                $table->foreignId('customer_id')->nullable()->constrained('users')->onDelete('cascade');
-                $table->foreignId('agency_id')->nullable()->constrained('agencies')->onDelete('cascade');
-                $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('cascade');
-                $table->string('title')->nullable();
-                $table->text('description')->nullable();
-                $table->text('details')->nullable();
-                $table->string('status')->default('pending');
-                $table->date('required_date')->nullable();
-                $table->date('requested_date')->nullable();
-                $table->string('priority')->nullable();
-                $table->text('notes')->nullable();
-                $table->timestamps();
             });
-        } else {
-            // Add user_id column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'user_id')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
-                });
-            }
+        }
 
-            // Add customer_id column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'customer_id')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->foreignId('customer_id')->nullable()->constrained('users')->onDelete('cascade');
-                });
-            }
+        // Add customer_id column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'customer_id')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->foreignId('customer_id')->nullable()->constrained('users')->onDelete('cascade');
+            });
+        }
 
-            // Add agency_id column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'agency_id')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->foreignId('agency_id')->nullable()->constrained('agencies')->onDelete('cascade');
-                });
-            }
+        // Add agency_id column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'agency_id')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->foreignId('agency_id')->nullable()->constrained('agencies')->onDelete('cascade');
+            });
+        }
 
-            // Add service_id column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'service_id')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('cascade');
-                });
-            }
+        // Add service_id column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'service_id')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('cascade');
+            });
+        }
 
-            // Add title column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'title')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->string('title')->nullable();
-                });
-            }
+        // Add title column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'title')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->string('title')->nullable();
+            });
+        }
 
-            // Add description column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'description')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->text('description')->nullable();
-                });
-            }
+        // Add description column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'description')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->text('description')->nullable();
+            });
+        }
 
-            // Add details column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'details')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->text('details')->nullable();
-                });
-            }
+        // Add details column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'details')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->text('details')->nullable();
+            });
+        }
 
-            // Add status column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'status')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->string('status')->default('pending');
-                });
-            }
+        // Add status column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'status')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->string('status')->default('pending');
+            });
+        }
 
-            // Add required_date column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'required_date')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->date('required_date')->nullable();
-                });
-            }
+        // Add required_date column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'required_date')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->date('required_date')->nullable();
+            });
+        }
 
-            // Add requested_date column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'requested_date')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->date('requested_date')->nullable();
-                });
-            }
+        // Add requested_date column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'requested_date')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->date('requested_date')->nullable();
+            });
+        }
 
-            // Add priority column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'priority')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->string('priority')->nullable();
-                });
-            }
+        // Add priority column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'priority')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->string('priority')->nullable();
+            });
+        }
 
-            // Add notes column if it doesn't exist
-            if (!Schema::hasColumn('requests', 'notes')) {
-                Schema::table('requests', function (Blueprint $table) {
-                    $table->text('notes')->nullable();
-                });
-            }
+        // Add notes column if it doesn't exist
+        if (!Schema::hasColumn('requests', 'notes')) {
+            Schema::table('requests', function (Blueprint $table) {
+                $table->text('notes')->nullable();
+            });
         }
     }
 
