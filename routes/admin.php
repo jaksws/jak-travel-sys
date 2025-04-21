@@ -40,6 +40,8 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
 
     // إدارة الطلبات
     Route::get('/requests', [DashboardController::class, 'requests'])->name('requests.index');
+    // إنشاء طلب جديد من قبل المسؤول
+    Route::post('/requests', [DashboardController::class, 'storeRequest'])->name('requests.store');
 
     // سجلات النظام
     Route::get('/system/logs', [DashboardController::class, 'logs'])->name('system.logs');
