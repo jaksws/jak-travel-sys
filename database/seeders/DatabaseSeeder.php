@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        // Check if the 'requests' table exists before seeding
+        if (!Schema::hasTable('requests')) {
+            $this->command->error("The 'requests' table does not exist. Please run the migrations first.");
+            return;
+        }
+
         // ترتيب تنفيذ البذور مهم لمراعاة العلاقات بين الجداول
         $this->call([
             // البيانات الأساسية أولاً

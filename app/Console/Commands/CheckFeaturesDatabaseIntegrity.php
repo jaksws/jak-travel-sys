@@ -184,6 +184,11 @@ class CheckFeaturesDatabaseIntegrity extends Command
                 $this->line('⚠️ ميزة تعدد اللغات غير مفعّلة، قد يؤثر على تجربة المسؤول');
             }
         }
+
+        // Check for the existence of the `requests` table
+        if (!Schema::hasTable('requests')) {
+            $issues[] = "The 'requests' table does not exist.";
+        }
         
         if (empty($issues)) {
             $this->info('✅ جميع ميزات التطبيق متوافقة مع هيكل قاعدة البيانات وتدعم دور المسؤول');

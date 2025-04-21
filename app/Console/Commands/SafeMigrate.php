@@ -76,6 +76,12 @@ class SafeMigrate extends Command
         // Ensure all migrations are run before seeding
         Artisan::call('migrate');
 
+        // Check for the existence of the `requests` table before seeding
+        if (!Schema::hasTable('requests')) {
+            $this->error("The 'requests' table does not exist. Please ensure all migrations are run.");
+            return Command::FAILURE;
+        }
+
         return Command::SUCCESS;
     }
     
