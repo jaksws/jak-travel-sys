@@ -11,15 +11,15 @@ return new class extends Migration
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_id')->constrained();
-            $table->foreignId('customer_id')->constrained('users');
-            $table->foreignId('agency_id')->constrained();
+            $table->foreignId('customer_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('agency_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->text('details')->nullable();
             $table->enum('priority', ['normal', 'urgent', 'emergency'])->default('normal');
-            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
-            $table->date('requested_date');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
+            $table->date('requested_date')->nullable();
             $table->date('required_date')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();

@@ -62,7 +62,8 @@ class CurrencyHelper
         // تطبيق تنسيق عرض العملة
         switch ($format) {
             case 'symbol_first':
-                return $currency->symbol . ' ' . $formattedAmount;
+                // No space for USD, space for others
+                return $currency->symbol . ($currency->symbol === '$' ? '' : ' ') . $formattedAmount;
             case 'symbol_last':
                 return $formattedAmount . ' ' . $currency->symbol;
             case 'code_first':

@@ -13,9 +13,7 @@ class RenameRequestsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('requests')) {
-            Schema::rename('requests', 'service_requests');
-        }
+        // No-op to keep 'requests' table for compatibility with existing code and tests
     }
 
     /**
