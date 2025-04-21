@@ -73,6 +73,9 @@ class SafeMigrate extends Command
         
         $this->info("Migration complete: {$migrated} tables migrated, {$skipped} tables skipped.");
         
+        // Ensure all migrations are run before seeding
+        Artisan::call('migrate');
+
         return Command::SUCCESS;
     }
     

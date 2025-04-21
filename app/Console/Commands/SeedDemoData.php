@@ -12,6 +12,7 @@ use App\Models\Quote;
 use App\Models\Document;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 
 class SeedDemoData extends Command
 {
@@ -42,6 +43,12 @@ class SeedDemoData extends Command
                 $this->info('تم إلغاء العملية.');
                 return 0;
             }
+        }
+
+        // Check for the existence of the service_requests table before seeding
+        if (!Schema::hasTable('service_requests')) {
+            $this->error('The service_requests table does not exist.');
+            return 0;
         }
 
         // إنشاء بيانات مستخدم التجربة السريعة
