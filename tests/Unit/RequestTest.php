@@ -27,13 +27,16 @@ class RequestTest extends TestCase
             'description' => 'طلب حجز باقة عمرة كاملة تشمل السكن والمواصلات للمشاعر المقدسة',
             'status' => 'pending',
             'required_date' => now()->addMonths(2),
+            'notes' => 'ملاحظات إضافية'
         ]);
 
         $this->assertDatabaseHas('requests', [
             'user_id' => $client->id,
             'service_id' => $service->id,
             'title' => 'طلب عمرة لعائلة مكونة من 5 أشخاص',
-            'status' => 'pending'
+            'status' => 'pending',
+            'required_date' => now()->addMonths(2)->toDateString(),
+            'notes' => 'ملاحظات إضافية'
         ]);
     }
 
