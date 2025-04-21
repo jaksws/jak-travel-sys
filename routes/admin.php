@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\DashboardController;
 Route::middleware(['auth', 'isAdmin'])->group(function () {
     // مسارات لوحة التحكم
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // إدارة الواجهات - مسارات جديدة لإدارة واجهة المستخدم
     Route::prefix('ui')->name('ui.')->group(function () {
