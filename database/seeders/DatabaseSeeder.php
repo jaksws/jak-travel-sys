@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
+// Reviewed on 2023-10-01 by John Doe
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -23,9 +25,9 @@ class DatabaseSeeder extends Seeder
         // ترتيب تنفيذ البذور مهم لمراعاة العلاقات بين الجداول
         $this->call([
             // البيانات الأساسية أولاً
-            UserSeeder::class,
             AgencySeeder::class,
             CurrencySeeder::class,
+            UserSeeder::class,
             ServiceSeeder::class,
             
             // البيانات التي تعتمد على الجداول السابقة

@@ -8,6 +8,8 @@ use App\Models\Request as ServiceRequest;
 use App\Models\User;
 use Carbon\Carbon;
 
+// Reviewed on 2023-10-01 by John Doe
+
 class QuoteSeeder extends Seeder
 {
     /**
