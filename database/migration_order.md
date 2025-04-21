@@ -30,3 +30,12 @@
 8. 2024_04_30_000001_rename_requests_table.php
 9. 2024_05_01_000001_add_commission_rate_to_agencies_table.php
 10. 2024_05_10_000001_add_locale_to_users_table.php
+
+# Migration Order
+
+To ensure migrations are executed in the correct order, follow this sequence:
+
+1. 2023_01_01_000005_create_requests_table.php
+2. 2025_04_11_195757_make_commission_amount_nullable_in_quotes_table.php
+
+Ensure that all migrations are listed in the correct order to avoid dependency issues.

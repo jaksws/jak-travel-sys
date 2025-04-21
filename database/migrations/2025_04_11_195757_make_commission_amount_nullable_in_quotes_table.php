@@ -12,13 +12,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if the 'service_requests' table exists before proceeding
+        if (!Schema::hasTable('service_requests')) {
+            throw new \Exception("The 'service_requests' table does not exist. Please ensure all migrations are executed in the correct order.");
+        }
+
         // For SQLite, we need a different approach
         if (DB::connection()->getDriverName() === 'sqlite') {
             // Create a temporary table with the desired schema
             if (!Schema::hasTable('quotes_temp')) {
                 Schema::create('quotes_temp', function (Blueprint $table) {
                     $table->id();
-                    $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
+                    $table->foreignId('request_id')->constrained('service_requests')->onDelete('cascade');
                     $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
                     $table->foreignId('subagent_id')->nullable()->constrained('users')->onDelete('cascade');
                     $table->decimal('price', 10, 2);
