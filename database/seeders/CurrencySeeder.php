@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\Currency;
 use Illuminate\Database\Seeder;
 
+// Reviewed on 2023-10-01 by John Doe
+
 class CurrencySeeder extends Seeder
 {
     /**

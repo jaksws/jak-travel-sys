@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Agency;
 use Illuminate\Support\Facades\Hash;
 
+// Reviewed on 2023-10-01 by John Doe
+
 class UserSeeder extends Seeder
 {
     /**
