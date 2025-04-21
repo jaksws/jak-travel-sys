@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->text('details')->nullable();
             $table->enum('priority', ['normal', 'urgent', 'emergency'])->default('normal');
-            $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'approved', 'rejected', 'completed', 'cancelled'])->default('pending');
             $table->date('requested_date')->nullable();
             $table->date('required_date')->nullable();
             $table->text('notes')->nullable();
