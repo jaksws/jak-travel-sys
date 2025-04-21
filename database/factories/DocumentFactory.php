@@ -13,42 +13,33 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class DocumentFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Document::class;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
-        $documentableTypes = [
-            Request::class,
-        ];
-        $documentableType = $this->faker->randomElement($documentableTypes);
+        // Create a parent request by default
+        $request = Request::factory()->create();
         $user = User::factory()->create();
 
         return [
-            'name' => $this->faker->words(3, true) . '.' . $this->faker->randomElement(['pdf', 'doc', 'jpg']),
-            'file_path' => 'documents/' . $this->faker->uuid . '.' . $this->faker->randomElement(['pdf', 'doc', 'jpg']),
-            'file_type' => $this->faker->randomElement(['application/pdf', 'application/msword', 'image/jpeg']),
-            'size' => $this->faker->numberBetween(1000, 10000000),
-            'documentable_id' => 1, // سيتم تعيينه لاحقًا
-            'documentable_type' => $documentableType,
-            'user_id' => $user->id, // إضافة user_id الإلزامي
-            'uploaded_by' => $user->id, // استخدام نفس المستخدم
-            'visibility' => $this->faker->randomElement(['public', 'agency', 'private']),
-            'notes' => $this->faker->sentence()
+            'name' => $this->faker->word . '.pdf',
+            'file_path' => 'documents/' . $this->faker->word . '.pdf',
+            'file_type' => 'application/pdf',
+            'size' => $this->faker->numberBetween(100, 1024 * 1024 * 5),
+            'documentable_id' => $request->id,
+            'documentable_type' => Request::class,
+            'uploaded_by' => $user->id,
+            'visibility' => 'private',
+            'notes' => $this->faker->sentence(),
         ];
-    }
-
-    /**
-     * تعيين النوع والمعرّف للعنصر الموثق
-     */
-    public function forDocumentable($documentable)
-    {
-        return $this->state(function (array $attributes) use ($documentable) {
-            return [
-                'documentable_id' => $documentable->id,
-                'documentable_type' => get_class($documentable),
-            ];
-        });
     }
 }

@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('documents', function (Blueprint $table) {
-            $table->bigInteger('size')->nullable()->after('file_type')->comment('File size in bytes');
+            if (!Schema::hasColumn('documents', 'size')) {
+                $table->unsignedBigInteger('size')->nullable()->after('file_type')->comment('File size in bytes');
+            }
         });
     }
 

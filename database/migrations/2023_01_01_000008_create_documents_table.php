@@ -14,10 +14,9 @@ return new class extends Migration
                 $table->string('name');
                 $table->string('file_path');
                 $table->string('file_type')->nullable();
-                $table->unsignedBigInteger('file_size')->nullable();
+                $table->unsignedBigInteger('size')->nullable(); // rename file_size to size
                 $table->morphs('documentable'); // Polymorphic relation
-                $table->foreignId('user_id')->constrained(); // Owner
-                $table->foreignId('request_id')->nullable()->constrained();
+                $table->foreignId('uploaded_by')->constrained('users')->onDelete('cascade'); // uploader reference
                 $table->enum('visibility', ['private', 'agency', 'customer', 'public'])->default('private');
                 $table->text('notes')->nullable();
                 $table->timestamps();
