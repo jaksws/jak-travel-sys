@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Agency;
 
+// Reviewed on 2023-10-01 by John Doe
+
 class AgencySeeder extends Seeder
 {
     /**
