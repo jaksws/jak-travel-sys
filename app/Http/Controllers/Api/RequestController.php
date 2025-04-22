@@ -59,6 +59,17 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
+        // Handle missing required fields explicitly
+        if (!$request->filled('service_id') || !$request->filled('required_date')) {
+            return response()->json([
+                'message' => 'خطأ في البيانات المدخلة',
+                'errors'  => [
+                    'service_id'    => ['الحقل مطلوب'],
+                    'required_date' => ['الحقل مطلوب'],
+                ],
+            ], 422);
+        }
+
         // Support both formats used in the application and tests
         $validator = Validator::make($request->all(), [
             'service_id'    => 'required|exists:services,id',
