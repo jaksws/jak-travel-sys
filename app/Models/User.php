@@ -94,7 +94,8 @@ class User extends Authenticatable
      */
     public function notifications()
     {
-        return $this->hasMany(Notification::class);
+        // استخدم علاقة morphMany القياسية مع DatabaseNotification
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable');
     }
 
     /**

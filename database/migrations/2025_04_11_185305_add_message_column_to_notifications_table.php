@@ -16,11 +16,6 @@ return new class extends Migration
             if (!Schema::hasColumn('notifications', 'message')) {
                 $table->text('message')->nullable(false);
             }
-            
-            // Add user_id column if it doesn't exist (for the custom notification implementation)
-            if (!Schema::hasColumn('notifications', 'user_id')) {
-                $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
-            }
         });
     }
 
@@ -33,11 +28,6 @@ return new class extends Migration
             // Drop columns if they exist
             if (Schema::hasColumn('notifications', 'message')) {
                 $table->dropColumn('message');
-            }
-            
-            if (Schema::hasColumn('notifications', 'user_id')) {
-                $table->dropForeign(['user_id']);
-                $table->dropColumn('user_id');
             }
         });
     }

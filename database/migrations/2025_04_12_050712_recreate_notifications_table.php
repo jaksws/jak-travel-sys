@@ -18,7 +18,6 @@ return new class extends Migration
         // إنشاء الجدول من جديد بالهيكل الصحيح
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('message')->nullable();
             $table->string('type')->default('general');

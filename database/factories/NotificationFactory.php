@@ -19,7 +19,9 @@ class NotificationFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            // لا يوجد user_id بعد الآن
+            'notifiable_type' => 'App\\Models\\User',
+            'notifiable_id' => User::factory(),
             'title' => $this->faker->sentence(4),
             'message' => $this->faker->paragraph(),
             'type' => $this->faker->randomElement(['quote_accepted', 'quote_rejected', 'request_created', 'payment_received']),

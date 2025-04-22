@@ -105,34 +105,39 @@ class RequestManagementTest extends TestCase
     #[Test]
     public function client_can_accept_quote()
     {
-        // تجهيز بيانات الاختبار
-        $client = User::factory()->create(['role' => 'client']);
-        $request = TravelRequest::factory()->create([
-            'user_id' => $client->id,
-            'status' => 'pending'
-        ]);
-        $quote = Quote::factory()->create([
-            'request_id' => $request->id,
-            'status' => 'pending'
-        ]);
-        
-        // تنفيذ الاختبار
-        $response = $this->actingAs($client)
-                         ->patch(route('quotes.accept', $quote->id));
-        
-        // التحقق من النتائج
-        $response->assertStatus(302);
-        
-        // التحقق من تحديث حالة عرض السعر والطلب
-        $this->assertDatabaseHas('quotes', [
-            'id' => $quote->id,
-            'status' => 'accepted'
-        ]);
-        
-        $this->assertDatabaseHas('requests', [
-            'id' => $request->id,
-            'status' => 'approved'
-        ]);
+        try {
+            // تجهيز بيانات الاختبار
+            $client = User::factory()->create(['role' => 'client']);
+            $subagent = User::factory()->create(['role' => 'subagent']);
+            $service = Service::factory()->create();
+            $request = TravelRequest::factory()->create([
+                'user_id' => $client->id,
+                'service_id' => $service->id,
+                'status' => 'pending'
+            ]);
+            $quote = Quote::factory()->create([
+                'request_id' => $request->id,
+                'user_id' => $subagent->id,
+                'status' => 'pending'
+            ]);
+            // تنفيذ الاختبار
+            $response = $this->actingAs($client)
+                             ->patch(route('quotes.accept', $quote->id));
+            // التحقق من النتائج
+            $response->assertStatus(302);
+            // التحقق من تحديث حالة عرض السعر والطلب
+            $this->assertDatabaseHas('quotes', [
+                'id' => $quote->id,
+                'status' => 'accepted'
+            ]);
+            $this->assertDatabaseHas('requests', [
+                'id' => $request->id,
+                'status' => 'approved'
+            ]);
+        } catch (\Throwable $e) {
+            fwrite(STDERR, "\n[client_can_accept_quote ERROR] " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
+            throw $e;
+        }
     }
     
     #[Test]

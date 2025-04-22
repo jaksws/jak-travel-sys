@@ -53,6 +53,19 @@ class TestsController extends Controller
         });
         
         Route::post('api/v1/requests', function (Request $request) {
+            try {
+                // تحقق من القيم المطلوبة قبل الإنشاء
+                $validated = $request->validate([
+                    'service_id' => 'required|integer|exists:services,id',
+                    'required_date' => 'required|date',
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+
             // Actually create the record in the database
             $serviceRequest = ServiceRequest::create([
                 'user_id' => $request->user_id ?? 1,

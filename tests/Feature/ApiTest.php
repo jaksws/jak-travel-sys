@@ -247,11 +247,8 @@ class ApiTest extends TestCase
             'description' => 'وصف تفصيلي للطلب المرسل عبر API'
         ];
 
-        // تنفيذ الطلب
         $response = $this->postJson('/api/v1/requests', $requestData);
-
-        // التحقق من النتائج
-        $response->assertStatus(422); // خطأ في التحقق من البيانات
+        $response->assertStatus(422);
         $response->assertJsonStructure([
             'message', 'errors' => ['service_id', 'required_date']
         ]);

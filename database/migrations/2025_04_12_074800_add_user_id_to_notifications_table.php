@@ -13,15 +13,12 @@ return new class extends Migration
     {
         if (Schema::hasTable('notifications')) {
             Schema::table('notifications', function (Blueprint $table) {
-                if (!Schema::hasColumn('notifications', 'user_id')) {
-                    $table->foreignId('user_id')->nullable()->after('id');
-                }
+                // حذف أي كود يضيف user_id من migration 2025_04_12_074800_add_user_id_to_notifications_table.php
             });
         } else {
             // إنشاء الجدول إذا لم يكن موجودًا
             Schema::create('notifications', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('user_id')->nullable();
                 $table->string('title');
                 $table->text('message')->nullable();
                 $table->string('type')->default('general');
@@ -39,9 +36,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            if (Schema::hasColumn('notifications', 'user_id')) {
-                $table->dropColumn('user_id');
-            }
+            // حذف أي كود يضيف user_id من migration 2025_04_12_074800_add_user_id_to_notifications_table.php
         });
     }
 };

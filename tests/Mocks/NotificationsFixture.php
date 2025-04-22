@@ -32,7 +32,6 @@ class NotificationsFixture
             'message' => $message,
             'created_at' => now(),
             'updated_at' => now(),
-            'user_id' => $user->id
         ]);
     }
     

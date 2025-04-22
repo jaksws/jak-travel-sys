@@ -23,9 +23,6 @@ return new class extends Migration
             $table->text('message')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
-            
-            // Add user_id for backward compatibility
-            $table->foreignId('user_id')->nullable();
         });
     }
 

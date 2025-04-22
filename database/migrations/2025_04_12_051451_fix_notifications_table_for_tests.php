@@ -16,7 +16,6 @@ return new class extends Migration
         if (!Schema::hasTable('notifications')) {
             Schema::create('notifications', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->string('title')->default('إشعار جديد');
                 $table->text('message')->nullable();
                 $table->string('type')->default('general');
@@ -32,7 +31,7 @@ return new class extends Migration
         if (Schema::hasTable('notifications')) {
             if (!Schema::hasColumn('notifications', 'title')) {
                 Schema::table('notifications', function (Blueprint $table) {
-                    $table->string('title')->default('إشعار جديد')->after('user_id');
+                    $table->string('title')->default('إشعار جديد')->after('id');
                 });
             }
             
