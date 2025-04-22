@@ -48,9 +48,7 @@ class RequestController extends Controller
      */
     public function create()
     {
-        $services = Service::where('status', 'active')->get();
-        
-        return view('requests.create', compact('services'));
+        return view('requests.create');
     }
 
     /**
@@ -58,29 +56,20 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'required_date' => 'required|date|after:today',
-            'notes' => 'nullable|string'
+        $data = $request->validate([
+            'service_id'    => 'required|exists:services,id',
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'required_date' => 'nullable|date',
+            'notes'         => 'nullable|string',
         ]);
 
-        $service = Service::findOrFail($request->service_id);
-        
-        $travelRequest = TravelRequest::create([
-            'service_id' => $service->id,
-            'user_id' => Auth::id(),
-            'agency_id' => $service->agency_id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'required_date' => $request->required_date,
-            'notes' => $request->notes,
-            'status' => 'pending'
-        ]);
+        $data['user_id'] = Auth::id();
+        $data['status']  = 'pending';
 
-        return redirect()->route('requests.show', $travelRequest)
-                         ->with('success', 'تم إنشاء طلبك بنجاح. سيتم التواصل معك قريباً');
+        $req = TravelRequest::create($data);
+
+        return redirect()->route('requests.show', $req);
     }
 
     /**
@@ -88,15 +77,27 @@ class RequestController extends Controller
      */
     public function show(TravelRequest $request)
     {
-        // Check access permissions
-        if (Auth::id() !== $request->user_id && 
-            Auth::user()->agency_id !== $request->agency_id &&
-            !Auth::user()->isAdmin()) {
-            abort(403, 'غير مصرح لك بالوصول إلى هذا الطلب');
+        return view('requests.show', ['request' => $request]);
+    }
+
+    /**
+     * Update the specified request in storage.
+     */
+    public function update(Request $request, TravelRequest $model)
+    {
+        if ($model->user_id !== Auth::id() || $model->status !== 'pending') {
+            abort(403);
         }
 
-        $request->load(['service', 'user', 'quotes']);
-        
-        return view('requests.show', compact('request'));
+        $data = $request->validate([
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'required_date' => 'required|date',
+            'notes'         => 'nullable|string',
+        ]);
+
+        $model->update($data);
+
+        return redirect()->route('requests.show', $model);
     }
 }

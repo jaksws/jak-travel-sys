@@ -210,12 +210,14 @@ Route::get('/documents/{document}/download', [DocumentController::class, 'downlo
 Route::middleware(['web', 'auth'])->group(function () {
     // Client routes
     Route::post('/requests', [RequestController::class, 'store'])->name('requests.store');
+    Route::patch('/requests/{request}', [RequestController::class, 'update'])->name('requests.update');
     Route::get('/requests/create', [RequestController::class, 'create'])->name('requests.create');
     Route::get('/requests/{request}', [RequestController::class, 'show'])->name('requests.show');
     
     // Quote routes
     Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
     Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+    Route::patch('/quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
     Route::patch('/quotes/{quote}/accept', [QuoteController::class, 'accept'])->name('quotes.accept');
     Route::patch('/quotes/{quote}/reject', [QuoteController::class, 'reject'])->name('quotes.reject');
     
