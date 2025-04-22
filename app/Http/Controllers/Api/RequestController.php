@@ -59,31 +59,15 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
-        // Handle missing required fields explicitly
-        if (!$request->filled('service_id') || !$request->filled('required_date')) {
-            return response()->json([
-                'message' => 'خطأ في البيانات المدخلة',
-                'errors'  => [
-                    'service_id'    => ['الحقل مطلوب'],
-                    'required_date' => ['الحقل مطلوب'],
-                ],
-            ], 422);
-        }
-
-        // Support both formats used in the application and tests
-        $validator = Validator::make($request->all(), [
+        // Validate API input; missing fields return JSON 422
+        $data = $request->validate([
             'service_id'    => 'required|exists:services,id',
             'title'         => 'required|string|max:255',
             'description'   => 'nullable|string',
             'required_date' => 'required|date',
+        ], [
+            'required' => 'الحقل مطلوب',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'خطأ في البيانات المدخلة',
-                'errors' => $validator->errors()
-            ], 422);
-        }
 
         // التحقق من وجود الخدمة ومن أنها نشطة
         $service = Service::findOrFail($request->service_id);
@@ -96,29 +80,15 @@ class RequestController extends Controller
         }
 
         // إنشاء الطلب
-        $serviceRequest = new ServiceRequest();
-        $serviceRequest->user_id = Auth::id() ?? $request->user_id ?? 1; // Allow guest/test requests
-        $serviceRequest->service_id = $request->service_id;
-        
-        // Support both field naming conventions
-        $serviceRequest->title = $request->title ?? $request->details ?? '';
-        $serviceRequest->description = $request->description ?? $request->details ?? '';
-        $serviceRequest->details = $request->details ?? $request->description ?? '';
-        
-        // Handle different date field names
-        $serviceRequest->start_date = $request->start_date ?? $request->required_date ?? now();
-        $serviceRequest->end_date = $request->end_date ?? null;
-        $serviceRequest->required_date = $request->required_date ?? $request->start_date ?? now();
-        
-        // Optional fields
-        $serviceRequest->adults = $request->adults ?? 1;
-        $serviceRequest->children = $request->children ?? 0;
-        $serviceRequest->additional_requirements = $request->additional_requirements ?? $request->notes ?? '';
-        $serviceRequest->notes = $request->notes ?? $request->additional_requirements ?? '';
-        
-        $serviceRequest->status = 'pending';
-        $serviceRequest->agency_id = $service->agency_id; // Important: set the agency_id from the service
-        $serviceRequest->save();
+        $serviceRequest = ServiceRequest::create([
+            'user_id'                 => Auth::id() ?? $request->user_id ?? 1,
+            'service_id'              => $data['service_id'],
+            'title'                   => $data['title'],
+            'description'             => $data['description'] ?? '',
+            'required_date'           => $data['required_date'],
+            'status'                  => 'pending',
+            'agency_id'               => $service->agency_id,
+        ]);
 
         // Format the response to match both API formats
         return response()->json([

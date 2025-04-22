@@ -8,6 +8,7 @@ use App\Models\Request as TravelRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\QuoteStatusChanged;
+use App\Services\NotificationService;
 
 class QuoteController extends Controller
 {
@@ -73,10 +74,8 @@ class QuoteController extends Controller
         $rq->status = 'approved';
         $rq->save();
 
-        Notification::send(
-            [$quote->user],
-            new QuoteStatusChanged($quote, 'accepted')
-        );
+        // use service to send and record notification properly
+        (new NotificationService())->sendQuoteStatusNotification($quote, 'accepted');
 
         return redirect()->back();
     }
@@ -92,10 +91,8 @@ class QuoteController extends Controller
         $quote->status = 'rejected';
         $quote->save();
 
-        Notification::send(
-            [$quote->user],
-            new QuoteStatusChanged($quote, 'rejected')
-        );
+        // use service to send and record notification properly
+        (new NotificationService())->sendQuoteStatusNotification($quote, 'rejected');
 
         return redirect()->back();
     }

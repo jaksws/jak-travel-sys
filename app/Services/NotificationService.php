@@ -67,25 +67,30 @@ class NotificationService
     }
 
     /**
-     * Send a quote status change notification to the customer and record it in database
+     * Send a quote status change notification to the customer
+     *
+     * @param Quote $quote
+     * @param string $status
+     * @return bool
      */
     public function sendQuoteStatusNotification($quote, string $status): bool
     {
-        $customer = $quote->request->customer;
-        // send via Laravel notification for tests asserting sent
-        Notification::send([$customer], new QuoteStatusChanged($quote, $status));
-        // manually insert into notifications table for display tests
+        $recipient = $quote->user; // send to quote creator (subagent or customer based on context)
+        $notification = new QuoteStatusChanged($quote, $status);
+        // send via database channel and others
+        $recipient->notify($notification);
+        // Also persist to database so display tests can retrieve it
         NotificationModel::create([
             'id'               => Str::uuid()->toString(),
-            'type'             => QuoteStatusChanged::class,
-            'notifiable_type'  => get_class($customer),
-            'notifiable_id'    => $customer->id,
-            'data'             => [
-                'quote_id' => $quote->id,
-                'status'   => $status,
-            ],
+            'type'             => get_class($notification),
+            'notifiable_type'  => get_class($recipient),
+            'notifiable_id'    => $recipient->getKey(),
+            'data'             => $notification->toArray($recipient),
+            'message'          => $notification->toArray($recipient)['message'],
             'read_at'          => null,
-            'user_id'          => $customer->id,
+            'user_id'          => $recipient->getKey(),
+            'created_at'       => now(),
+            'updated_at'       => now(),
         ]);
         return true;
     }
