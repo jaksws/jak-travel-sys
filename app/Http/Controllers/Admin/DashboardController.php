@@ -236,6 +236,24 @@ class DashboardController extends Controller
     }
 
     /**
+     * Store a new request created by admin
+     */
+    public function storeRequest(Request $req)
+    {
+        $data = $req->validate([
+            'service_id' => 'required|exists:services,id',
+            'user_id'    => 'required|exists:users,id',
+            'title'      => 'required|string|max:255',
+            'description'=> 'nullable|string',
+            'required_date' => 'nullable|date',
+            'notes'      => 'nullable|string',
+            'status'     => 'nullable|string',
+        ]);
+        TravelRequest::create($data);
+        return redirect()->route('admin.requests.index');
+    }
+
+    /**
      * عرض سجلات النظام
      *
      * @return \Illuminate\View\View
