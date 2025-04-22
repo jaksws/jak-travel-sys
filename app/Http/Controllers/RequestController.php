@@ -83,21 +83,21 @@ class RequestController extends Controller
     /**
      * Update the specified request in storage.
      */
-    public function update(Request $request, TravelRequest $model)
+    public function update(Request $httpRequest, TravelRequest $request)
     {
-        if ($model->user_id !== Auth::id() || $model->status !== 'pending') {
+        if ($request->user_id !== Auth::id() || $request->status !== 'pending') {
             abort(403);
         }
 
-        $data = $request->validate([
+        $data = $httpRequest->validate([
             'title'         => 'required|string|max:255',
             'description'   => 'nullable|string',
             'required_date' => 'required|date',
             'notes'         => 'nullable|string',
         ]);
 
-        $model->update($data);
+        $request->update($data);
 
-        return redirect()->route('requests.show', $model);
+        return redirect()->route('requests.show', $request);
     }
 }

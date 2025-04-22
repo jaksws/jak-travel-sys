@@ -61,17 +61,10 @@ class RequestController extends Controller
     {
         // Support both formats used in the application and tests
         $validator = Validator::make($request->all(), [
-            'service_id' => 'required|exists:services,id',
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'details' => 'sometimes|required|string',
-            'start_date' => 'sometimes|required|date|after_or_equal:today',
-            'required_date' => 'sometimes|required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'adults' => 'sometimes|required|integer|min:1',
-            'children' => 'nullable|integer|min:0',
-            'additional_requirements' => 'nullable|string',
-            'notes' => 'nullable|string',
+            'service_id'    => 'required|exists:services,id',
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'required_date' => 'required|date',
         ]);
 
         if ($validator->fails()) {

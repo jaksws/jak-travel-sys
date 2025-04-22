@@ -253,6 +253,10 @@ Route::group([
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
+    // إدارة الطلبات
+    Route::get('/requests', [\App\Http\Controllers\Admin\DashboardController::class, 'requests'])->name('requests.index');
+    Route::post('/requests', [\App\Http\Controllers\Admin\DashboardController::class, 'storeRequest'])->name('requests.store');
+
     // Users management
     Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
     
