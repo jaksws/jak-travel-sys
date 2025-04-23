@@ -259,6 +259,12 @@ Route::group([
 
     // Users management
     Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'viewUser'])->name('users.show');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\DashboardController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'deleteUser'])->name('users.destroy');
+    Route::patch('/users/{id}/toggle-status', [\App\Http\Controllers\Admin\DashboardController::class, 'toggleUserStatus'])->name('users.toggle-status');
+    Route::post('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'storeUser'])->name('users.store');
     
     // System logs
     Route::get('/system/logs', [\App\Http\Controllers\Admin\DashboardController::class, 'logs'])->name('system.logs');
