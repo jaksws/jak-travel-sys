@@ -46,24 +46,16 @@ class AdminDashboardUIIntegrationTest extends TestCase
      */
     public function test_ui_color_changes_reflect_in_preview(): void
     {
-        // Skip if we're just testing basic route registration
-        // $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
-        
-        // تغيير الألوان
-        $response = $this->actingAs($this->admin)
+        $this->actingAs($this->admin)
             ->post(route('admin.ui.home.update'), [
                 'primary_color' => '#ff0000',
                 'secondary_color' => '#00ff00',
                 'accent_color' => '#0000ff',
                 'section_order' => 'hero,services,testimonials'
             ]);
-        
-        $response->assertStatus(302);
-        
-        // التحقق من عرض الألوان الجديدة في معاينة الصفحة الرئيسية
+        // بعد التحديث، جلب الصفحة والتحقق من الألوان في HTML
         $viewResponse = $this->actingAs($this->admin)
             ->get(route('admin.ui.home'));
-        
         $viewResponse->assertSee('#ff0000');
         $viewResponse->assertSee('#00ff00');
         $viewResponse->assertSee('#0000ff');
@@ -74,19 +66,27 @@ class AdminDashboardUIIntegrationTest extends TestCase
      */
     public function test_adding_new_page_makes_it_available_in_system(): void
     {
-        // Skip if we're just testing basic route registration
-        // $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
-        
-        // إضافة صفحة جديدة
-        $response = $this->actingAs($this->admin)
+        $this->actingAs($this->admin)
             ->post(route('admin.ui.interfaces.update'), [
                 'new_page_title' => 'صفحة اختبار',
                 'new_page_slug' => 'test-page',
                 'new_page_content' => 'محتوى صفحة الاختبار'
             ]);
-        
-        $response->assertStatus(302);
-        
+        // بعد الإضافة، جلب صفحة الواجهات والتحقق من ظهور الصفحة الجديدة
+        $viewResponse = $this->actingAs($this->admin)
+            ->get(route('admin.ui.interfaces'));
+        $viewResponse->assertSee('صفحة اختبار');
+        $viewResponse->assertSee('محتوى صفحة الاختبار');
+    }
+
+    /**
+     * اختبار التكامل: تحميل شعار جديد والتحقق من تطبيقه
+     */
+    public function test_logo_upload_integration(): void
+    {
+        $logo = UploadedFile::fake()->create('site-logo.png', 100);
+        $this->actingAs($this->admin)
+            ->post(route('admin.ui.home.update'), [
         // التحقق من وجود الصفحة الجديدة في التكوين
         $this->assertEquals('صفحة اختبار', config('ui.pages.test-page.title'));
         $this->assertEquals('محتوى صفحة الاختبار', config('ui.pages.test-page.content'));

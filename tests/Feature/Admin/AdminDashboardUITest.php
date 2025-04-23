@@ -19,7 +19,12 @@ class AdminDashboardUITest extends AdminTestCase
         $this->loginAsAdmin();
         $response = $this->get(route('admin.dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('روابط الإجراءات السريعة'); // تحقق من وجود النص أو الرابط المطلوب
+        // تحقق من وجود عنوان "إجراءات سريعة" أو زر فعلي
+        $response->assertSee('إجراءات سريعة');
+        $response->assertSee('إدارة المستخدمين');
+        $response->assertSee('إدارة الطلبات');
+        $response->assertSee('سجلات النظام');
+        $response->assertSee('إعدادات النظام');
     }
     
     /**
@@ -46,7 +51,9 @@ class AdminDashboardUITest extends AdminTestCase
         $this->loginAsAdmin();
         $response = $this->get(route('admin.dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('ملف المستخدم'); // تحقق من وجود روابط ملفات المستخدمين
+        // تحقق من وجود رابط الملف الشخصي أو نص "الملف الشخصي"
+        $response->assertSee('الملف الشخصي');
+        $response->assertSee('admin@example.com');
     }
     
     /**
