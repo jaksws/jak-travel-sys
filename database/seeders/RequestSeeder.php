@@ -8,6 +8,9 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\Agency;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
+
+// Reviewed on 2023-10-01 by John Doe
 
 class RequestSeeder extends Seeder
 {
@@ -16,6 +19,12 @@ class RequestSeeder extends Seeder
      */
     public function run(): void
     {
+        // Check if the 'requests' table exists before seeding
+        if (!Schema::hasTable('requests')) {
+            $this->command->error("The 'requests' table does not exist. Please run the migrations first.");
+            return;
+        }
+
         // جلب وكالة اليمن
         $yemenAgency = Agency::where('email', 'info@yemen-travel.com')->first();
         
