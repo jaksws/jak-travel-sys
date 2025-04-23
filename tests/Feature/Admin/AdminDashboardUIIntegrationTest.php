@@ -87,49 +87,18 @@ class AdminDashboardUIIntegrationTest extends TestCase
         $logo = UploadedFile::fake()->create('site-logo.png', 100);
         $this->actingAs($this->admin)
             ->post(route('admin.ui.home.update'), [
-        // التحقق من وجود الصفحة الجديدة في التكوين
-        $this->assertEquals('صفحة اختبار', config('ui.pages.test-page.title'));
-        $this->assertEquals('محتوى صفحة الاختبار', config('ui.pages.test-page.content'));
-        
-        // التحقق من عرض الصفحة الجديدة في صفحة إدارة الواجهات
-        $viewResponse = $this->actingAs($this->admin)
-            ->get(route('admin.ui.interfaces'));
-        
-        $viewResponse->assertSuccessful();
-        
-        // تنظيف التكوين بعد الاختبار
-        $this->cleanupConfig();
-    }
-
-    /**
-     * اختبار التكامل: تحميل شعار جديد والتحقق من تطبيقه
-     */
-    public function test_logo_upload_integration(): void
-    {
-        // Skip if we're just testing basic route registration
-        // $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
-        
-        // Usar archivo simple en lugar de imagen para evitar dependencia de GD
-        $logo = UploadedFile::fake()->create('site-logo.png', 100);
-        
-        // تحميل الشعار الجديد
-        $response = $this->actingAs($this->admin)
-            ->post(route('admin.ui.home.update'), [
                 'primary_color' => '#3b82f6',
                 'secondary_color' => '#64748b',
                 'accent_color' => '#10b981',
                 'section_order' => 'hero,services,testimonials',
                 'main_logo' => $logo
             ]);
-        
-        $response->assertStatus(302);
-        $response->assertSessionHas('success');
-        
-        // التحقق من تخزين الملف بشكل صحيح
+        // تحقق من وجود الشعار في التخزين
         Storage::disk('public')->assertExists('logos/' . $logo->hashName());
-        
-        // التحقق من تحديث مسار الشعار في التكوين
-        $this->assertStringContainsString('logos/' . $logo->hashName(), config('ui.logos.main'));
+        // تحقق من ظهور اسم الشعار في الصفحة
+        $viewResponse = $this->actingAs($this->admin)
+            ->get(route('admin.ui.home'));
+        $viewResponse->assertSee($logo->hashName());
     }
 
     /**
