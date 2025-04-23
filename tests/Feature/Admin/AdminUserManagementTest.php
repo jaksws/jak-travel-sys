@@ -134,9 +134,23 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_toggle_user_status()
     {
-        $this->markTestSkipped('تم تخطي اختبار تغيير حالة المستخدم مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $user = User::factory()->create(['status' => 'active']);
+        $this->loginAsAdmin();
+        $response = $this->patch(route('admin.users.toggle-status', $user->id));
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'status' => 'inactive',
+        ]);
+        // Toggle again
+        $response = $this->patch(route('admin.users.toggle-status', $user->id));
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'status' => 'active',
+        ]);
     }
-    
+
     /**
      * Test that admin can filter users by role.
      *
@@ -144,9 +158,15 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_filter_users_by_role()
     {
-        $this->markTestSkipped('تم تخطي اختبار تصفية المستخدمين حسب الدور مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $admin = User::factory()->create(['role' => 'admin']);
+        $customer = User::factory()->create(['role' => 'customer']);
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.users.index', ['role' => 'admin']));
+        $response->assertStatus(200);
+        $response->assertSee($admin->email);
+        $response->assertDontSee($customer->email);
     }
-    
+
     /**
      * Test that admin can search for users.
      *
@@ -154,6 +174,12 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_search_for_users()
     {
-        $this->markTestSkipped('تم تخطي اختبار البحث عن المستخدمين مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $user1 = User::factory()->create(['name' => 'سامي البحثي']);
+        $user2 = User::factory()->create(['name' => 'غير مطابق']);
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.users.index', ['search' => 'سامي']));
+        $response->assertStatus(200);
+        $response->assertSee('سامي البحثي');
+        $response->assertDontSee('غير مطابق');
     }
 }

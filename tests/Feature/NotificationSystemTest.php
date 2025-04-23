@@ -112,19 +112,33 @@ class NotificationSystemTest extends TestCase
     }
     
     #[Test]
-    #[Skipped('تم تخطي اختبار تحديد الإشعارات كمقروءة حتى يتم تعريف المسارات اللازمة')]
     public function it_sets_notification_as_read()
     {
-        // تم تخطي هذا الاختبار مؤقتاً حتى يتم تعريف المسارات اللازمة
-        $this->markTestSkipped('تم تخطي اختبار تحديد الإشعارات كمقروءة حتى يتم تعريف المسارات اللازمة');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $quote = Quote::factory()->create(['user_id' => $user->id]);
+        $user->notify(new QuoteStatusChanged($quote, 'pending'));
+        $notification = $user->notifications()->first();
+        $this->assertNull($notification->read_at);
+        $response = $this->patch(route('notifications.mark-read', $notification->id));
+        $response->assertSuccessful();
+        $notification->refresh();
+        $this->assertNotNull($notification->read_at);
     }
-    
+
     #[Test]
-    #[Skipped('تم تخطي اختبار عرض الإشعارات حتى يتم تعريف المسارات اللازمة')]
     public function users_can_view_their_notifications()
     {
-        // تم تخطي هذا الاختبار مؤقتاً حتى يتم تعريف المسارات اللازمة
-        $this->markTestSkipped('تم تخطي اختبار عرض الإشعارات حتى يتم تعريف المسارات اللازمة');
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $quote1 = Quote::factory()->create(['user_id' => $user->id]);
+        $quote2 = Quote::factory()->create(['user_id' => $user->id]);
+        $user->notify(new QuoteStatusChanged($quote1, 'pending'));
+        $user->notify(new QuoteStatusChanged($quote2, 'accepted'));
+        $response = $this->get(route('notifications.index'));
+        $response->assertStatus(200);
+        $response->assertSee('عرض سعر جديد');
+        $response->assertSee('تم قبول عرض السعر');
     }
 
     #[Test]
