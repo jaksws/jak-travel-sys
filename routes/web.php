@@ -268,4 +268,8 @@ Route::group([
     
     // System logs
     Route::get('/system/logs', [\App\Http\Controllers\Admin\DashboardController::class, 'logs'])->name('system.logs');
+    
+    // Admin settings routes
+    Route::get('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'settings'])->name('settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'updateSettings'])->name('settings.update');
 });

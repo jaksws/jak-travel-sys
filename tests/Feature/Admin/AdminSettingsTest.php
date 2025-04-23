@@ -13,7 +13,12 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_admin_can_view_settings_page()
     {
-        $this->markTestSkipped('تم تخطي اختبار صفحة الإعدادات مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.settings'));
+        $response->assertStatus(200);
+        $response->assertSee('multilingual');
+        $response->assertSee('dark_mode');
+        $response->assertSee('payment_system');
     }
     
     /**
@@ -23,7 +28,18 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_admin_can_update_settings()
     {
-        $this->markTestSkipped('تم تخطي اختبار تحديث الإعدادات مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $this->loginAsAdmin();
+        $data = [
+            'multilingual' => 'on',
+            'dark_mode' => 'on',
+            'payment_system' => 'on',
+            'enhanced_ui' => 'on',
+            // ai_features intentionally left off
+        ];
+        $response = $this->post(route('admin.settings.update'), $data);
+        $response->assertStatus(302);
+        $response->assertRedirect(route('admin.settings'));
+        $response->assertSessionHas('success');
     }
     
     /**
@@ -33,6 +49,11 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_settings_validation()
     {
-        $this->markTestSkipped('تم تخطي اختبار التحقق من صلاحية الإعدادات مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $this->loginAsAdmin();
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $data = [
+            'dark_mode' => 'invalid_value',
+        ];
+        $this->post(route('admin.settings.update'), $data);
     }
 }

@@ -49,6 +49,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/system/logs', [DashboardController::class, 'logs'])->name('system.logs');
 
     // إعدادات النظام
-    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
-    Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
+    // Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
+    // Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
 });

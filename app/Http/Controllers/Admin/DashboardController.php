@@ -333,6 +333,14 @@ class DashboardController extends Controller
      */
     public function updateSettings(Request $request)
     {
+        $validated = $request->validate([
+            'multilingual' => 'nullable|in:on',
+            'dark_mode' => 'nullable|in:on',
+            'payment_system' => 'nullable|in:on',
+            'enhanced_ui' => 'nullable|in:on',
+            'ai_features' => 'nullable|in:on',
+        ]);
+
         // تحديث الإعدادات
         $settings = [
             'multilingual' => $request->has('multilingual'),
