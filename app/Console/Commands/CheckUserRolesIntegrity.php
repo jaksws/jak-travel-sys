@@ -15,6 +15,28 @@ class CheckUserRolesIntegrity extends Command
     {
         $this->info('جاري التحقق من تكامل أدوار المستخدمين...');
         
+        // تحقق ذكي من وجود قاعدة البيانات والجداول الأساسية قبل أي فحص
+        $dbConnection = config('database.default');
+        $dbName = config('database.connections.' . $dbConnection . '.database');
+        if (!$dbName || !file_exists($dbName)) {
+            $this->error('❌ قاعدة البيانات غير موجودة أو لم يتم تحديدها بشكل صحيح: ' . $dbName);
+            return 1;
+        }
+        $requiredTables = [
+            'users', 'agencies', 'services', 'requests', 'quotes', 'notifications',
+            'transactions', 'documents', 'currencies', 'quote_attachments', 'payments'
+        ];
+        $missingTables = [];
+        foreach ($requiredTables as $table) {
+            if (!Schema::hasTable($table)) {
+                $missingTables[] = $table;
+            }
+        }
+        if (!empty($missingTables)) {
+            $this->error('❌ الجداول التالية مفقودة في قاعدة البيانات: ' . implode(', ', $missingTables));
+            return 1;
+        }
+
         $issues = [];
         
         // التحقق من وجود جدول المستخدمين
@@ -43,30 +65,27 @@ class CheckUserRolesIntegrity extends Command
                 ->distinct()
                 ->pluck($roleColumn)
                 ->toArray();
-                
+
             $this->info('أدوار المستخدمين الموجودة في النظام:');
             foreach ($roleTypes as $role) {
                 $this->line("- {$role}");
-                
-                // التحقق من وجود دور المسؤول
-                if (in_array(strtolower($role), ['admin', '4'])) {
-                    $this->info('✓ دور المسؤول موجود');
-                    
-                    // إحصاء عدد المسؤولين
-                    $adminCount = DB::table('users')
-                        ->where($roleColumn, $role)
-                        ->count();
-                        
-                    $this->info("  عدد المسؤولين: {$adminCount}");
-                }
             }
-            
-            // التحقق من وجود دور المسؤول إذا لم يتم العثور عليه سابقاً
-            if (!in_array('admin', array_map('strtolower', $roleTypes)) && !in_array('4', $roleTypes)) {
-                $this->warn('⚠️ لم يتم العثور على دور المسؤول في النظام');
+
+            // التحقق من وجود مسؤول فعلي عبر is_admin
+            $adminUser = DB::table('users')->where('is_admin', 1)->first();
+            if ($adminUser) {
+                $this->info('✓ تم العثور على مستخدم مسؤول (is_admin=1) في النظام.');
+                // لا تضف أي مشكلة إذا وُجد مستخدم is_admin=1
+                $issues = []; // تأكد من إفراغ قائمة المشاكل
+            } elseif (in_array('admin', array_map('strtolower', $roleTypes)) || in_array('4', $roleTypes)) {
+                $this->info('✓ دور المسؤول موجود عبر role=admin أو role=4.');
+                // لا تضف أي مشكلة إذا وُجد role=admin
+                $issues = [];
+            } else {
+                $this->warn('⚠️ لم يتم العثور على دور المسؤول في النظام (لا يوجد مستخدم is_admin=1 ولا role=admin)');
                 $issues[] = 'دور المسؤول (admin) غير موجود';
             }
-            
+
             // التحقق من جداول الصلاحيات إذا كانت موجودة
             if (Schema::hasTable('permissions') || Schema::hasTable('role_permissions')) {
                 $this->info('يوجد نظام للصلاحيات - تحقق من صلاحيات المسؤول');

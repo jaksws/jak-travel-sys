@@ -23,8 +23,8 @@ class RenameRequestsTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('service_requests')) {
-            Schema::rename('service_requests', 'requests');
+        if (Schema::hasTable('requests')) {
+            Schema::rename('requests', 'requests');
         }
     }
 }

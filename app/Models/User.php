@@ -103,8 +103,8 @@ class User extends Authenticatable
      */
     public function requests()
     {
-        if (Schema::hasTable('service_requests')) {
-            return $this->hasMany(Request::class, 'customer_id')->getQuery()->from('service_requests');
+        if (Schema::hasTable('requests')) {
+            return $this->hasMany(Request::class, 'customer_id')->getQuery()->from('requests');
         }
         
         return $this->hasMany(Request::class, 'customer_id');

@@ -45,9 +45,9 @@ class SeedDemoData extends Command
             }
         }
 
-        // Check for the existence of the service_requests table before seeding
-        if (!Schema::hasTable('service_requests')) {
-            $this->error('The service_requests table does not exist.');
+        // Check for the existence of the requests table before seeding
+        if (!Schema::hasTable('requests')) {
+            $this->error('The requests table does not exist.');
             return 0;
         }
 
