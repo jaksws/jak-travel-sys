@@ -13,7 +13,14 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_view_users_index()
     {
-        $this->markTestSkipped('تم تخطي اختبار عرض قائمة المستخدمين مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        // إنشاء بعض المستخدمين
+        $users = User::factory()->count(3)->create();
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.users.index'));
+        $response->assertStatus(200);
+        foreach ($users as $user) {
+            $response->assertSee($user->email);
+        }
     }
     
     /**
@@ -23,7 +30,12 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_view_user_detail()
     {
-        $this->markTestSkipped('تم تخطي اختبار عرض تفاصيل المستخدم مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $user = User::factory()->create();
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.users.show', $user->id));
+        $response->assertStatus(200);
+        $response->assertSee($user->email);
+        $response->assertSee($user->name);
     }
     
     /**
@@ -33,7 +45,12 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_view_edit_user_form()
     {
-        $this->markTestSkipped('تم تخطي اختبار عرض نموذج تعديل المستخدم مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $user = User::factory()->create();
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.users.edit', $user->id));
+        $response->assertStatus(200);
+        $response->assertSee($user->email);
+        $response->assertSee($user->name);
     }
     
     /**
@@ -43,7 +60,23 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_update_user()
     {
-        $this->markTestSkipped('تم تخطي اختبار تحديث بيانات المستخدم مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $user = User::factory()->create([
+            'name' => 'الاسم القديم',
+            'email' => 'old@example.com',
+        ]);
+        $this->loginAsAdmin();
+        $newData = [
+            'name' => 'اسم جديد',
+            'email' => 'new@example.com',
+        ];
+        $response = $this->put(route('admin.users.update', $user->id), $newData);
+        $response->assertStatus(302);
+        $response->assertRedirect();
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'اسم جديد',
+            'email' => 'new@example.com',
+        ]);
     }
     
     /**
@@ -53,7 +86,22 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_create_user()
     {
-        $this->markTestSkipped('تم تخطي اختبار إنشاء مستخدم جديد مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $this->loginAsAdmin();
+        $userData = [
+            'name' => 'مستخدم جديد',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'customer',
+        ];
+        $response = $this->post(route('admin.users.store'), $userData);
+        $response->assertStatus(302);
+        $response->assertRedirect();
+        $this->assertDatabaseHas('users', [
+            'email' => 'newuser@example.com',
+            'name' => 'مستخدم جديد',
+            'role' => 'customer',
+        ]);
     }
     
     /**
@@ -63,7 +111,14 @@ class AdminUserManagementTest extends AdminTestCase
      */
     public function test_admin_can_delete_user()
     {
-        $this->markTestSkipped('تم تخطي اختبار حذف مستخدم مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $user = User::factory()->create();
+        $this->loginAsAdmin();
+        $response = $this->delete(route('admin.users.destroy', $user->id));
+        $response->assertStatus(302);
+        $response->assertRedirect();
+        $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
+        ]);
     }
     
     /**
