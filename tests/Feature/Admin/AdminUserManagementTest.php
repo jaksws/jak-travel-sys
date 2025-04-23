@@ -63,11 +63,15 @@ class AdminUserManagementTest extends AdminTestCase
         $user = User::factory()->create([
             'name' => 'الاسم القديم',
             'email' => 'old@example.com',
+            'role' => 'customer',
+            'status' => 'active',
         ]);
         $this->loginAsAdmin();
         $newData = [
             'name' => 'اسم جديد',
             'email' => 'new@example.com',
+            'role' => 'customer',
+            'status' => 'inactive',
         ];
         $response = $this->put(route('admin.users.update', $user->id), $newData);
         $response->assertStatus(302);
@@ -76,6 +80,8 @@ class AdminUserManagementTest extends AdminTestCase
             'id' => $user->id,
             'name' => 'اسم جديد',
             'email' => 'new@example.com',
+            'role' => 'customer',
+            'status' => 'inactive',
         ]);
     }
     

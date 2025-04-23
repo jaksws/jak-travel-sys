@@ -202,6 +202,37 @@ class DashboardController extends Controller
     }
 
     /**
+     * إنشاء مستخدم جديد من لوحة تحكم الأدمن
+     */
+    public function storeUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:admin,agency,subagent,customer',
+        ]);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->role = $request->role;
+        $user->status = 'active';
+        $user->save();
+        return redirect()->route('admin.users.index')->with('success', 'تم إنشاء المستخدم بنجاح');
+    }
+
+    /**
+     * حذف مستخدم من لوحة تحكم الأدمن
+     */
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'تم حذف المستخدم بنجاح');
+    }
+
+    /**
      * عرض صفحة إدارة الطلبات
      *
      * @param Request $request
