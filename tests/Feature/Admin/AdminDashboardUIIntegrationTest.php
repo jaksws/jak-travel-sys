@@ -47,7 +47,7 @@ class AdminDashboardUIIntegrationTest extends TestCase
     public function test_ui_color_changes_reflect_in_preview(): void
     {
         // Skip if we're just testing basic route registration
-        $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
+        // $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
         
         // تغيير الألوان
         $response = $this->actingAs($this->admin)
@@ -75,7 +75,7 @@ class AdminDashboardUIIntegrationTest extends TestCase
     public function test_adding_new_page_makes_it_available_in_system(): void
     {
         // Skip if we're just testing basic route registration
-        $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
+        // $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
         
         // إضافة صفحة جديدة
         $response = $this->actingAs($this->admin)
@@ -107,7 +107,7 @@ class AdminDashboardUIIntegrationTest extends TestCase
     public function test_logo_upload_integration(): void
     {
         // Skip if we're just testing basic route registration
-        $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
+        // $this->markTestSkipped('Este test requiere integración completa para ejecutarse correctamente');
         
         // Usar archivo simple en lugar de imagen para evitar dependencia de GD
         $logo = UploadedFile::fake()->create('site-logo.png', 100);

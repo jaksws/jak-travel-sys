@@ -16,7 +16,10 @@ class AdminDashboardUITest extends AdminTestCase
      */
     public function test_quick_action_links_are_working()
     {
-        $this->markTestSkipped('تم تخطي اختبار روابط الإجراءات السريعة مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.dashboard'));
+        $response->assertStatus(200);
+        $response->assertSee('روابط الإجراءات السريعة'); // تحقق من وجود النص أو الرابط المطلوب
     }
     
     /**
@@ -40,7 +43,10 @@ class AdminDashboardUITest extends AdminTestCase
      */
     public function test_latest_users_have_profile_links()
     {
-        $this->markTestSkipped('تم تخطي اختبار روابط ملفات المستخدمين مؤقتاً حتى يتم اكتمال تطوير الميزة');
+        $this->loginAsAdmin();
+        $response = $this->get(route('admin.dashboard'));
+        $response->assertStatus(200);
+        $response->assertSee('ملف المستخدم'); // تحقق من وجود روابط ملفات المستخدمين
     }
     
     /**
