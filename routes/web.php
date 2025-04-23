@@ -273,3 +273,10 @@ Route::group([
     Route::get('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'settings'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'updateSettings'])->name('settings.update');
 });
+
+// Aliases for /client/* to match test expectations
+Route::prefix('client')->middleware(['auth', \App\Http\Middleware\CustomerMiddleware::class])->group(function () {
+    Route::get('/dashboard', [CustomerDashboardController::class, 'index']);
+    Route::get('/requests', [CustomerRequestController::class, 'index']);
+    Route::get('/quotes', [CustomerQuoteController::class, 'index']);
+});

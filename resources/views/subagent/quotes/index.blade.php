@@ -8,9 +8,16 @@
 @section('content')
 <div class="container-fluid">
     <div class="row mb-4">
-        <div class="col-12">
-            <h2><i class="fas fa-tag me-2"></i> عروض الأسعار</h2>
-            <p class="text-muted">استعرض عروض الأسعار التي قمت بتقديمها وتتبع حالتها</p>
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h2><i class="fas fa-tag me-2"></i> عروض الأسعار</h2>
+                <p class="text-muted">استعرض عروض الأسعار التي قمت بتقديمها وتتبع حالتها</p>
+            </div>
+            <div>
+                <a href="{{ route('subagent.requests.index') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> تقديم عرض سعر
+                </a>
+            </div>
         </div>
     </div>
 

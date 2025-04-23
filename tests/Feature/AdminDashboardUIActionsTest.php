@@ -49,4 +49,111 @@ class AdminDashboardUIActionsTest extends TestCase
         $response->assertSee('تعديل');
         $response->assertSee('حذف');
     }
+
+    public function test_agency_dashboard_has_main_buttons_and_links()
+    {
+        $agency = User::factory()->create(['role' => 'agency', 'user_type' => 'agency', 'is_active' => 1]);
+        $this->actingAs($agency);
+        $response = $this->get('/agency/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('إضافة سبوكيل');
+        $response->assertSee('إضافة خدمة');
+        $response->assertSee('تصدير');
+        $response->assertSee('بحث');
+        $response->assertSee('إدارة السبوكلاء');
+        $response->assertSee('إدارة الخدمات');
+        $response->assertSee('إعدادات الوكالة');
+        $response->assertSee('تسجيل الخروج');
+    }
+
+    public function test_agency_services_page_buttons_and_links()
+    {
+        $agency = User::factory()->create(['role' => 'agency', 'user_type' => 'agency', 'is_active' => 1]);
+        $this->actingAs($agency);
+        $response = $this->get('/agency/services');
+        $response->assertStatus(200);
+        $response->assertSee('إضافة خدمة');
+        $response->assertSee('تعديل');
+        $response->assertSee('حذف');
+        $response->assertSee('بحث');
+        $response->assertSee('تصدير');
+    }
+
+    public function test_agency_subagents_page_buttons_and_links()
+    {
+        $agency = User::factory()->create(['role' => 'agency', 'user_type' => 'agency', 'is_active' => 1]);
+        $this->actingAs($agency);
+        $response = $this->get('/agency/subagents');
+        $response->assertStatus(200);
+        $response->assertSee('إضافة سبوكيل');
+        $response->assertSee('تعديل');
+        $response->assertSee('حذف');
+        $response->assertSee('بحث');
+        $response->assertSee('تصدير');
+    }
+
+    public function test_subagent_dashboard_has_main_buttons_and_links()
+    {
+        $subagent = User::factory()->create(['role' => 'subagent', 'user_type' => 'subagent', 'is_active' => 1]);
+        $this->actingAs($subagent);
+        $response = $this->get('/subagent/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('تقديم عرض سعر');
+        $response->assertSee('طلباتي');
+        $response->assertSee('عروضي');
+        $response->assertSee('بحث');
+        $response->assertSee('تسجيل الخروج');
+    }
+
+    public function test_subagent_quotes_page_buttons_and_links()
+    {
+        $subagent = User::factory()->create(['role' => 'subagent', 'user_type' => 'subagent', 'is_active' => 1]);
+        $this->actingAs($subagent);
+        $response = $this->get('/subagent/quotes');
+        $response->assertStatus(200);
+        $response->assertSee('تقديم عرض سعر');
+        $response->assertSee('تعديل');
+        $response->assertSee('حذف');
+        $response->assertSee('بحث');
+        $response->assertSee('تصدير');
+    }
+
+    public function test_client_dashboard_has_main_buttons_and_links()
+    {
+        $client = User::factory()->create(['role' => 'client', 'user_type' => 'customer', 'is_active' => 1]);
+        $this->actingAs($client);
+        $response = $this->get('/client/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('طلب خدمة جديدة');
+        $response->assertSee('طلباتي');
+        $response->assertSee('عروضي');
+        $response->assertSee('بحث');
+        $response->assertSee('تسجيل الخروج');
+    }
+
+    public function test_client_requests_page_buttons_and_links()
+    {
+        $client = User::factory()->create(['role' => 'client', 'user_type' => 'customer', 'is_active' => 1]);
+        $this->actingAs($client);
+        $response = $this->get('/client/requests');
+        $response->assertStatus(200);
+        $response->assertSee('طلب خدمة جديدة');
+        $response->assertSee('تعديل');
+        $response->assertSee('حذف');
+        $response->assertSee('بحث');
+        $response->assertSee('تصدير');
+    }
+
+    public function test_client_quotes_page_buttons_and_links()
+    {
+        $client = User::factory()->create(['role' => 'client', 'user_type' => 'customer', 'is_active' => 1]);
+        $this->actingAs($client);
+        $response = $this->get('/client/quotes');
+        $response->assertStatus(200);
+        $response->assertSee('عروضي');
+        $response->assertSee('قبول العرض');
+        $response->assertSee('رفض العرض');
+        $response->assertSee('بحث');
+        $response->assertSee('تصدير');
+    }
 }
