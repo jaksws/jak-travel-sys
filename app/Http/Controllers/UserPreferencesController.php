@@ -36,7 +36,7 @@ class UserPreferencesController extends Controller
      * حفظ تفضيلات المستخدم
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function save(Request $request)
     {
@@ -79,16 +79,21 @@ class UserPreferencesController extends Controller
         }
         
         $user->save();
-        
-        return response()->json([
-            'success' => true,
-            'message' => __('v2.preferences_updated_successfully', ['default' => 'Preferences updated successfully']),
-            'data' => [
-                'locale' => $user->locale ?? Session::get('locale'),
-                'textDirection' => Session::get('textDirection'),
-                'theme' => $user->theme ?? Session::get('theme', 'system')
-            ]
-        ]);
+
+        // استجابة مختلفة حسب نوع الطلب
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('v2.preferences_updated_successfully', ['default' => 'Preferences updated successfully']),
+                'data' => [
+                    'locale' => $user->locale ?? Session::get('locale'),
+                    'textDirection' => Session::get('textDirection'),
+                    'theme' => $user->theme ?? Session::get('theme', 'system')
+                ]
+            ]);
+        } else {
+            return redirect()->back()->with('success', __('v2.preferences_updated_successfully', ['default' => 'تم حفظ التفضيلات بنجاح']));
+        }
     }
     
     /**
