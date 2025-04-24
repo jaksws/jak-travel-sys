@@ -137,10 +137,8 @@
                 <!-- إضافة مفتاح تغيير اللغة -->
                 @if(config('v1_features.multilingual.enabled', false))
                 <li class="nav-item dropdown ms-2">
-                    <a class="nav-link p-0" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <button class="btn btn-sm rounded-circle" style="width: 38px; height: 38px; background-color: var(--bg-secondary);">
-                            <i class="fas fa-globe"></i>
-                        </button>
+                    <a class="nav-link p-0 btn btn-sm rounded-circle" style="width: 38px; height: 38px; background-color: var(--bg-secondary);" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-globe"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="languageDropdown">
                         <h6 class="dropdown-header">{{ __('v2.select_language') }}</h6>

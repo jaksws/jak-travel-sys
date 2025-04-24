@@ -38,7 +38,7 @@
                             {{ __('v2.language') }}
                         </label>
                         <select id="locale" name="locale" class="input">
-                            @foreach(config('v1_features.multilingual.available_locales') as $locale)
+                            @foreach((array) (config('v1_features.multilingual.available_locales') ?? ['ar','en']) as $locale)
                                 <option value="{{ $locale }}" {{ $currentLocale == $locale ? 'selected' : '' }}>
                                     @switch($locale)
                                         @case('ar')
