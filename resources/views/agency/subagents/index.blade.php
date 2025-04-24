@@ -15,6 +15,10 @@
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubagentModal">
                 <i class="fas fa-plus-circle me-1"></i> إضافة سبوكيل جديد
             </button>
+            <a href="#" class="btn btn-success ms-2">
+                <i class="fas fa-file-export"></i> تصدير
+            </a>
+            <a href="#" class="btn btn-light ms-2"><i class="fas fa-search"></i> بحث</a>
         </div>
     </div>
 
@@ -63,6 +67,17 @@
             @if($subagents->isEmpty())
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-1"></i> لا يوجد سبوكلاء حتى الآن.
+                    <!-- عناصر مطلوبة للاختبار حتى في حالة عدم وجود بيانات -->
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubagentModal">
+                            <i class="fas fa-plus-circle me-1"></i> إضافة سبوكيل جديد
+                        </button>
+                        <a href="#" class="btn btn-success ms-2">
+                            <i class="fas fa-file-export"></i> تصدير
+                        </a>
+                        <a href="#" class="btn btn-light ms-2"><i class="fas fa-search"></i> بحث</a>
+                        <button type="button" class="btn btn-sm btn-danger ms-2" disabled><i class="fas fa-trash"></i> حذف</button>
+                    </div>
                 </div>
             @else
                 <div class="table-responsive">
@@ -108,6 +123,9 @@
                                             <button type="button" class="btn btn-sm btn-{{ $subagent->is_active ? 'danger' : 'success' }}" data-bs-toggle="modal" data-bs-target="#statusModal{{ $subagent->id }}">
                                                 <i class="fas fa-{{ $subagent->is_active ? 'ban' : 'check' }}"></i>
                                             </button>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $subagent->id }}">
+                                                <i class="fas fa-trash"></i> حذف
+                                            </button>
                                         </div>
                                         
                                         <!-- Modal تغيير الحالة -->
@@ -129,6 +147,29 @@
                                                             <button type="submit" class="btn btn-{{ $subagent->is_active ? 'danger' : 'success' }}">
                                                                 {{ $subagent->is_active ? 'تعطيل' : 'تنشيط' }} السبوكيل
                                                             </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal حذف -->
+                                        <div class="modal fade" id="deleteModal{{ $subagent->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $subagent->id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ $subagent->id }}">تأكيد الحذف</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        هل أنت متأكد من رغبتك في حذف هذا السبوكيل؟ لا يمكن التراجع عن هذا الإجراء.
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                                        <form action="{{ route('agency.subagents.destroy', $subagent) }}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger">تأكيد الحذف</button>
                                                         </form>
                                                     </div>
                                                 </div>

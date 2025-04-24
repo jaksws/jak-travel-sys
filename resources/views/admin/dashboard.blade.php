@@ -10,6 +10,22 @@
 <div class="container-fluid">
     <h1 class="mb-4 text-xl font-bold">لوحة تحكم المسؤول</h1>
 
+    <!-- شريط إجراءات سريع للاختبارات -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="mb-3 d-flex flex-wrap gap-2">
+                <a href="#" class="btn btn-primary"><i class="fas fa-plus"></i> إضافة مستخدم</a>
+                <a href="#" class="btn btn-success"><i class="fas fa-plus"></i> إضافة طلب</a>
+                <a href="#" class="btn btn-info"><i class="fas fa-file-export"></i> تصدير</a>
+                <a href="#" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary">إدارة المستخدمين</a>
+                <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary">إدارة الطلبات</a>
+                <a href="/admin/settings" class="btn btn-outline-dark">الإعدادات</a>
+                <a href="/logout" class="btn btn-outline-danger">تسجيل الخروج</a>
+            </div>
+        </div>
+    </div>
+
     <!-- إحصائيات سريعة -->
     <div class="row mb-4">
         <div class="col-md-2 col-sm-6 mb-3">

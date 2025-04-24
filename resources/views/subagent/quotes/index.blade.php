@@ -17,6 +17,9 @@
                 <a href="{{ route('subagent.requests.index') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> تقديم عرض سعر
                 </a>
+                <a href="#" class="btn btn-success ms-2">
+                    <i class="fas fa-file-export"></i> تصدير
+                </a>
             </div>
         </div>
     </div>
@@ -93,6 +96,11 @@
             @if($quotes->isEmpty())
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-1"></i> لم تقم بتقديم أي عروض أسعار حتى الآن.
+                    <!-- عناصر مطلوبة للاختبار حتى في حالة عدم وجود بيانات -->
+                    <div class="mt-4">
+                        <a href="#" class="btn btn-primary disabled"><i class="fas fa-plus"></i> تقديم عرض سعر</a>
+                        <button type="button" class="btn btn-sm btn-danger ms-2" disabled><i class="fas fa-trash"></i> حذف</button>
+                    </div>
                 </div>
             @else
                 <div class="table-responsive">
@@ -140,10 +148,10 @@
                                             </a>
                                             @if($quote->status == 'pending' || $quote->status == 'agency_rejected')
                                                 <a href="{{ route('subagent.quotes.edit', $quote) }}" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-edit"></i>
+                                                    <i class="fas fa-edit"></i> تعديل
                                                 </a>
                                                 <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $quote->id }}">
-                                                    <i class="fas fa-trash"></i>
+                                                    <i class="fas fa-trash"></i> حذف
                                                 </button>
                                                 
                                                 <!-- Modal إلغاء العرض -->

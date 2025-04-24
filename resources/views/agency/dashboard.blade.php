@@ -21,6 +21,22 @@
         </div>
     </div>
 
+    <!-- شريط إجراءات سريع للاختبارات -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="mb-3 d-flex flex-wrap gap-2">
+                <a href="{{ route('agency.subagents.create') }}" class="btn btn-primary"><i class="fas fa-plus"></i> إضافة سبوكيل</a>
+                <a href="{{ route('agency.services.create') }}" class="btn btn-success"><i class="fas fa-plus"></i> إضافة خدمة</a>
+                <a href="{{ route('agency.reports.export') }}" class="btn btn-info"><i class="fas fa-file-export"></i> تصدير</a>
+                <a href="{{ route('agency.requests.index') }}" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
+                <a href="{{ route('agency.subagents.index') }}" class="btn btn-outline-primary">إدارة السبوكلاء</a>
+                <a href="{{ route('agency.services.index') }}" class="btn btn-outline-secondary">إدارة الخدمات</a>
+                <a href="{{ route('agency.settings.index') }}" class="btn btn-outline-dark">إعدادات الوكالة</a>
+                <a href="/logout" class="btn btn-outline-danger">تسجيل الخروج</a>
+            </div>
+        </div>
+    </div>
+
     <!-- Content Row - Main Stats -->
     <div class="row">
         <!-- إجمالي الطلبات -->

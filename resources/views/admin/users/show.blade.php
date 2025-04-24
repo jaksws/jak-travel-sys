@@ -16,6 +16,13 @@
             <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-warning">
                 <i class="fas fa-edit me-1"></i> تعديل
             </a>
+            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash me-1"></i> حذف
+                </button>
+            </form>
             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-right me-1"></i> عودة
             </a>
