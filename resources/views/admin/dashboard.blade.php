@@ -21,7 +21,8 @@
                 <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary">إدارة المستخدمين</a>
                 <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary">إدارة الطلبات</a>
                 <a href="/admin/settings" class="btn btn-outline-dark">الإعدادات</a>
-                <a href="/logout" class="btn btn-outline-danger">تسجيل الخروج</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">تسجيل الخروج</a>
             </div>
         </div>
     </div>

@@ -17,7 +17,8 @@
                 <a href="{{ route('customer.requests.index') }}" class="btn btn-info">طلباتي</a>
                 <a href="{{ route('customer.quotes.index') }}" class="btn btn-success">عروضي</a>
                 <a href="{{ route('customer.requests.index') }}" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
-                <a href="/logout" class="btn btn-outline-danger">تسجيل الخروج</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">تسجيل الخروج</a>
             </div>
         </div>
     </div>
