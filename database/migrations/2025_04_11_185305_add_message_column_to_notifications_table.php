@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            // Add message column if it doesn't exist
-            if (!Schema::hasColumn('notifications', 'message')) {
-                $table->text('message')->nullable(false);
-            }
-        });
+        if (Schema::hasTable('notifications')) {
+            Schema::table('notifications', function (Blueprint $table) {
+                // Add message column if it doesn't exist
+                if (!Schema::hasColumn('notifications', 'message')) {
+                    $table->text('message')->nullable(false);
+                }
+            });
+        }
     }
 
     /**
@@ -24,11 +26,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            // Drop columns if they exist
-            if (Schema::hasColumn('notifications', 'message')) {
-                $table->dropColumn('message');
-            }
-        });
+        if (Schema::hasTable('notifications')) {
+            Schema::table('notifications', function (Blueprint $table) {
+                // Drop columns if they exist
+                if (Schema::hasColumn('notifications', 'message')) {
+                    $table->dropColumn('message');
+                }
+            });
+        }
     }
 };

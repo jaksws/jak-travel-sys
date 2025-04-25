@@ -11,21 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            // إضافة الأعمدة المطلوبة إذا لم تكن موجودة بالفعل
-            if (!Schema::hasColumn('notifications', 'title')) {
-                $table->string('title')->nullable();
-            }
-            if (!Schema::hasColumn('notifications', 'message')) {
-                $table->text('message')->nullable();
-            }
-            if (!Schema::hasColumn('notifications', 'type')) {
-                $table->string('type')->nullable();
-            }
-            if (!Schema::hasColumn('notifications', 'link')) {
-                $table->string('link')->nullable();
-            }
-        });
+        if (Schema::hasTable('notifications')) {
+            Schema::table('notifications', function (Blueprint $table) {
+                // إضافة الأعمدة المطلوبة إذا لم تكن موجودة بالفعل
+                if (!Schema::hasColumn('notifications', 'title')) {
+                    $table->string('title')->nullable();
+                }
+                if (!Schema::hasColumn('notifications', 'message')) {
+                    $table->text('message')->nullable();
+                }
+                if (!Schema::hasColumn('notifications', 'type')) {
+                    $table->string('type')->nullable();
+                }
+                if (!Schema::hasColumn('notifications', 'link')) {
+                    $table->string('link')->nullable();
+                }
+            });
+        }
     }
 
     /**
@@ -33,8 +35,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            $table->dropColumn(['title', 'message', 'type', 'link']);
-        });
+        if (Schema::hasTable('notifications')) {
+            Schema::table('notifications', function (Blueprint $table) {
+                $columns = array_filter(['title', 'message', 'type', 'link'], function($col) {
+                    return Schema::hasColumn('notifications', $col);
+                });
+                if (!empty($columns)) {
+                    $table->dropColumn($columns);
+                }
+            });
+        }
     }
 };
