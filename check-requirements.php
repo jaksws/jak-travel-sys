@@ -63,7 +63,9 @@ $required_extensions = [
     'mbstring' => false,
     'tokenizer' => false,
     'xml' => false,
-    'fileinfo' => false
+    'fileinfo' => false,
+    'intl' => false,
+    'soap' => false
 ];
 
 // فحص امتداد pdo_mysql بطريقتين
@@ -80,6 +82,10 @@ foreach ($required_extensions as $ext => $status) {
     
     $status = $required_extensions[$ext];
     echo "- {$ext}: " . ($status ? "✅ متوفر" : "❌ غير متوفر") . "\n";
+    
+    if (!$status) {
+        echo "  - لتثبيت {$ext}، استخدم الأمر المناسب لنظام التشغيل الخاص بك.\n";
+    }
     
     if ($ext === 'pdo_mysql' && !$status) {
         echo "  - موجود في extension_loaded(): " . ($pdo_mysql_loaded ? "نعم" : "لا") . "\n";

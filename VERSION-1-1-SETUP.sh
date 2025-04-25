@@ -89,94 +89,55 @@ else
     echo -e "${YELLOW}يرجى تحميل الإصدار 1.0 يدويًا وتحديث الملفات.${NC}"
 fi
 
-# تحديث ملف تكوين ميزات الإصدار 1.0
-echo -e "${YELLOW}تحديث ملف تكوين ميزات الإصدار 1.0...${NC}"
-
+# تحديث ملف تكوين ميزات الإصدار 1.1
 if [ -f "config/v1_features.php" ]; then
-    # احتفظ بنسخة من إعدادات المستخدم الحالية
     cp config/v1_features.php config/v1_features.backup.php
-    
-    # تحديث ملف التكوين مع الإبقاء على إعدادات المستخدم
     echo -e "${YELLOW}تطبيق تحديثات ملف التكوين مع الحفاظ على الإعدادات الحالية...${NC}"
-    # هذا سيتم تنفيذه في خطوة لاحقة عبر أوامر PHP Artisan
+    php artisan config:update-features || echo -e "${YELLOW}فشل تنفيذ أمر تحديث التكوين${NC}"
 else
-    echo -e "${YELLOW}إنشاء ملف تكوين ميزات الإصدار 1.0...${NC}"
+    echo -e "${YELLOW}إنشاء ملف تكوين ميزات الإصدار 1.1...${NC}"
     mkdir -p config
     cat > config/v1_features.php << 'EOL'
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | ميزات الإصدار 1.0
-    |--------------------------------------------------------------------------
-    |
-    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 1.0 من النظام
-    | يمكنك تفعيل أو تعطيل أي من هذه الميزات حسب الحاجة
-    |
-    */
-
     'multilingual' => [
         'enabled' => true,
         'available_locales' => ['ar', 'en', 'fr', 'tr', 'es', 'id', 'ur'],
         'default_locale' => 'ar',
     ],
-
     'dark_mode' => [
         'enabled' => true,
-        'default' => 'system', // 'light', 'dark', 'system'
+        'default' => 'system',
     ],
-
     'payment_system' => [
         'enabled' => true,
         'providers' => [
             'mada' => [
                 'enabled' => true,
                 'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('MADA_MERCHANT_ID', ''),
-                    'api_key' => env('MADA_API_KEY', ''),
-                ],
             ],
             'visa' => [
                 'enabled' => true,
                 'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('VISA_MERCHANT_ID', ''),
-                    'api_key' => env('VISA_API_KEY', ''),
-                ],
             ],
             'mastercard' => [
                 'enabled' => true,
                 'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('MASTERCARD_MERCHANT_ID', ''),
-                    'api_key' => env('MASTERCARD_API_KEY', ''),
-                ],
             ],
             'apple_pay' => [
                 'enabled' => true,
                 'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('APPLE_PAY_MERCHANT_ID', ''),
-                    'certificate_path' => env('APPLE_PAY_CERTIFICATE_PATH', ''),
-                ],
             ],
             'google_pay' => [
                 'enabled' => true,
                 'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('GOOGLE_PAY_MERCHANT_ID', ''),
-                    'api_key' => env('GOOGLE_PAY_API_KEY', ''),
-                ],
             ],
         ],
     ],
-
     'enhanced_ui' => [
         'enabled' => true,
     ],
-    
     'analytics' => [
         'enabled' => true,
         'modules' => [
@@ -186,20 +147,19 @@ return [
             'market_trends' => true,
         ],
     ],
-    
     'additional_languages' => [
         'enabled' => true,
         'languages' => [
-            'es' => true, // الإسبانية
-            'id' => true, // الإندونيسية
-            'ur' => true, // الأوردية
+            'es' => true,
+            'id' => true,
+            'ur' => true,
         ],
     ],
 ];
 EOL
 fi
 
-echo -e "${GREEN}تم تحديث ملف تكوين ميزات الإصدار 1.0${NC}"
+echo -e "${GREEN}تم تحديث ملف تكوين ميزات الإصدار 1.1${NC}"
 
 # تحديث التبعيات
 echo -e "${YELLOW}تحديث تبعيات Composer...${NC}"
