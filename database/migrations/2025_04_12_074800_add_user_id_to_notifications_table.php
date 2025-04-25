@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('notifications')) {
-            Schema::table('notifications', function (Blueprint $table) {
-                // حذف أي كود يضيف user_id من migration 2025_04_12_074800_add_user_id_to_notifications_table.php
-            });
-        } else {
+        if (!Schema::hasTable('notifications')) {
             // إنشاء الجدول إذا لم يكن موجودًا
             Schema::create('notifications', function (Blueprint $table) {
                 $table->id();
@@ -35,8 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            // حذف أي كود يضيف user_id من migration 2025_04_12_074800_add_user_id_to_notifications_table.php
-        });
+        Schema::dropIfExists('notifications');
     }
 };

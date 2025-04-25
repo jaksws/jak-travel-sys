@@ -45,7 +45,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn([
+            $columns = [
                 'payment_settings',
                 'notification_settings',
                 'theme_color',
@@ -54,7 +54,12 @@ return new class extends Migration
                 'social_media_twitter',
                 'social_media_facebook',
                 'social_media_linkedin',
-            ]);
+            ];
+            foreach ($columns as $col) {
+                if (Schema::hasColumn('agencies', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
     }
 };

@@ -23,8 +23,6 @@ class RenameRequestsTable extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('requests')) {
-            Schema::rename('requests', 'requests');
-        }
+        // لا داعي لأي إجراء عكسي لأن اسم الجدول لم يتغير فعليًا
     }
 }

@@ -37,12 +37,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn([
+            $columns = [
                 'default_commission_rate',
                 'default_currency',
                 'price_decimals',
-                'price_display_format'
-            ]);
+                'price_display_format',
+            ];
+            foreach ($columns as $col) {
+                if (Schema::hasColumn('agencies', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
     }
 };

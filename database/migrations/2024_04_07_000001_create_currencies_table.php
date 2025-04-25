@@ -49,7 +49,9 @@ return new class extends Migration
         });
 
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn('default_currency');
+            if (Schema::hasColumn('agencies', 'default_currency')) {
+                $table->dropColumn('default_currency');
+            }
         });
 
         Schema::table('quotes', function (Blueprint $table) {

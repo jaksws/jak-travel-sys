@@ -10,15 +10,15 @@ return new class extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained();
+            $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('cascade');
             $table->foreignId('customer_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->foreignId('agency_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('agency_id')->nullable()->constrained('agencies')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->text('details')->nullable();
-            $table->enum('priority', ['normal', 'urgent', 'emergency'])->default('normal');
-            $table->enum('status', ['pending', 'in_progress', 'approved', 'rejected', 'completed', 'cancelled'])->default('pending');
+            $table->string('priority')->nullable();
+            $table->string('status')->default('pending');
             $table->date('requested_date')->nullable();
             $table->date('required_date')->nullable();
             $table->text('notes')->nullable();
