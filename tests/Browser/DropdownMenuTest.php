@@ -56,4 +56,40 @@ class DropdownMenuTest extends DuskTestCase
                 ->assertPresent('@notifications-dropdown-menu');
         });
     }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function user_dropdown_menu_shows_profile_and_logout_links()
+    {
+        $user = User::factory()->create([
+            'name' => 'Dropdown User',
+            'email' => 'dropdownuser@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $this->browse(function (Browser $browser) use ($user) {
+            $browser->loginAs($user)
+                ->visit('/')
+                ->pause(1000) // Pause for initial page load
+                ->waitUntil('window.bootstrap !== undefined && window.bootstrap.Dropdown !== undefined', 15) // Wait for Bootstrap JS and Dropdown component
+                ->waitFor('@user-dropdown-toggle', 10)
+                ->assertVisible('@user-dropdown-toggle')
+                ->scrollTo('@user-dropdown-toggle'); // Scroll to it
+
+            // Use script to manually trigger the dropdown show event (single string)
+            $browser->script(
+                'var toggleElement = document.querySelector("[dusk=\'user-dropdown-toggle\']"); '
+                . 'if (toggleElement) { '
+                . '  var dropdownInstance = bootstrap.Dropdown.getInstance(toggleElement) || new bootstrap.Dropdown(toggleElement); '
+                . '  dropdownInstance.show(); '
+                . '} else { console.error("Dusk toggle element not found"); }'
+            );
+
+            $browser->pause(1000) // Pause after triggering show
+                ->waitFor('@user-dropdown-menu', 10) // Wait for menu visibility
+                ->assertVisible('@user-dropdown-menu')
+                ->waitFor('@user-dropdown-profile-link', 5)
+                ->assertVisible('@user-dropdown-profile-link')
+                ->assertVisible('@user-dropdown-logout-btn');
+        });
+    }
 }

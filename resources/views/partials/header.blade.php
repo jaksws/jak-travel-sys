@@ -114,13 +114,13 @@
                                     </div>
                                 </div>
                             </li>
-                            <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}"><i class="fas fa-user-edit me-2"></i> {{ __('v2.profile_settings') }}</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}" dusk="user-dropdown-profile-link"><i class="fas fa-user-edit me-2"></i> {{ __('v2.profile_settings') }}</a></li>
                             <li><a class="dropdown-item py-2" href="{{ route('user.preferences') }}"><i class="fas fa-palette me-2"></i> {{ __('v2.appearance_settings') }}</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item py-2 text-danger"><i class="fas fa-sign-out-alt me-2"></i> {{ __('v2.logout') }}</button>
+                                    <button type="submit" class="dropdown-item py-2 text-danger" dusk="user-dropdown-logout-btn"><i class="fas fa-sign-out-alt me-2"></i> {{ __('v2.logout') }}</button>
                                 </form>
                             </li>
                         </ul>
