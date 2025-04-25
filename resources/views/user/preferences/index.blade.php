@@ -106,8 +106,37 @@
             });
         });
 
-        // AJAX form submission
+        // تفعيل زر التبديل للوضع الليلي
+        const themeSelector = document.getElementById('theme-selector');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
         const preferencesForm = document.getElementById('preferences-form');
+
+        if (darkModeToggle && themeSelector) {
+            darkModeToggle.addEventListener('change', function() {
+                console.log('Toggle changed:', darkModeToggle.checked);
+                if (darkModeToggle.checked) {
+                    themeSelector.value = 'dark';
+                } else {
+                    themeSelector.value = 'light';
+                }
+                // Trigger change event for select to sync UI
+                themeSelector.dispatchEvent(new Event('change'));
+                // Submit the form after a short delay to ensure value is set
+                setTimeout(function() {
+                    preferencesForm.requestSubmit();
+                }, 100);
+            });
+            themeSelector.addEventListener('change', function() {
+                console.log('Theme select changed:', themeSelector.value);
+                if (themeSelector.value === 'dark') {
+                    darkModeToggle.checked = true;
+                } else {
+                    darkModeToggle.checked = false;
+                }
+            });
+        }
+
+        // AJAX form submission
         preferencesForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(preferencesForm);
