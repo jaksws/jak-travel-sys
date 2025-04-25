@@ -54,7 +54,7 @@
                 @else
                     <!-- إضافة زر الإشعارات -->
                     <li class="nav-item dropdown mx-2">
-                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" dusk="notifications-dropdown-toggle">
                             <i class="fas fa-bell fs-5"></i>
                             <!-- يمكن تعديل هذا الجزء ليعرض عدد الإشعارات الفعلية من قاعدة البيانات -->
                             @if(auth()->user()->unreadNotifications->count() > 0)
@@ -64,7 +64,7 @@
                                 </span>
                             @endif
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width: 280px; max-height: 400px; overflow-y: auto;" aria-labelledby="notificationsDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width: 280px; max-height: 400px; overflow-y: auto;" aria-labelledby="notificationsDropdown" dusk="notifications-dropdown-menu">
                             <h6 class="dropdown-header bg-light fw-bold">الإشعارات</h6>
                             @if(auth()->user()->notifications->count() > 0)
                                 @foreach(auth()->user()->notifications->take(5) as $notification)
@@ -89,7 +89,7 @@
                     </li>
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" dusk="user-dropdown-toggle">
                             <!-- صورة المستخدم أو الأحرف الأولى من اسمه -->
                             <div class="avatar-circle bg-primary text-white me-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;border-radius:50%;">
                                 @if(auth()->user()->profile_photo_path)
@@ -100,7 +100,7 @@
                             </div>
                             <span>{{ auth()->user()->name }}</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown" dusk="user-dropdown-menu">
                             <li>
                                 <div class="dropdown-header bg-primary bg-gradient text-white p-3">
                                     <div class="d-flex align-items-center">

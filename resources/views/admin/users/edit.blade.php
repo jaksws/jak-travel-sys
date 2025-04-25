@@ -90,6 +90,19 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    
+                    <div class="col-md-6">
+                        <label for="user_type" class="form-label">نوع الحساب (user_type)</label>
+                        <select class="form-select @error('user_type') is-invalid @enderror" id="user_type" name="user_type">
+                            <option value="agency" {{ old('user_type', $user->user_type) == 'agency' ? 'selected' : '' }}>وكالة</option>
+                            <option value="subagent" {{ old('user_type', $user->user_type) == 'subagent' ? 'selected' : '' }}>سبوكيل</option>
+                            <option value="customer" {{ old('user_type', $user->user_type) == 'customer' ? 'selected' : '' }}>عميل</option>
+                            <option value="admin" {{ old('user_type', $user->user_type) == 'admin' ? 'selected' : '' }}>مسؤول</option>
+                        </select>
+                        @error('user_type')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
                 
                 <hr class="my-4">
