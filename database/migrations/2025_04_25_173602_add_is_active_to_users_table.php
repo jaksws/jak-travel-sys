@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'theme')) {
-                $table->string('theme')->nullable()->after('locale');
+            // Add is_active column if missing
+            if (!Schema::hasColumn('users', 'is_active')) {
+                $table->boolean('is_active')->default(true)->after('status');
             }
         });
     }
@@ -24,7 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('theme');
+            // Remove is_active column if exists
+            if (Schema::hasColumn('users', 'is_active')) {
+                $table->dropColumn('is_active');
+            }
         });
     }
 };

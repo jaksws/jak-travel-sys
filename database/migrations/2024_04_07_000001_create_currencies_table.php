@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('symbol');
             $table->boolean('is_default')->default(false);
             $table->decimal('exchange_rate', 10, 4)->default(1.0000); // Base rate compared to default currency
-            $table->boolean('is_active')->default(true);
+            $table->string('status')->default('active'); // Use status instead of is_active
             $table->timestamps();
         });
 

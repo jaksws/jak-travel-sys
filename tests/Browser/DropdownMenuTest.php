@@ -3,93 +3,80 @@
 namespace Tests\Browser;
 
 use App\Models\User;
-use Laravel\Dusk\Browser;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class DropdownMenuTest extends DuskTestCase
 {
     use DatabaseMigrations;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_can_open_user_dropdown_menu_in_header()
+    protected $user;
+
+    protected function setUp(): void
     {
-        $user = User::factory()->create([
+        parent::setUp();
+        $this->user = User::factory()->create([
             'name' => 'Test User',
-            'email' => 'testuser@example.com',
+            'email' => 'test@example.com',
+            'role' => 'customer', // Or any role that has the header dropdowns
             'password' => bcrypt('password'),
         ]);
+    }
 
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->loginAs($user)
-                ->visit('/')
-                ->pause(1500)
-                ->assertPresent('@user-dropdown-toggle')
-                ->click('@user-dropdown-toggle')
-                ->pause(1500)
-                ->assertPresent('@user-dropdown-menu');
+    /**
+     * Test user dropdown.
+     * @group dropdown
+     * @return void
+     */
+    public function testUserCanOpenUserDropdownMenuInHeader(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->user)
+                    ->visit('/') // Or the page where the header exists
+                    ->waitFor('@user-dropdown-toggle') // Use a specific dusk selector for the trigger
+                    ->click('@user-dropdown-toggle')
+                    ->waitFor('@user-dropdown-menu') // Use a specific dusk selector for the menu
+                    ->assertVisible('@user-dropdown-menu'); // Assert the menu is visible
         });
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_can_open_notifications_dropdown_menu_in_header()
+     /**
+     * Test notifications dropdown.
+     * @group dropdown
+     * @return void
+     */
+    public function testUserCanOpenNotificationsDropdownMenuInHeader(): void
     {
-        $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'testuser2@example.com',
-            'password' => bcrypt('password'),
-        ]);
-        // إضافة إشعار تجريبي لهذا المستخدم
-        $quote = \App\Models\Quote::factory()->create([
-            'user_id' => $user->id,
-            'status' => 'pending',
-        ]);
-        $user->notify(new \App\Notifications\QuoteStatusChanged($quote, 'pending'));
-
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->loginAs($user)
-                ->visit('/')
-                ->pause(1500)
-                ->assertPresent('@notifications-dropdown-toggle')
-                ->click('@notifications-dropdown-toggle')
-                ->pause(1500)
-                ->assertPresent('@notifications-dropdown-menu');
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->user)
+                    ->visit('/') // Or the page where the header exists
+                    ->waitFor('@notifications-dropdown-toggle') // Use a specific dusk selector
+                    ->click('@notifications-dropdown-toggle')
+                    ->waitFor('@notifications-dropdown-menu') // Use a specific dusk selector
+                    ->assertVisible('@notifications-dropdown-menu');
         });
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_dropdown_menu_shows_profile_and_logout_links()
+    /**
+     * Test user dropdown menu links.
+     * @group dropdown
+     * @return void
+     */
+    public function testUserDropdownMenuShowsProfileAndLogoutLinks(): void
     {
-        $user = User::factory()->create([
-            'name' => 'Dropdown User',
-            'email' => 'dropdownuser@example.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        $this->browse(function (Browser $browser) use ($user) {
-            $browser->loginAs($user)
-                ->visit('/')
-                ->pause(1000) // Pause for initial page load
-                ->waitUntil('window.bootstrap !== undefined && window.bootstrap.Dropdown !== undefined', 15) // Wait for Bootstrap JS and Dropdown component
-                ->waitFor('@user-dropdown-toggle', 10)
-                ->assertVisible('@user-dropdown-toggle')
-                ->scrollTo('@user-dropdown-toggle'); // Scroll to it
-
-            // Use script to manually trigger the dropdown show event (single string)
-            $browser->script(
-                'var toggleElement = document.querySelector("[dusk=\'user-dropdown-toggle\']"); '
-                . 'if (toggleElement) { '
-                . '  var dropdownInstance = bootstrap.Dropdown.getInstance(toggleElement) || new bootstrap.Dropdown(toggleElement); '
-                . '  dropdownInstance.show(); '
-                . '} else { console.error("Dusk toggle element not found"); }'
-            );
-
-            $browser->pause(1000) // Pause after triggering show
-                ->waitFor('@user-dropdown-menu', 10) // Wait for menu visibility
-                ->assertVisible('@user-dropdown-menu')
-                ->waitFor('@user-dropdown-profile-link', 5)
-                ->assertVisible('@user-dropdown-profile-link')
-                ->assertVisible('@user-dropdown-logout-btn');
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->user)
+                    ->visit('/') // Or the page where the header exists
+                    ->waitFor('@user-dropdown-toggle')
+                    ->click('@user-dropdown-toggle')
+                    ->waitFor('@user-dropdown-menu')
+                    ->assertVisible('@user-dropdown-menu')
+                    // Use specific dusk selectors for the links
+                    ->assertSeeIn('@user-dropdown-menu', __('v2.profile_settings')) // Check for profile link text
+                    ->assertVisible('@user-dropdown-profile-link') // Check profile link exists
+                    ->assertSeeIn('@user-dropdown-menu', __('v2.logout')) // Check for logout button text
+                    ->assertVisible('@user-dropdown-logout-btn'); // Check logout button exists
         });
     }
 }

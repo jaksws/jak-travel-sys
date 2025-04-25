@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('email_notifications')->default(false)->after('theme');
+            if (!Schema::hasColumn('users', 'email_notifications')) {
+                $table->boolean('email_notifications')->default(true)->after('theme');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('email_notifications');
+            if (Schema::hasColumn('users', 'email_notifications')) {
+                $table->dropColumn('email_notifications');
+            }
         });
     }
 };

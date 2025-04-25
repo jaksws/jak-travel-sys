@@ -27,7 +27,7 @@
             <h6 class="m-0 font-weight-bold">بيانات المستخدم</h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+            <form action="{{ route('admin.users.update', $user->id) }}" method="POST" dusk="edit-user-form">
                 @csrf
                 @method('PUT')
                 
@@ -134,11 +134,11 @@
                 </div>
                 
                 <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" dusk="delete-user-button">
                         <i class="fas fa-trash me-1"></i> حذف المستخدم
                     </button>
                     
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" dusk="update-user-submit">
                         <i class="fas fa-save me-1"></i> حفظ التغييرات
                     </button>
                 </div>
@@ -166,7 +166,7 @@
                 <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">نعم، قم بالحذف</button>
+                    <button type="submit" class="btn btn-danger" dusk="confirm-delete-button">نعم، قم بالحذف</button>
                 </form>
             </div>
         </div>

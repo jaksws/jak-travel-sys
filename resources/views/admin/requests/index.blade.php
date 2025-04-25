@@ -11,7 +11,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">إدارة الطلبات</h1>
-        <a href="{{ route('admin.requests.store') }}" class="btn btn-primary d-none">إضافة طلب جديد</a>
+        <a href="{{ route('admin.requests.store') }}" class="btn btn-primary d-none" dusk="add-request-button">إضافة طلب جديد</a>
     </div>
 
     <div class="card shadow mb-4">
@@ -40,6 +40,7 @@
                             <th>الخدمة</th>
                             <th>الحالة</th>
                             <th>تاريخ الطلب</th>
+                            <th>الإجراءات</th> {{-- Add Actions column header --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -68,10 +69,19 @@
                                 @endswitch
                             </td>
                             <td>{{ $request->created_at ? $request->created_at->format('Y-m-d') : '-' }}</td>
+                            <td> {{-- Add Actions column data --}}
+                                <a href="{{ route('admin.requests.show', $request->id) }}" class="btn btn-sm btn-info" title="عرض"><i class="fas fa-eye"></i></a>
+                                <a href="{{ route('admin.requests.edit', $request->id) }}" class="btn btn-sm btn-warning" title="تعديل"><i class="fas fa-edit"></i></a>
+                                <form action="{{ route('admin.requests.destroy', $request->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذا الطلب؟');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" title="حذف"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">لا توجد طلبات</td>
+                            <td colspan="7" class="text-center">لا توجد طلبات</td> {{-- Update colspan --}}
                         </tr>
                         @endforelse
                     </tbody>

@@ -11,10 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('locale', 10)->default('ar')->after('remember_token');
-            $table->string('theme_preference', 20)->default('light')->after('locale');
-        });
+        // Add locale column if it does not exist
+        if (!Schema::hasColumn('users', 'locale')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('locale', 10)->default('ar')->after('remember_token');
+            });
+        }
+        // Add theme_preference column if it does not exist
+        if (!Schema::hasColumn('users', 'theme_preference')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('theme_preference', 20)->default('light')->after('locale');
+            });
+        }
     }
 
     /**

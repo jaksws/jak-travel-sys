@@ -21,7 +21,7 @@ class AgencySeeder extends Seeder
                 'name' => 'وكالة اليمن للسفر والسياحة',
                 'phone' => '777123456',
                 'address' => 'صنعاء - شارع جمال عبد الناصر',
-                'is_active' => true
+                'status' => 'active'
             ]
         );
 
@@ -31,7 +31,7 @@ class AgencySeeder extends Seeder
                 'name' => 'وكالة الخليج للسفريات',
                 'phone' => '777654321',
                 'address' => 'عدن - المنصورة',
-                'is_active' => true
+                'status' => 'active'
             ]
         );
 
@@ -41,7 +41,7 @@ class AgencySeeder extends Seeder
                 'name' => 'وكالة الشرق للسفر',
                 'phone' => '777111222',
                 'address' => 'حضرموت - المكلا',
-                'is_active' => true
+                'status' => 'active'
             ]
         );
     }

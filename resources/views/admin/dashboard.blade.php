@@ -14,13 +14,13 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="mb-3 d-flex flex-wrap gap-2">
-                <a href="#" class="btn btn-primary"><i class="fas fa-plus"></i> إضافة مستخدم</a>
-                <a href="#" class="btn btn-success"><i class="fas fa-plus"></i> إضافة طلب</a>
+                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal" dusk="add-user-button"><i class="fas fa-plus"></i> إضافة مستخدم</a>
+                <a href="{{ route('admin.requests.store') }}" class="btn btn-success" dusk="add-request-button-dashboard"><i class="fas fa-plus"></i> إضافة طلب</a>
                 <a href="#" class="btn btn-info"><i class="fas fa-file-export"></i> تصدير</a>
                 <a href="#" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
-                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary">إدارة المستخدمين</a>
-                <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary">إدارة الطلبات</a>
-                <a href="/admin/settings" class="btn btn-outline-dark">الإعدادات</a>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary" dusk="manage-users-link">إدارة المستخدمين</a>
+                <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary" dusk="manage-requests-link">إدارة الطلبات</a>
+                <a href="/admin/settings" class="btn btn-outline-dark" dusk="settings-link">الإعدادات</a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                 <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">تسجيل الخروج</a>
             </div>
@@ -297,25 +297,25 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="manage-users-link">
                                 <span><i class="fas fa-users me-2"></i> إدارة المستخدمين</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="{{ route('admin.requests.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="{{ route('admin.requests.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="manage-requests-link">
                                 <span><i class="fas fa-clipboard-list me-2"></i> إدارة الطلبات</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="{{ route('admin.system.logs') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="{{ route('admin.system.logs') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="quick-link-system-logs">
                                 <span><i class="fas fa-file-alt me-2"></i> سجلات النظام</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="/admin/settings" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="/admin/settings" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="settings-link">
                                 <span><i class="fas fa-cog me-2"></i> إعدادات النظام</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>

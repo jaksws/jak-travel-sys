@@ -93,7 +93,8 @@ class SeedDemoData extends Command
                 'default_currency' => 'SAR',
                 'default_commission_rate' => 10,
                 'price_decimals' => 2,
-                'price_display_format' => 'symbol_first'
+                'price_display_format' => 'symbol_first',
+                'status' => 'active' // Add status for agency
             ]
         );
 
@@ -104,10 +105,13 @@ class SeedDemoData extends Command
                 'name' => 'مستخدم التجربة',
                 'password' => Hash::make('123456'),
                 'agency_id' => $agency->id,
-                'user_type' => 'agency',
-                'is_active' => true,
+                'role' => 'agent',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'en', // Add default locale
+                'theme' => 'light', // Add default theme
+                'email_notifications' => true, // Add default email notification
             ]
         );
     }
@@ -127,7 +131,8 @@ class SeedDemoData extends Command
                 'default_currency' => 'SAR',
                 'default_commission_rate' => 15,
                 'price_decimals' => 2,
-                'price_display_format' => 'symbol_first'
+                'price_display_format' => 'symbol_first',
+                'status' => 'active' // Add status for agency
             ]
         );
 
@@ -138,10 +143,13 @@ class SeedDemoData extends Command
                 'name' => 'مدير وكالة اليمن',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'agency',
-                'is_active' => true,
+                'role' => 'agent',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -152,10 +160,13 @@ class SeedDemoData extends Command
                 'name' => 'أحمد محمد',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'subagent',
-                'is_active' => true,
+                'role' => 'subagent',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -165,10 +176,13 @@ class SeedDemoData extends Command
                 'name' => 'محمد علي',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'subagent',
-                'is_active' => true,
+                'role' => 'subagent',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -179,10 +193,13 @@ class SeedDemoData extends Command
                 'name' => 'سالم علي',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'customer',
-                'is_active' => true,
+                'role' => 'client',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -192,10 +209,13 @@ class SeedDemoData extends Command
                 'name' => 'فاطمة أحمد',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'customer',
-                'is_active' => true,
+                'role' => 'client',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -217,7 +237,8 @@ class SeedDemoData extends Command
                 'default_currency' => 'SAR',
                 'default_commission_rate' => 12,
                 'price_decimals' => 2,
-                'price_display_format' => 'symbol_first'
+                'price_display_format' => 'symbol_first',
+                'status' => 'active' // Add status for agency
             ]
         );
 
@@ -228,10 +249,13 @@ class SeedDemoData extends Command
                 'name' => 'مدير وكالة الخليج',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'agency',
-                'is_active' => true,
+                'role' => 'agent',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -242,10 +266,13 @@ class SeedDemoData extends Command
                 'name' => 'خالد حسن',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'subagent',
-                'is_active' => true,
+                'role' => 'subagent',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -256,10 +283,13 @@ class SeedDemoData extends Command
                 'name' => 'عبد الله محمد',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'user_type' => 'customer',
-                'is_active' => true,
+                'role' => 'client',
+                'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
 
@@ -280,7 +310,7 @@ class SeedDemoData extends Command
                 'symbol' => 'ر.س',
                 'is_default' => true,
                 'exchange_rate' => 1.0000,
-                'is_active' => true,
+                'status' => 'active',
             ]);
 
             Currency::create([
@@ -289,7 +319,7 @@ class SeedDemoData extends Command
                 'symbol' => '$',
                 'is_default' => false,
                 'exchange_rate' => 0.2667,
-                'is_active' => true,
+                'status' => 'active',
             ]);
 
             Currency::create([
@@ -298,7 +328,7 @@ class SeedDemoData extends Command
                 'symbol' => '€',
                 'is_default' => false,
                 'exchange_rate' => 0.2453,
-                'is_active' => true,
+                'status' => 'active',
             ]);
 
             Currency::create([
@@ -307,7 +337,7 @@ class SeedDemoData extends Command
                 'symbol' => 'ر.ي',
                 'is_default' => false,
                 'exchange_rate' => 66.7500,
-                'is_active' => true,
+                'status' => 'active',
             ]);
         }
     }
@@ -378,11 +408,15 @@ class SeedDemoData extends Command
 
             // ربط الخدمة بالسبوكلاء
             $subagents = User::where('agency_id', $agency->id)
-                ->where('user_type', 'subagent')
-                ->where('is_active', true)
+                ->where('role', 'subagent')
+                ->where('status', 'active')
                 ->get();
             
-            $service->subagents()->syncWithoutDetaching($subagents->pluck('id')->toArray());
+            // Assuming the pivot table service_subagent still uses is_active
+            $syncData = $subagents->pluck('id')->mapWithKeys(function ($id) {
+                return [$id => ['is_active' => true]];
+            })->toArray();
+            $service->subagents()->syncWithoutDetaching($syncData);
         }
     }
 
@@ -395,12 +429,12 @@ class SeedDemoData extends Command
         
         $services = Service::where('agency_id', $agency->id)->get();
         $customers = User::where('agency_id', $agency->id)
-            ->where('user_type', 'customer')
-            ->where('is_active', true)
+            ->where('role', 'client')
+            ->where('status', 'active')
             ->get();
         $subagents = User::where('agency_id', $agency->id)
-            ->where('user_type', 'subagent')
-            ->where('is_active', true)
+            ->where('role', 'subagent')
+            ->where('status', 'active')
             ->get();
         
         if ($services->isEmpty() || $customers->isEmpty() || $subagents->isEmpty()) {
@@ -413,7 +447,7 @@ class SeedDemoData extends Command
         
         // إنشاء طلبات
         foreach ($customers as $customer) {
-            foreach ($services->random(3) as $service) {
+            foreach ($services->random(min(3, $services->count())) as $service) {
                 $request = ServiceRequest::create([
                     'service_id' => $service->id,
                     'customer_id' => $customer->id,
@@ -427,7 +461,7 @@ class SeedDemoData extends Command
                 ]);
                 
                 // إنشاء عروض أسعار للطلب
-                foreach ($subagents->random(rand(1, 2)) as $subagent) {
+                foreach ($subagents->random(min(rand(1, 2), $subagents->count())) as $subagent) {
                     Quote::create([
                         'request_id' => $request->id,
                         'subagent_id' => $subagent->id,

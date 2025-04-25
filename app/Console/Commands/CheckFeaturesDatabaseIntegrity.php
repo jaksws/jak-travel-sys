@@ -25,27 +25,15 @@ class CheckFeaturesDatabaseIntegrity extends Command
                 $issues[] = 'ميزة إدارة المستخدمين نشطة لكن جدول المستخدمين غير موجود';
             } else {
                 // التحقق من دعم أدوار المستخدمين خاصة دور المسؤول
-                if (!Schema::hasColumn('users', 'role') && !Schema::hasColumn('users', 'type') && !Schema::hasColumn('users', 'user_type')) {
-                    $issues[] = 'جدول المستخدمين لا يحتوي على عمود لتحديد الدور أو النوع (role/type/user_type)';
+                if (!Schema::hasColumn('users', 'role')) {
+                    $issues[] = 'جدول المستخدمين لا يحتوي على عمود لتحديد الدور (role)';
                 } else {
-                    // تحديد عمود الدور المستخدم في النظام
-                    $roleColumn = null;
-                    if (Schema::hasColumn('users', 'role')) {
-                        $roleColumn = 'role';
-                    } elseif (Schema::hasColumn('users', 'user_type')) {
-                        $roleColumn = 'user_type';
-                    } elseif (Schema::hasColumn('users', 'type')) {
-                        $roleColumn = 'type';
-                    }
+                    $roleColumn = 'role'; // Use role column
                     
                     // التحقق من وجود مستخدمين بدور مسؤول
                     try {
                         $adminExists = DB::table('users')
-                            ->where(function($query) use ($roleColumn) {
-                                $query->where($roleColumn, 'admin')
-                                      ->orWhere($roleColumn, 'Admin')
-                                      ->orWhere($roleColumn, '4'); // افتراض أن 4 يمثل دور المسؤول
-                            })
+                            ->where($roleColumn, 'admin') // Check for 'admin' role
                             ->exists();
                             
                         if (!$adminExists) {
@@ -54,28 +42,22 @@ class CheckFeaturesDatabaseIntegrity extends Command
                             // التحقق من صلاحيات المسؤول
                             $this->info('✓ تم العثور على مستخدم بدور مسؤول (admin)');
                             $adminCount = DB::table('users')
-                                ->where(function($query) use ($roleColumn) {
-                                    $query->where($roleColumn, 'admin')
-                                          ->orWhere($roleColumn, 'Admin')
-                                          ->orWhere($roleColumn, '4');
-                                })
+                                ->where($roleColumn, 'admin')
                                 ->count();
                             $this->line("  عدد المسؤولين في النظام: {$adminCount}");
                             
-                            // فحص إضافي لحالة الحساب
-                            if (Schema::hasColumn('users', 'is_active')) {
+                            // فحص إضافي لحالة الحساب - Use 'status'
+                            if (Schema::hasColumn('users', 'status')) {
                                 $activeAdmins = DB::table('users')
-                                    ->where(function($query) use ($roleColumn) {
-                                        $query->where($roleColumn, 'admin')
-                                              ->orWhere($roleColumn, 'Admin')
-                                              ->orWhere($roleColumn, '4');
-                                    })
-                                    ->where('is_active', true)
+                                    ->where($roleColumn, 'admin')
+                                    ->where('status', 'active') // Check for 'active' status
                                     ->count();
                                 
                                 if ($activeAdmins == 0) {
                                     $issues[] = 'لا يوجد مسؤولين نشطين في النظام، يرجى تفعيل حساب مسؤول واحد على الأقل';
                                 }
+                            } else {
+                                $issues[] = 'جدول المستخدمين لا يحتوي على عمود لتحديد الحالة (status)';
                             }
                         }
                     } catch (\Exception $e) {

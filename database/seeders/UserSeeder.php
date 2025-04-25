@@ -27,10 +27,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'مدير وكالة اليمن',
                     'password' => Hash::make('password123'),
-                    'phone' => '777100100',
-                    'user_type' => 'agency',
+                    'role' => 'agent',
                     'agency_id' => $yemenAgency->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
             
@@ -40,11 +42,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'أحمد محمد',
                     'password' => Hash::make('password123'),
-                    'phone' => '777200200',
-                    'user_type' => 'subagent',
+                    'role' => 'subagent',
                     'agency_id' => $yemenAgency->id,
-                    'parent_id' => $agencyAdmin->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
             
@@ -53,11 +56,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'محمد علي',
                     'password' => Hash::make('password123'),
-                    'phone' => '777300300',
-                    'user_type' => 'subagent',
+                    'role' => 'subagent',
                     'agency_id' => $yemenAgency->id,
-                    'parent_id' => $agencyAdmin->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
             
@@ -67,11 +71,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'سالم علي',
                     'password' => Hash::make('password123'),
-                    'phone' => '777400400',
-                    'user_type' => 'customer',
+                    'role' => 'client',
                     'agency_id' => $yemenAgency->id,
-                    'parent_id' => $agencyAdmin->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
             
@@ -80,11 +85,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'فاطمة أحمد',
                     'password' => Hash::make('password123'),
-                    'phone' => '777500500',
-                    'user_type' => 'customer',
+                    'role' => 'client',
                     'agency_id' => $yemenAgency->id,
-                    'parent_id' => $agencyAdmin->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
         }
@@ -96,10 +102,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'مدير وكالة الخليج',
                     'password' => Hash::make('password123'),
-                    'phone' => '777600600',
-                    'user_type' => 'agency',
+                    'role' => 'agent',
                     'agency_id' => $gulfAgency->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
             
@@ -109,11 +117,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'خالد حسن',
                     'password' => Hash::make('password123'),
-                    'phone' => '777700700',
-                    'user_type' => 'subagent',
+                    'role' => 'subagent',
                     'agency_id' => $gulfAgency->id,
-                    'parent_id' => $gulfAdmin->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
             
@@ -123,11 +132,12 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'عبد الله محمد',
                     'password' => Hash::make('password123'),
-                    'phone' => '777800800',
-                    'user_type' => 'customer',
+                    'role' => 'client',
                     'agency_id' => $gulfAgency->id,
-                    'parent_id' => $gulfAdmin->id,
-                    'is_active' => true,
+                    'status' => 'active',
+                    'locale' => 'ar',
+                    'theme' => 'light',
+                    'email_notifications' => true,
                 ]
             );
         }
@@ -138,10 +148,26 @@ class UserSeeder extends Seeder
             [
                 'name' => 'مستخدم اختباري',
                 'password' => Hash::make('123456'),
-                'phone' => '777999999',
-                'user_type' => 'agency',
-                'agency_id' => $yemenAgency ? $yemenAgency->id : 1,
-                'is_active' => true,
+                'role' => 'agent',
+                'agency_id' => $yemenAgency ? $yemenAgency->id : ($gulfAgency ? $gulfAgency->id : null),
+                'status' => 'active',
+                'locale' => 'en',
+                'theme' => 'dark',
+                'email_notifications' => false,
+            ]
+        );
+
+        // Add Admin User
+        User::firstOrCreate(
+            ['email' => 'admin@jak.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'status' => 'active',
+                'locale' => 'en',
+                'theme' => 'light',
+                'email_notifications' => true,
             ]
         );
     }
