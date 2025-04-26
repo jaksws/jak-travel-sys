@@ -59,9 +59,9 @@ if [ "$OS_TYPE" = "Windows" ]; then
   set DB_CONNECTION=sqlite
   set DB_DATABASE=%cd%\database\database.sqlite
 
-  if not exist database\database.sqlite (
-      type nul > database\database.sqlite
-  )
+  if [ ! -f "database/database.sqlite" ]; then
+    type nul > database\database.sqlite
+  fi
 
   php artisan migrate:fresh --seed --env=testing
   php artisan dusk
