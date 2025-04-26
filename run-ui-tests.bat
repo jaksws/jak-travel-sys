@@ -11,8 +11,14 @@ if not exist database\database.sqlite (
     type nul > database\database.sqlite
 )
 
-REM 3. تنفيذ الهجرات من جديد
+REM 3. تنظيف ذاكرة التخزين المؤقت
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+REM 4. تنفيذ الهجرات من جديد
 php artisan migrate:fresh --seed --env=testing
 
-REM 4. تشغيل اختبارات Dusk
+REM 5. تشغيل اختبارات Dusk
 php artisan dusk

@@ -19,5 +19,11 @@ if [ -f "VERSION-1-1-SETUP.sh" ]; then
     echo -e "${GREEN}Updated VERSION-1-1-SETUP.sh${NC}"
 fi
 
+# Update README.md
+if [ -f "README.md" ]; then
+    sed -i 's/VERSION-1-ROADMAP.md/VERSION-1-ROADMAP.md/g' README.md
+    echo -e "${GREEN}Updated README.md${NC}"
+fi
+
 echo -e "${GREEN}All roadmap references have been fixed!${NC}"
 echo -e "${YELLOW}Please make sure to run this script with proper permissions.${NC}"
