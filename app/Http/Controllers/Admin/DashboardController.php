@@ -183,6 +183,12 @@ class DashboardController extends Controller
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
+        // ربط السبوكيل بالوكالة المختارة عند اختيار الدور سبوكيل
+        if ($request->role === 'subagent' && $request->filled('agency_id')) {
+            $user->agency_id = $request->agency_id;
+        } elseif ($request->role !== 'subagent') {
+            $user->agency_id = null;
+        }
         $user->save();
 
         // تحديث أو إنشاء معلومات الوكالة إذا كان الدور وكالة
