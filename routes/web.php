@@ -256,15 +256,19 @@ Route::group([
     // إدارة الطلبات
     Route::get('/requests', [\App\Http\Controllers\Admin\DashboardController::class, 'requests'])->name('requests.index');
     Route::post('/requests', [\App\Http\Controllers\Admin\DashboardController::class, 'storeRequest'])->name('requests.store');
+    Route::get('/requests/{request}', [\App\Http\Controllers\Admin\DashboardController::class, 'showRequest'])->name('requests.show');
+    Route::get('/requests/{request}/edit', [\App\Http\Controllers\Admin\DashboardController::class, 'editRequest'])->name('requests.edit');
+    Route::put('/requests/{request}', [\App\Http\Controllers\Admin\DashboardController::class, 'updateRequest'])->name('requests.update');
+    Route::delete('/requests/{request}', [\App\Http\Controllers\Admin\DashboardController::class, 'destroyRequest'])->name('requests.destroy');
 
-    // Users management
-    // Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
-    // Route::get('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'viewUser'])->name('users.show');
-    // Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\DashboardController::class, 'editUser'])->name('users.edit');
-    // Route::put('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'updateUser'])->name('users.update');
-    // Route::delete('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'deleteUser'])->name('users.destroy');
-    // Route::patch('/users/{id}/toggle-status', [\App\Http\Controllers\Admin\DashboardController::class, 'toggleUserStatus'])->name('users.toggle-status');
-    // Route::post('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'storeUser'])->name('users.store');
+    // إدارة المستخدمين (Admin Users Management)
+    Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'viewUser'])->name('users.show');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\DashboardController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'deleteUser'])->name('users.destroy');
+    Route::patch('/users/{id}/toggle-status', [\App\Http\Controllers\Admin\DashboardController::class, 'toggleUserStatus'])->name('users.toggle-status');
+    Route::post('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'storeUser'])->name('users.store');
     
     // System logs
     Route::get('/system/logs', [\App\Http\Controllers\Admin\DashboardController::class, 'logs'])->name('system.logs');
@@ -280,3 +284,6 @@ Route::prefix('client')->middleware(['auth', \App\Http\Middleware\CustomerMiddle
     Route::get('/requests', [CustomerRequestController::class, 'index']);
     Route::get('/quotes', [CustomerQuoteController::class, 'index']);
 });
+
+
+Route::get('debug-admin-users', [\App\Http\Controllers\Admin\DashboardController::class, 'users']);

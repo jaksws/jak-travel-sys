@@ -35,6 +35,7 @@ class AdminDashboardTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->adminUser)
                     ->visit('/admin/dashboard')
+                    ->screenshot('debug-dashboard')
                     ->assertSee('لوحة تحكم المسؤول')
                     ->assertSee($this->adminUser->name);
         });

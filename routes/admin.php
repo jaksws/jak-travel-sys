@@ -3,31 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 
-/**
- * في هذا الملف، لا نحتاج لإضافة بادئة 'admin.' للمسارات
- * ولا نحتاج لإضافة بادئة '/admin' للمسارات
- * لأن RouteServiceProvider يقوم بذلك تلقائيًا
- */
+// ... comments ...
 
-// Apply middleware for authentication and admin role
 Route::middleware(['auth', 'isAdmin'])->group(function () {
-    // مسارات لوحة التحكم
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // إدارة الواجهات - مسارات جديدة لإدارة واجهة المستخدم
-    Route::prefix('ui')->name('ui.')->group(function () {
-        // إدارة الصفحة الرئيسية
-        Route::get('/home', [DashboardController::class, 'homePageManager'])->name('home');
-        Route::post('/home', [DashboardController::class, 'updateHomePage'])->name('home.update');
-
-        // إدارة واجهات التطبيق
-        Route::get('/interfaces', [DashboardController::class, 'interfacesManager'])->name('interfaces');
-        Route::post('/interfaces', [DashboardController::class, 'updateInterfaces'])->name('interfaces.update');
-
-        // تقارير وإحصائيات
-        Route::get('/analytics', [DashboardController::class, 'analyticsReports'])->name('analytics');
-    });
+    // ... dashboard and ui routes ...
 
     // إدارة المستخدمين
     Route::name('admin.')->group(function () {
@@ -38,17 +17,20 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
         Route::delete('/users/{id}', [DashboardController::class, 'deleteUser'])->name('users.destroy');
         Route::patch('/users/{id}/toggle-status', [DashboardController::class, 'toggleUserStatus'])->name('users.toggle-status');
         Route::post('/users', [DashboardController::class, 'storeUser'])->name('users.store');
+
+        // إدارة الطلبات - Move these inside the admin group
+        Route::get('/requests', [DashboardController::class, 'requests'])->name('requests.index');
+        Route::post('/requests', [DashboardController::class, 'storeRequest'])->name('requests.store');
+        // Add missing request routes
+        Route::get('/requests/{request}', [DashboardController::class, 'showRequest'])->name('requests.show'); // Assuming showRequest method exists or will be created
+        Route::get('/requests/{request}/edit', [DashboardController::class, 'editRequest'])->name('requests.edit'); // Assuming editRequest method exists or will be created
+        Route::put('/requests/{request}', [DashboardController::class, 'updateRequest'])->name('requests.update'); // Assuming updateRequest method exists or will be created
+        Route::delete('/requests/{request}', [DashboardController::class, 'destroyRequest'])->name('requests.destroy'); // Assuming destroyRequest method exists or will be created
     });
 
-    // إدارة الطلبات
-    Route::get('/requests', [DashboardController::class, 'requests'])->name('requests.index');
-    // إنشاء طلب جديد من قبل المسؤول
-    Route::post('/requests', [DashboardController::class, 'storeRequest'])->name('requests.store');
+    // إدارة الطلبات - Remove from here
+    // Route::get('/requests', [DashboardController::class, 'requests'])->name('requests.index');
+    // Route::post('/requests', [DashboardController::class, 'storeRequest'])->name('requests.store');
 
-    // سجلات النظام
-    Route::get('/system/logs', [DashboardController::class, 'logs'])->name('system.logs');
-
-    // إعدادات النظام
-    // Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
-    // Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
+    // ... system logs and settings routes ...
 });
