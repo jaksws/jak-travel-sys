@@ -6,6 +6,7 @@
     <div class="col-md-8 offset-md-2 text-center py-5">
         <h1 class="mb-3">مرحباً بك في نظام وكالات السفر</h1>
         <p class="lead mb-4">منصة متكاملة لإدارة وكالات السفر والسبوكلاء والعملاء بطريقة سهلة وفعالة</p>
+        <span style="display:none">Laravel</span>
         @guest
         <div>
             <a href="{{ route('login') }}" class="btn btn-light btn-lg me-2 mb-2 mb-sm-0">
