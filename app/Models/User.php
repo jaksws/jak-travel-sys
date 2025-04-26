@@ -136,8 +136,9 @@ class User extends Authenticatable
      */
     public function isAgent(): bool
     {
-        // Treat both 'agent' and 'agency' roles as agents for middleware checks
-        return in_array($this->role, ['agent', 'agency']);
+        // السماح بالدخول لأي مستخدم لديه role = 'agent' أو 'agency' أو 'admin'
+        // يمكنك إضافة أو إزالة أدوار حسب الحاجة
+        return in_array($this->role, ['agent', 'agency', 'admin']);
     }
     
     /**
@@ -157,7 +158,8 @@ class User extends Authenticatable
      */
     public function isClient(): bool
     {
-        return $this->role === 'client';
+        // السماح لكل من client و customer باعتبارهم عملاء
+        return in_array($this->role, ['client', 'customer']);
     }
 
     /**
