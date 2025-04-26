@@ -44,7 +44,7 @@
                         <div class="col-12 mb-2">
                             <strong>تاريخ الإنضمام:</strong> {{ auth()->user()->created_at->format('Y-m-d') }}
                         </div>
-                        @if(auth()->user()->isAgency())
+                        @if(auth()->user()->isAgency() && auth()->user()->agency)
                             <div class="col-12 mb-2">
                                 <strong>اسم الوكالة:</strong> {{ auth()->user()->agency->name }}
                             </div>
@@ -53,7 +53,7 @@
                 </div>
             </div>
             
-            @if(auth()->user()->isAgency())
+            @if(auth()->user()->isAgency() && auth()->user()->agency)
                 <!-- بطاقة معلومات الوكالة -->
                 <div class="card shadow mb-4">
                     <div class="card-header bg-success text-white">
@@ -67,15 +67,15 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>البريد الإلكتروني:</span>
-                                <strong>{{ auth()->user()->agency->email }}</strong>
+                                <strong>{{ auth()->user()->agency ? auth()->user()->agency->email : 'غير محدد' }}</strong>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>رقم الهاتف:</span>
-                                <strong>{{ auth()->user()->agency->phone }}</strong>
+                                <strong>{{ auth()->user()->agency ? auth()->user()->agency->phone : 'غير محدد' }}</strong>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>العنوان:</span>
-                                <strong>{{ auth()->user()->agency->address ?? 'غير محدد' }}</strong>
+                                <strong>{{ auth()->user()->agency ? auth()->user()->agency->address : 'غير محدد' }}</strong>
                             </li>
                         </ul>
                     </div>
@@ -178,7 +178,7 @@
                 </div>
             </div>
             
-            @if(auth()->user()->isAgency())
+            @if(auth()->user()->isAgency() && auth()->user()->agency)
                 <!-- بطاقة تعديل معلومات الوكالة -->
                 <div class="card shadow mb-4">
                     <div class="card-header bg-success text-white">
@@ -201,7 +201,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label for="agency_email" class="form-label">البريد الإلكتروني للوكالة</label>
-                                    <input type="email" class="form-control @error('agency_email') is-invalid @enderror" id="agency_email" name="agency_email" value="{{ old('agency_email', auth()->user()->agency->email) }}" required>
+                                    <input type="email" class="form-control @error('agency_email') is-invalid @enderror" id="agency_email" name="agency_email" value="{{ old('agency_email', auth()->user()->agency ? auth()->user()->agency->email : '') }}" required>
                                     @error('agency_email')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -213,7 +213,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="agency_phone" class="form-label">رقم هاتف الوكالة</label>
-                                    <input type="text" class="form-control @error('agency_phone') is-invalid @enderror" id="agency_phone" name="agency_phone" value="{{ old('agency_phone', auth()->user()->agency->phone) }}" required>
+                                    <input type="text" class="form-control @error('agency_phone') is-invalid @enderror" id="agency_phone" name="agency_phone" value="{{ old('agency_phone', auth()->user()->agency ? auth()->user()->agency->phone : '') }}" required>
                                     @error('agency_phone')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -233,7 +233,7 @@
                             
                             <div class="mb-3">
                                 <label for="agency_address" class="form-label">عنوان الوكالة</label>
-                                <textarea class="form-control @error('agency_address') is-invalid @enderror" id="agency_address" name="agency_address" rows="2">{{ old('agency_address', auth()->user()->agency->address) }}</textarea>
+                                <textarea class="form-control @error('agency_address') is-invalid @enderror" id="agency_address" name="agency_address" rows="2">{{ old('agency_address', auth()->user()->agency ? auth()->user()->agency->address : '') }}</textarea>
                                 @error('agency_address')
                                     <div class="invalid-feedback">
                                         {{ $message }}
