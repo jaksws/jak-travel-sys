@@ -31,6 +31,11 @@ class ServiceController extends Controller
      */
     public function create()
     {
+        // Debug: سجل الوصول إلى الدالة
+        \Log::info('وصل الطلب إلى دالة create في ServiceController للسبوكيل', [
+            'user_id' => auth()->id(),
+            'role' => auth()->user()->role ?? null
+        ]);
         return view('subagent.services.create');
     }
 

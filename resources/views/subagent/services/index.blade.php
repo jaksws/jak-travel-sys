@@ -22,6 +22,12 @@
         </div>
     </div>
 
+    @if(auth()->check())
+        <div class="alert alert-info">
+            نوع المستخدم الحالي: {{ auth()->user()->role }}
+        </div>
+    @endif
+
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
