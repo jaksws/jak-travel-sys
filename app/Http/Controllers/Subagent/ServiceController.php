@@ -27,6 +27,14 @@ class ServiceController extends Controller
     }
 
     /**
+     * عرض نموذج إضافة خدمة جديدة للسبوكيل.
+     */
+    public function create()
+    {
+        return view('subagent.services.create');
+    }
+
+    /**
      * عرض تفاصيل خدمة معينة.
      */
     public function show(Service $service)

@@ -147,6 +147,8 @@ Route::prefix('subagent')->middleware(['auth', \App\Http\Middleware\SubagentMidd
     // الخدمات المتاحة
     Route::get('/services', [SubagentServiceController::class, 'index'])->name('services.index');
     Route::get('/services/{service}', [SubagentServiceController::class, 'show'])->name('services.show');
+    Route::get('/services/create', [SubagentServiceController::class, 'create'])->name('services.create');
+    Route::post('/services', [SubagentServiceController::class, 'store'])->name('services.store');
     
     // طلبات عروض الأسعار
     Route::get('/requests', [SubagentRequestController::class, 'index'])->name('requests.index');
