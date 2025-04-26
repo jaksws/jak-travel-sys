@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Subagent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Service;
+use App\Models\Agency;
 
 class ServiceController extends Controller
 {
@@ -51,5 +52,37 @@ class ServiceController extends Controller
                                 ->get();
         
         return view('subagent.services.show', compact('service', 'serviceSubagent', 'requestsHistory'));
+    }
+
+    /**
+     * إضافة خدمة جديدة.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|string',
+            'description' => 'nullable|string',
+            // أضف أي حقول أخرى مطلوبة للخدمة
+        ]);
+
+        $user = auth()->user();
+        $agencyId = $user->agency_id;
+        if (!$agencyId) {
+            return back()->withErrors(['agency_id' => 'لا يمكن إضافة خدمة لأن السبوكيل غير مرتبط بأي وكالة.']);
+        }
+
+        $service = new \App\Models\Service();
+        $service->name = $request->name;
+        $service->type = $request->type;
+        $service->description = $request->description;
+        $service->agency_id = $agencyId; // ربط الخدمة بالوكالة الأساسية
+        $service->status = 'active';
+        $service->save();
+
+        // ربط الخدمة بالسبوكيل في جدول pivot إذا كان ذلك مطلوباً
+        $service->subagents()->attach($user->id);
+
+        return redirect()->route('subagent.services.index')->with('success', 'تمت إضافة الخدمة بنجاح وستظهر للوكالة الأساسية والعملاء.');
     }
 }
