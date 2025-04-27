@@ -60,7 +60,7 @@
                                         <td>{{ $currency->symbol }}</td>
                                         <td>{{ $currency->exchange_rate }}</td>
                                         <td>
-                                            @if($currency->is_active)
+                                            @if($currency->isActive())
                                                 <span class="badge bg-success">نشطة</span>
                                             @else
                                                 <span class="badge bg-danger">غير نشطة</span>
@@ -87,8 +87,8 @@
                                                     <form action="{{ route('agency.settings.currencies.toggle-status', $currency) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" class="btn btn-sm {{ $currency->is_active ? 'btn-danger' : 'btn-success' }}" title="{{ $currency->is_active ? 'تعطيل' : 'تفعيل' }}">
-                                                            <i class="fas fa-{{ $currency->is_active ? 'ban' : 'check' }}"></i>
+                                                        <button type="submit" class="btn btn-sm {{ $currency->isActive() ? 'btn-danger' : 'btn-success' }}" title="{{ $currency->isActive() ? 'تعطيل' : 'تفعيل' }}">
+                                                            <i class="fas fa-{{ $currency->isActive() ? 'ban' : 'check' }}"></i>
                                                         </button>
                                                     </form>
                                                     <form action="{{ route('agency.settings.currencies.destroy', $currency) }}" method="POST" class="d-inline delete-form">

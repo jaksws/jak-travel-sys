@@ -31,7 +31,7 @@ class ServiceController extends Controller
         $subagents = \App\Models\User::where('agency_id', Auth::user()->agency_id)
                                    ->where('user_type', 'subagent')
                                    ->get();
-        $currencies = \App\Models\Currency::where('is_active', true)->get();
+        $currencies = \App\Models\Currency::where('status', 'active')->get(); // Use status field
         
         return view('agency.services.create', compact('serviceTypes', 'subagents', 'currencies'));
     }
@@ -104,7 +104,7 @@ class ServiceController extends Controller
         $subagents = \App\Models\User::where('agency_id', Auth::user()->agency_id)
                                    ->where('user_type', 'subagent')
                                    ->get();
-        $currencies = \App\Models\Currency::where('is_active', true)->get();
+        $currencies = \App\Models\Currency::where('status', 'active')->get(); // Use status field
         
         $selectedSubagents = $service->subagents->pluck('id')->toArray();
         

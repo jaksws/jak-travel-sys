@@ -15,12 +15,29 @@ class Currency extends Model
         'symbol',
         'exchange_rate',
         'is_default',
+        'status', // Add status
     ];
 
     protected $casts = [
         'exchange_rate' => 'float',
         'is_default' => 'boolean',
     ];
+
+    /**
+     * Get the services associated with the currency.
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
+     * Get the quotes associated with the currency.
+     */
+    public function quotes()
+    {
+        return $this->hasMany(Quote::class);
+    }
 
     /**
      * The "booted" method of the model.
@@ -46,6 +63,16 @@ class Currency extends Model
     public function isDefault()
     {
         return $this->is_default;
+    }
+
+    /**
+     * Check if the currency is active.
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
     }
 
     /**
