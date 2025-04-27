@@ -58,7 +58,8 @@
                             <input type="number" step="0.01" min="0" class="form-control @error('base_price') is-invalid @enderror" id="base_price" name="base_price" value="{{ old('base_price') }}" required>
                             <select class="form-select" name="currency_id" id="currency_id" required>
                                 <option value="">-- العملة --</option>
-                                @foreach(\App\Models\Currency::where('is_active', true)->get() as $currency)
+                                {{-- Use the $currencies variable passed from the controller --}}
+                                @foreach($currencies as $currency)
                                     <option value="{{ $currency->id }}" {{ old('currency_id') == $currency->id ? 'selected' : '' }}>{{ $currency->code }} ({{ $currency->symbol }})</option>
                                 @endforeach
                             </select>
