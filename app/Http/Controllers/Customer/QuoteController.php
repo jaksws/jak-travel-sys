@@ -92,7 +92,7 @@ class QuoteController extends Controller
             $quote->subagent->notify(new QuoteStatusChanged($quote));
             // إشعار للوكالة
             $agency = \App\Models\User::where('agency_id', $quote->request->agency_id)
-                               ->where('user_type', 'agency')
+                               ->where('role', 'agency')
                                ->first();
             if ($agency) {
                 $agency->notify(new QuoteStatusChanged($quote));
@@ -131,7 +131,7 @@ class QuoteController extends Controller
             $quote->subagent->notify(new QuoteStatusChanged($quote));
             // إشعار للوكالة
             $agency = \App\Models\User::where('agency_id', $quote->request->agency_id)
-                               ->where('user_type', 'agency')
+                               ->where('role', 'agency')
                                ->first();
             if ($agency) {
                 $agency->notify(new QuoteStatusChanged($quote));

@@ -29,7 +29,7 @@ class ServiceController extends Controller
     {
         $serviceTypes = ServiceTypeHelper::getTypes();
         $subagents = \App\Models\User::where('agency_id', Auth::user()->agency_id)
-                                   ->where('user_type', 'subagent')
+                                   ->where('role', 'subagent')
                                    ->get();
         $currencies = \App\Models\Currency::where('status', 'active')->get(); // Use status field
         
@@ -102,7 +102,7 @@ class ServiceController extends Controller
 
         $serviceTypes = ServiceTypeHelper::getTypes();
         $subagents = \App\Models\User::where('agency_id', Auth::user()->agency_id)
-                                   ->where('user_type', 'subagent')
+                                   ->where('role', 'subagent')
                                    ->get();
         $currencies = \App\Models\Currency::where('status', 'active')->get(); // Use status field
         

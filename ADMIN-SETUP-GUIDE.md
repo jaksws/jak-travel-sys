@@ -15,7 +15,6 @@ php artisan app:setup-admin-user
 #### المشكلة: يتم إنشاء المستخدم من نوع "عميل" بدلاً من "مسؤول"
 
 وفقاً لهيكل قاعدة البيانات الخاصة بك، يوجد عمودان مهمان في جدول المستخدمين:
-- `user_type`: يقبل القيم ('admin', 'agency', 'subagent', 'customer') مع قيمة افتراضية 'customer'
 - `role`: يتم ضبطه افتراضياً على 'admin'
 - `is_admin`: قيمة منطقية (0/1) مضبوطة افتراضياً على '0'
 
@@ -32,17 +31,16 @@ sqlite3 database/database.sqlite
 .schema users
 
 # عرض أنواع المستخدمين الحالية
-SELECT email, user_type, role, is_admin FROM users;
+SELECT email, role, is_admin FROM users;
 
-# تحديث نوع المستخدم ودوره وعلامة المسؤول لمستخدم محدد
+# تحديث دور المستخدم وعلامة المسؤول لمستخدم محدد
 UPDATE users SET 
-  user_type = 'admin', 
   role = 'admin',
   is_admin = 1
 WHERE email = 'البريد_الإلكتروني_للمسؤول';
 
 # التحقق من التغييرات
-SELECT email, user_type, role, is_admin FROM users WHERE email = 'البريد_الإلكتروني_للمسؤول';
+SELECT email, role, is_admin FROM users WHERE email = 'البريد_الإلكتروني_للمسؤول';
 
 # الخروج من SQLite
 .exit
@@ -50,15 +48,9 @@ SELECT email, user_type, role, is_admin FROM users WHERE email = 'البريد_�
 
 #### ملاحظات مهمة حول أنواع المستخدمين
 
-1. عمود `user_type` لديه قيود تحقق (CHECK constraint) تسمح فقط بالقيم التالية:
-   - 'admin': مسؤول النظام
-   - 'agency': وكيل رئيسي
-   - 'subagent': سبوكيل
-   - 'customer': عميل
+1. يجب تعيين حقل `is_admin` إلى القيمة 1 للمستخدمين المسؤولين.
 
-2. يجب تعيين حقل `is_admin` إلى القيمة 1 للمستخدمين المسؤولين.
-
-3. قد تحتاج أيضاً إلى التأكد من أن قيمة `role` مضبوطة على 'admin'.
+2. قد تحتاج أيضاً إلى التأكد من أن قيمة `role` مضبوطة على 'admin'.
 
 ## الوصول إلى لوحة تحكم المسؤول
 
@@ -91,7 +83,6 @@ SELECT email, user_type, role, is_admin FROM users WHERE email = 'البريد_�
        public function handle(Request $request, Closure $next)
        {
            if (!Auth::check() || 
-               Auth::user()->user_type !== 'admin' && 
                Auth::user()->role !== 'admin' && 
                Auth::user()->is_admin !== 1) {
                return redirect('/')->with('error', 'لا تملك صلاحية الوصول');
@@ -159,7 +150,7 @@ php artisan optimize:clear
 
 # تحديث المستخدم الحالي ليكون مسؤولاً
 # استبدل 'your-email@example.com' بالبريد الإلكتروني الخاص بك
-sqlite3 database/database.sqlite "UPDATE users SET user_type='admin', role='admin', is_admin=1 WHERE email='your-email@example.com'"
+sqlite3 database/database.sqlite "UPDATE users SET role='admin', is_admin=1 WHERE email='your-email@example.com'"
 
 # إعادة تشغيل خادم التطوير
 php artisan serve

@@ -116,7 +116,7 @@ class ServiceSeeder extends Seeder
             
             // ربط السبوكلاء بالخدمات
             $subagents = User::where('agency_id', $yemenAgency->id)
-                ->where('user_type', 'subagent')
+                ->where('role', 'subagent')
                 ->get();
                 
             foreach ($subagents as $subagent) {
@@ -163,7 +163,7 @@ class ServiceSeeder extends Seeder
             
             // ربط السبوكلاء بالخدمات
             $gulfSubagents = User::where('agency_id', $gulfAgency->id)
-                ->where('user_type', 'subagent')
+                ->where('role', 'subagent')
                 ->get();
                 
             foreach ($gulfSubagents as $subagent) {

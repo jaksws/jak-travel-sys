@@ -34,7 +34,7 @@ class RequestSeeder extends Seeder
         
         // جلب العملاء
         $customers = User::where('agency_id', $yemenAgency->id)
-            ->where('user_type', 'customer')
+            ->where('role', 'customer')
             ->get();
             
         if ($customers->isEmpty()) {

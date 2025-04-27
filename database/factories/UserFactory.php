@@ -87,7 +87,7 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user is an agency/agent.
+     * Indicate that the user is an agency/agency.
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
@@ -95,7 +95,7 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'role' => 'agent', // Or 'agency' depending on your exact roles
+                'role' => 'agency', // Or 'agency' depending on your exact roles
             ];
         });
     }
@@ -115,7 +115,7 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user is a client/customer.
+     * Indicate that the user is a customer/customer.
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
@@ -123,7 +123,7 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'role' => 'client', // Or 'customer' depending on your exact roles
+                'role' => 'customer', // Or 'customer' depending on your exact roles
             ];
         });
     }

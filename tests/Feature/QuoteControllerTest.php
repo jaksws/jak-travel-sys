@@ -26,8 +26,7 @@ class QuoteControllerTest extends TestCase
         $agency = Agency::factory()->create();
         $subagent = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'subagent',
-            'user_type' => 'subagent'
+            'role' => 'subagent'
         ]);
         
         $service = Service::factory()->create(['agency_id' => $agency->id]);
@@ -62,20 +61,19 @@ class QuoteControllerTest extends TestCase
     }
     
     #[Test]
-    public function client_cannot_create_quote()
+    public function customer_cannot_create_quote()
     {
         $agency = Agency::factory()->create();
-        $client = User::factory()->create([
+        $customer = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'client',
-            'user_type' => 'customer'
+            'role' => 'customer'
         ]);
         
         $service = Service::factory()->create(['agency_id' => $agency->id]);
         $travelRequest = TravelRequest::factory()->create([
             'agency_id' => $agency->id,
             'service_id' => $service->id,
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
         ]);
         
         $currency = Currency::factory()->create(['code' => 'SAR']);
@@ -95,7 +93,7 @@ class QuoteControllerTest extends TestCase
         $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
         
         // العميل يحاول إنشاء عرض سعر
-        $this->actingAs($client)
+        $this->actingAs($customer)
              ->post(route('quotes.store'), $quoteData);
         
         // التأكد من عدم إنشاء عرض سعر في قاعدة البيانات
@@ -110,14 +108,12 @@ class QuoteControllerTest extends TestCase
         // إنشاء مستخدم مشرف بدلاً من وكيل لتجنب قيود التحقق
         $admin = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'admin',
-            'user_type' => 'admin'
+            'role' => 'admin'
         ]);
         
-        $client = User::factory()->create([
+        $customer = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'client',
-            'user_type' => 'customer'
+            'role' => 'customer'
         ]);
         
         $service = Service::factory()->create(['agency_id' => $agency->id]);
@@ -136,7 +132,7 @@ class QuoteControllerTest extends TestCase
         $travelRequest = TravelRequest::factory()->create([
             'agency_id' => $agency->id,
             'service_id' => $service->id,
-            'user_id' => $client->id
+            'user_id' => $customer->id
         ]);
         
         $quote = Quote::factory()->create([
@@ -156,28 +152,26 @@ class QuoteControllerTest extends TestCase
     }
     
     #[Test]
-    public function client_can_accept_own_quote()
+    public function customer_can_accept_own_quote()
     {
         Notification::fake();
         
         $agency = Agency::factory()->create();
-        $client = User::factory()->create([
+        $customer = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'client',
-            'user_type' => 'customer'
+            'role' => 'customer'
         ]);
         
         $subagent = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'subagent',
-            'user_type' => 'subagent'
+            'role' => 'subagent'
         ]);
         
         $service = Service::factory()->create(['agency_id' => $agency->id]);
         $travelRequest = TravelRequest::factory()->create([
             'agency_id' => $agency->id,
             'service_id' => $service->id,
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'status' => 'pending'
         ]);
         
@@ -188,7 +182,7 @@ class QuoteControllerTest extends TestCase
             'status' => 'pending'
         ]);
         
-        $response = $this->actingAs($client)
+        $response = $this->actingAs($customer)
                          ->patch(route('quotes.accept', $quote));
         
         $response->assertStatus(302);
@@ -207,28 +201,26 @@ class QuoteControllerTest extends TestCase
     }
     
     #[Test]
-    public function client_can_reject_own_quote()
+    public function customer_can_reject_own_quote()
     {
         Notification::fake();
         
         $agency = Agency::factory()->create();
-        $client = User::factory()->create([
+        $customer = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'client',
-            'user_type' => 'customer'
+            'role' => 'customer'
         ]);
         
         $subagent = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'subagent',
-            'user_type' => 'subagent'
+            'role' => 'subagent'
         ]);
         
         $service = Service::factory()->create(['agency_id' => $agency->id]);
         $travelRequest = TravelRequest::factory()->create([
             'agency_id' => $agency->id,
             'service_id' => $service->id,
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'status' => 'pending'
         ]);
         
@@ -239,7 +231,7 @@ class QuoteControllerTest extends TestCase
             'status' => 'pending'
         ]);
         
-        $response = $this->actingAs($client)
+        $response = $this->actingAs($customer)
                          ->patch(route('quotes.reject', $quote));
         
         $response->assertStatus(302);
@@ -263,30 +255,27 @@ class QuoteControllerTest extends TestCase
         $agency = Agency::factory()->create();
         
         // العميل صاحب الطلب
-        $client = User::factory()->create([
+        $customer = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'client',
-            'user_type' => 'customer'
+            'role' => 'customer'
         ]);
         
         // عميل آخر لا علاقة له بالطلب
-        $otherClient = User::factory()->create([
+        $otherCustomer = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'client',
-            'user_type' => 'customer'
+            'role' => 'customer'
         ]);
         
         $subagent = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'subagent',
-            'user_type' => 'subagent'
+            'role' => 'subagent'
         ]);
         
         $service = Service::factory()->create(['agency_id' => $agency->id]);
         $travelRequest = TravelRequest::factory()->create([
             'agency_id' => $agency->id,
             'service_id' => $service->id,
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'status' => 'pending'
         ]);
         
@@ -304,7 +293,7 @@ class QuoteControllerTest extends TestCase
         $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
         
         // عميل آخر (غير صاحب الطلب) يحاول قبول عرض السعر
-        $this->actingAs($otherClient)
+        $this->actingAs($otherCustomer)
              ->patch(route('quotes.accept', $quote));
         
         $quote->refresh();
@@ -327,8 +316,7 @@ class QuoteControllerTest extends TestCase
         $agency = Agency::factory()->create();
         $subagent = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'subagent',
-            'user_type' => 'subagent'
+            'role' => 'subagent'
         ]);
 
         $service = Service::factory()->create(['agency_id' => $agency->id]);
@@ -368,23 +356,21 @@ class QuoteControllerTest extends TestCase
         Notification::fake();
 
         $agency = Agency::factory()->create();
-        $client = User::factory()->create([
+        $customer = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'client',
-            'user_type' => 'customer'
+            'role' => 'customer'
         ]);
 
         $subagent = User::factory()->create([
             'agency_id' => $agency->id,
-            'role' => 'subagent',
-            'user_type' => 'subagent'
+            'role' => 'subagent'
         ]);
 
         $service = Service::factory()->create(['agency_id' => $agency->id]);
         $travelRequest = TravelRequest::factory()->create([
             'agency_id' => $agency->id,
             'service_id' => $service->id,
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'status' => 'pending'
         ]);
 

@@ -25,7 +25,6 @@ class AdminMiddleware
         
         // Check user is admin using the correct fields from the database schema
         if (
-            ($user->user_type === 'admin') || 
             ($user->role === 'admin') || 
             ($user->is_admin == 1)
         ) {

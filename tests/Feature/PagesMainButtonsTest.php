@@ -39,7 +39,7 @@ class PagesMainButtonsTest extends TestCase
     /** @test */
     public function customer_dashboard_has_main_links_and_buttons()
     {
-        $customer = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $this->actingAs($customer);
         $response = $this->get(route('customer.dashboard'));
         $response->assertStatus(200);
@@ -72,7 +72,7 @@ class PagesMainButtonsTest extends TestCase
     /** @test */
     public function customer_requests_page_has_add_and_search_buttons()
     {
-        $customer = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $this->actingAs($customer);
         $response = $this->get(route('customer.requests.index'));
         $response->assertStatus(200);
@@ -105,7 +105,7 @@ class PagesMainButtonsTest extends TestCase
     /** @test */
     public function customer_quotes_page_has_search_button()
     {
-        $customer = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $this->actingAs($customer);
         $response = $this->get(route('customer.quotes.index'));
         $response->assertStatus(200);

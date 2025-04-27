@@ -25,14 +25,6 @@
         <div class="card-body">
             <form action="{{ route('agency.transactions.index') }}" method="GET" class="row g-3">
                 <div class="col-md-3">
-                    <label for="user_type" class="form-label">نوع المستخدم</label>
-                    <select class="form-select" id="user_type" name="user_type">
-                        <option value="">الكل</option>
-                        <option value="subagent">سبوكلاء</option>
-                        <option value="customer">عملاء</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
                     <label for="type" class="form-label">نوع المعاملة</label>
                     <select class="form-select" id="type" name="type">
                         <option value="">الكل</option>

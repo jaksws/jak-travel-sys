@@ -37,7 +37,7 @@ class SetupAdminUser extends Command
         }
         
         // تحديد القيم المسموحة للعمود - Simplified
-        $validUserTypes = ['admin', 'agent', 'subagent', 'client']; 
+        $validUserTypes = ['admin', 'agency', 'subagent', 'customer']; 
         
         // اختيار القيمة المناسبة للمسؤول
         $adminType = 'admin'; // Directly use 'admin'

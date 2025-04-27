@@ -37,7 +37,7 @@ class PaymentServiceTest extends TestCase
     public function it_processes_payment_successfully()
     {
         // تجهيز البيانات الأساسية
-        $user = User::factory()->create(['role' => 'client']);
+        $user = User::factory()->create(['role' => 'customer']);
         $currency = Currency::factory()->create(['code' => 'SAR']);
         $quote = Quote::factory()->create([
             'price' => 1000,
@@ -83,7 +83,7 @@ class PaymentServiceTest extends TestCase
     public function it_fails_payment_with_invalid_data()
     {
         // تجهيز البيانات الأساسية
-        $user = User::factory()->create(['role' => 'client']);
+        $user = User::factory()->create(['role' => 'customer']);
         $currency = Currency::factory()->create(['code' => 'SAR']);
         $quote = Quote::factory()->create([
             'price' => 1000,
@@ -159,7 +159,7 @@ class PaymentServiceTest extends TestCase
     public function it_processes_payment_correctly()
     {
         // تجهيز البيانات الأساسية
-        $user = User::factory()->create(['role' => 'client']);
+        $user = User::factory()->create(['role' => 'customer']);
         $currency = Currency::factory()->create(['code' => 'SAR']);
         $quote = Quote::factory()->create([
             'price' => 1000,

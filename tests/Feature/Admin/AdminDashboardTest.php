@@ -20,7 +20,7 @@ class AdminDashboardTest extends AdminTestCase
     {
         // Create test data
         $agency = Agency::factory()->create();
-        $users = User::factory()->count(3)->create(['user_type' => 'customer']);
+        $users = User::factory()->count(3)->create(['role' => 'customer']);
         $services = Service::factory()->count(2)->create(['agency_id' => $agency->id]);
         $requests = TravelRequest::factory()->count(4)->create(['service_id' => $services[0]->id]);
         $quotes = Quote::factory()->count(2)->create(['request_id' => $requests[0]->id]);
@@ -57,10 +57,10 @@ class AdminDashboardTest extends AdminTestCase
     public function test_dashboard_displays_user_statistics_chart_data()
     {
         // Create test users of different types
-        User::factory()->create(['user_type' => 'admin', 'role' => 'admin']);
-        User::factory()->count(2)->create(['user_type' => 'agency', 'role' => 'agency']);
-        User::factory()->count(3)->create(['user_type' => 'subagent', 'role' => 'subagent']);
-        User::factory()->count(4)->create(['user_type' => 'customer', 'role' => 'customer']);
+        User::factory()->create(['role' => 'admin']);
+        User::factory()->count(2)->create(['role' => 'agency']);
+        User::factory()->count(3)->create(['role' => 'subagent']);
+        User::factory()->count(4)->create(['role' => 'customer']);
         
         // Login as admin
         $this->loginAsAdmin();
@@ -227,7 +227,7 @@ class AdminDashboardTest extends AdminTestCase
     {
         // Create test data
         $agency = Agency::factory()->create();
-        $users = User::factory()->count(3)->create(['user_type' => 'customer']);
+        $users = User::factory()->count(3)->create(['role' => 'customer']);
         $services = Service::factory()->count(2)->create(['agency_id' => $agency->id]);
         $requests = TravelRequest::factory()->count(4)->create(['service_id' => $services[0]->id]);
         $quotes = Quote::factory()->count(2)->create(['request_id' => $requests[0]->id]);

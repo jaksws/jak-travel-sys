@@ -12,18 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Add user_type column if missing
-        if (!Schema::hasColumn('users', 'user_type')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->string('user_type')->default('client')->after('role');
-            });
-        }
-        // Backfill user_type from role
-        DB::table('users')->update(['user_type' => DB::raw('role')]);
         // Add is_admin column if missing
         if (!Schema::hasColumn('users', 'is_admin')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->boolean('is_admin')->default(false)->after('user_type');
+                $table->boolean('is_admin')->default(false)->after('role');
             });
         }
         // Backfill is_admin flag for admins
@@ -35,15 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Drop is_admin and user_type if exist
+        // Drop is_admin if exist
         if (Schema::hasColumn('users', 'is_admin')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->dropColumn('is_admin');
-            });
-        }
-        if (Schema::hasColumn('users', 'user_type')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn('user_type');
             });
         }
     }

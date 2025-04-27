@@ -79,7 +79,7 @@ class Agency extends Model
      */
     public function customers()
     {
-        return $this->users()->where('role', 'client'); // Assuming 'client' is the role for customers
+        return $this->users()->where('role', 'customer'); // Assuming 'customer' is the role for customers
     }
 
     /**
@@ -87,7 +87,7 @@ class Agency extends Model
      */
     public function managers()
     {
-        return $this->users()->where('role', 'agent'); // Assuming 'agent' is the role for managers/agency admins
+        return $this->users()->where('role', 'agency'); // Assuming 'agency' is the role for managers/agency admins
     }
 
     /**

@@ -18,7 +18,7 @@ class QuoteSeeder extends Seeder
     public function run(): void
     {
         // جلب السبوكلاء
-        $subagents = User::where('user_type', 'subagent')->get();
+        $subagents = User::where('role', 'subagent')->get();
         
         if ($subagents->isEmpty()) {
             return;

@@ -25,7 +25,7 @@ class RequestController extends Controller
         
         $requests = $query->with(['service', 'user'])->latest()->paginate(15);
         
-        return view('agent.requests.index', compact('requests'));
+        return view('agency.requests.index', compact('requests'));
     }
     
     /**

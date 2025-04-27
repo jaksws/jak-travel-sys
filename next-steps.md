@@ -13,7 +13,7 @@
 - Implement OAuth2 for third-party integrations
 
 ## 3. View Templates
-- Complete the view templates for client, agent, and admin interfaces
+- Complete the view templates for customer, agency, and admin interfaces
 - Implement a consistent design system
 - Ensure responsive design for mobile users
 - Add dark mode support

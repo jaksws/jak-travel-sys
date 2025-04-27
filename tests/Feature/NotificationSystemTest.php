@@ -25,7 +25,7 @@ class NotificationSystemTest extends TestCase
     public function it_sends_notification_when_quote_status_changes()
     {
         // إنشاء المستخدمين والبيانات المطلوبة
-        $customer = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $agency = Agency::factory()->create();
         $service = Service::factory()->create(['agency_id' => $agency->id]);
         
@@ -145,7 +145,7 @@ class NotificationSystemTest extends TestCase
     public function it_checks_if_notifications_are_sent_correctly()
     {
         // إنشاء المستخدمين والبيانات المطلوبة
-        $customer = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $agency = Agency::factory()->create();
         $service = Service::factory()->create(['agency_id' => $agency->id]);
 
@@ -186,7 +186,7 @@ class NotificationSystemTest extends TestCase
     public function it_checks_if_notifications_are_displayed_correctly()
     {
         // إنشاء المستخدمين والبيانات المطلوبة
-        $customer = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $agency = Agency::factory()->create();
         $service = Service::factory()->create(['agency_id' => $agency->id]);
 

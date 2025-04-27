@@ -43,50 +43,6 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="user_type" class="form-label">نوع الحساب</label>
-                            <select id="user_type" class="form-select @error('user_type') is-invalid @enderror" name="user_type" required>
-                                <option value="">اختر نوع الحساب</option>
-                                <option value="agency" {{ old('user_type') == 'agency' ? 'selected' : '' }}>وكيل أساسي</option>
-                                <option value="subagent" {{ old('user_type') == 'subagent' ? 'selected' : '' }}>سبوكيل</option>
-                                <option value="customer" {{ old('user_type') == 'customer' ? 'selected' : '' }}>عميل</option>
-                            </select>
-                            @error('user_type')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-
-                        <div id="agency_fields" class="d-none">
-                            <div class="mb-3">
-                                <label for="agency_name" class="form-label">اسم الوكالة</label>
-                                <input id="agency_name" type="text" class="form-control @error('agency_name') is-invalid @enderror" name="agency_name" value="{{ old('agency_name') }}">
-                                @error('agency_name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div id="subagent_customer_fields" class="d-none">
-                            <div class="mb-3">
-                                <label for="agency_id" class="form-label">الوكالة التابع لها</label>
-                                <select id="agency_id" class="form-select @error('agency_id') is-invalid @enderror" name="agency_id">
-                                    <option value="">اختر الوكالة</option>
-                                    @foreach(\App\Models\Agency::all() as $agency)
-                                        <option value="{{ $agency->id }}" {{ old('agency_id') == $agency->id ? 'selected' : '' }}>{{ $agency->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('agency_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
                             <label for="password" class="form-label">كلمة المرور</label>
                             <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
                             @error('password')
@@ -115,28 +71,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const userTypeSelect = document.getElementById('user_type');
-        const agencyFields = document.getElementById('agency_fields');
-        const subagentCustomerFields = document.getElementById('subagent_customer_fields');
-        
-        function toggleFields() {
-            if (userTypeSelect.value === 'agency') {
-                agencyFields.classList.remove('d-none');
-                subagentCustomerFields.classList.add('d-none');
-            } else if (userTypeSelect.value === 'subagent' || userTypeSelect.value === 'customer') {
-                agencyFields.classList.add('d-none');
-                subagentCustomerFields.classList.remove('d-none');
-            } else {
-                agencyFields.classList.add('d-none');
-                subagentCustomerFields.classList.add('d-none');
-            }
-        }
-        
-        userTypeSelect.addEventListener('change', toggleFields);
-        toggleFields();
-    });
-</script>
 @endsection

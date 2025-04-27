@@ -33,21 +33,21 @@ class UserTest extends TestCase
     public function it_checks_user_roles()
     {
         $admin = User::factory()->create(['role' => 'admin']);
-        $agent = User::factory()->create(['role' => 'agent']);
+        $agency = User::factory()->create(['role' => 'agency']);
         $subagent = User::factory()->create(['role' => 'subagent']);
-        $client = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
 
         $this->assertTrue($admin->isAdmin());
         $this->assertTrue($admin->isAgent()); // متوافق مع منطق الدالة الحالية
 
-        $this->assertTrue($agent->isAgent());
-        $this->assertFalse($agent->isSubagent());
+        $this->assertTrue($agency->isAgent());
+        $this->assertFalse($agency->isSubagent());
 
         $this->assertTrue($subagent->isSubagent());
         $this->assertFalse($subagent->isClient());
 
-        $this->assertTrue($client->isClient());
-        $this->assertFalse($client->isAdmin());
+        $this->assertTrue($customer->isClient());
+        $this->assertFalse($customer->isAdmin());
     }
 
     #[Test]

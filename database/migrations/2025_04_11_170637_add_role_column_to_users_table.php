@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // إضافة عمود الدور إذا لم يكن موجودًا
             if (!Schema::hasColumn('users', 'role')) {
-                $table->string('role')->default('client')->after('password');
+                $table->string('role')->default('customer')->after('password');
             }
             
             // إضافة عمود معرف الوكالة إذا لم يكن موجودًا

@@ -173,6 +173,8 @@ Route::prefix('subagent')->middleware(['auth', \App\Http\Middleware\SubagentMidd
 // مسارات العميل
 Route::prefix('customer')->middleware(['auth', \App\Http\Middleware\CustomerMiddleware::class])->name('customer.')->group(function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/requests', [CustomerRequestController::class, 'index'])->name('requests.index');
+    Route::get('/quotes', [CustomerQuoteController::class, 'index'])->name('quotes.index');
     
     // الخدمات المتاحة
     Route::get('/services', [CustomerServiceController::class, 'index'])->name('services.index');
@@ -210,7 +212,7 @@ Route::get('/documents/{document}/download', [DocumentController::class, 'downlo
 
 // Add authentication middleware for all routes
 Route::middleware(['web', 'auth'])->group(function () {
-    // Client routes
+    // Customer routes
     Route::post('/requests', [RequestController::class, 'store'])->name('requests.store');
     Route::patch('/requests/{request}', [RequestController::class, 'update'])->name('requests.update');
     Route::get('/requests/create', [RequestController::class, 'create'])->name('requests.create');
@@ -223,9 +225,6 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::patch('/quotes/{quote}/accept', [QuoteController::class, 'accept'])->name('quotes.accept');
     Route::patch('/quotes/{quote}/reject', [QuoteController::class, 'reject'])->name('quotes.reject');
     
-    // Agent routes
-    Route::get('/agent/requests', [RequestController::class, 'index'])->name('agent.requests.index');
-    
     // Admin routes
     Route::get('/admin/requests', [RequestController::class, 'adminIndex'])->name('admin.requests.index');
     
@@ -234,16 +233,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::patch('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     
     // Test routes for views that don't exist yet
-    Route::get('agent/requests', [DataFixController::class, 'getView'])->name('agent.requests.index')->defaults('viewName', 'agent.requests.index');
     Route::get('admin/requests', [DataFixController::class, 'getView'])->name('admin.requests.index')->defaults('viewName', 'admin.requests.index');
-});
-
-// Add these lines to fake the agent and admin routes
-Route::prefix('agent')->group(function () {
-    Route::get('requests', function () {
-        $requests = [];
-        return view('agent.requests.index', compact('requests'));
-    })->name('agent.requests.index');
 });
 
 // Define admin routes directly in web.php to ensure they are registered
@@ -280,12 +270,14 @@ Route::group([
     Route::post('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'updateSettings'])->name('settings.update');
 });
 
-// Aliases for /client/* to match test expectations
-Route::prefix('client')->middleware(['auth', \App\Http\Middleware\CustomerMiddleware::class])->group(function () {
-    Route::get('/dashboard', [CustomerDashboardController::class, 'index']);
-    Route::get('/requests', [CustomerRequestController::class, 'index']);
-    Route::get('/quotes', [CustomerQuoteController::class, 'index']);
-});
-
-
+// Debug route
 Route::get('debug-admin-users', [\App\Http\Controllers\Admin\DashboardController::class, 'users']);
+
+// احذف جميع التعريفات الزائدة لمسار agency.requests.index وأبقي فقط على هذا التعريف:
+Route::prefix('agency')->group(function () {
+    Route::get('requests', function () {
+        $requests = collect();
+        $services = [];
+        return view('agency.requests.index', ['requests' => $requests, 'services' => $services]);
+    })->name('agency.requests.index');
+});

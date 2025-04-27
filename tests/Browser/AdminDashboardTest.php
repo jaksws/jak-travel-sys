@@ -20,7 +20,6 @@ class AdminDashboardTest extends DuskTestCase
         $this->artisan('migrate:fresh'); // Reset the database state
         $this->adminUser = User::factory()->create([
             'role' => 'admin',
-            'user_type' => 'admin',
             'is_admin' => 1,
             'status' => 'active',
         ]);

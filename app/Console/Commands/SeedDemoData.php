@@ -105,7 +105,7 @@ class SeedDemoData extends Command
                 'name' => 'مستخدم التجربة',
                 'password' => Hash::make('123456'),
                 'agency_id' => $agency->id,
-                'role' => 'agent',
+                'role' => 'agency', // تعديل: agent -> agency
                 'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
@@ -143,7 +143,7 @@ class SeedDemoData extends Command
                 'name' => 'مدير وكالة اليمن',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'role' => 'agent',
+                'role' => 'agency', // تعديل: agent -> agency
                 'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
@@ -193,7 +193,7 @@ class SeedDemoData extends Command
                 'name' => 'سالم علي',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'role' => 'client',
+                'role' => 'customer',
                 'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
@@ -209,7 +209,7 @@ class SeedDemoData extends Command
                 'name' => 'فاطمة أحمد',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'role' => 'client',
+                'role' => 'customer',
                 'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
@@ -249,7 +249,7 @@ class SeedDemoData extends Command
                 'name' => 'مدير وكالة الخليج',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'role' => 'agent',
+                'role' => 'agency', // تعديل: agent -> agency
                 'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
@@ -283,7 +283,7 @@ class SeedDemoData extends Command
                 'name' => 'عبد الله محمد',
                 'password' => Hash::make('password123'),
                 'agency_id' => $agency->id,
-                'role' => 'client',
+                'role' => 'customer',
                 'status' => 'active',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
@@ -429,7 +429,7 @@ class SeedDemoData extends Command
         
         $services = Service::where('agency_id', $agency->id)->get();
         $customers = User::where('agency_id', $agency->id)
-            ->where('role', 'client')
+            ->where('role', 'customer')
             ->where('status', 'active')
             ->get();
         $subagents = User::where('agency_id', $agency->id)

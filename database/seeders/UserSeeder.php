@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'مدير وكالة اليمن',
                     'password' => Hash::make('password123'),
-                    'role' => 'agent',
+                    'role' => 'agency',
                     'agency_id' => $yemenAgency->id,
                     'status' => 'active',
                     'locale' => 'ar',
@@ -71,7 +71,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'سالم علي',
                     'password' => Hash::make('password123'),
-                    'role' => 'client',
+                    'role' => 'customer',
                     'agency_id' => $yemenAgency->id,
                     'status' => 'active',
                     'locale' => 'ar',
@@ -85,7 +85,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'فاطمة أحمد',
                     'password' => Hash::make('password123'),
-                    'role' => 'client',
+                    'role' => 'customer',
                     'agency_id' => $yemenAgency->id,
                     'status' => 'active',
                     'locale' => 'ar',
@@ -102,7 +102,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'مدير وكالة الخليج',
                     'password' => Hash::make('password123'),
-                    'role' => 'agent',
+                    'role' => 'agency',
                     'agency_id' => $gulfAgency->id,
                     'status' => 'active',
                     'locale' => 'ar',
@@ -132,7 +132,7 @@ class UserSeeder extends Seeder
                 [
                     'name' => 'عبد الله محمد',
                     'password' => Hash::make('password123'),
-                    'role' => 'client',
+                    'role' => 'customer',
                     'agency_id' => $gulfAgency->id,
                     'status' => 'active',
                     'locale' => 'ar',
@@ -148,7 +148,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'مستخدم اختباري',
                 'password' => Hash::make('123456'),
-                'role' => 'agent',
+                'role' => 'agency',
                 'agency_id' => $yemenAgency ? $yemenAgency->id : ($gulfAgency ? $gulfAgency->id : null),
                 'status' => 'active',
                 'locale' => 'en',

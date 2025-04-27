@@ -170,16 +170,12 @@ class DashboardController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,agency,subagent,customer',
             'status' => 'required|in:active,inactive',
-            'user_type' => 'nullable|in:admin,agency,subagent,customer',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
         $user->role = $request->role;
         $user->status = $request->status;
-        if ($request->filled('user_type')) {
-            $user->user_type = $request->user_type;
-        }
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
@@ -199,6 +195,7 @@ class DashboardController extends Controller
             $agency->address = $request->agency_address;
             $agency->phone = $request->agency_phone;
             $agency->license_number = $request->agency_license_number;
+            $agency->email = $user->email; // إصلاح: تمرير البريد الإلكتروني للوكالة
             $agency->save();
         }
 
