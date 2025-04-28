@@ -25,7 +25,7 @@
             <h6 class="m-0 font-weight-bold">تعديل الإعدادات العامة</h6>
         </div>
         <div class="card-body">
-            <form action="/admin/settings" method="POST" class="mb-0">
+            <form action="{{ route('admin.settings.update') }}" method="POST" class="mb-0">
                 @csrf
                 <div class="row mb-4">
                     <div class="col-lg-6">
@@ -76,6 +76,68 @@
                         </div>
                     </div>
                 </div>
+                
+                <hr class="my-4">
+                <h5 class="mb-3">إعدادات الفوتر</h5>
+                <div class="mb-3">
+                    <label for="footer_text" class="form-label">نص الفوتر</label>
+                    <input type="text" class="form-control" id="footer_text" name="footer_text" value="{{ config('ui.footer.text', '') }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">روابط الفوتر</label>
+                    <div id="footer-links-list">
+                        @php $footerLinks = config('ui.footer.links', []); @endphp
+                        @foreach($footerLinks as $i => $link)
+                        <div class="input-group mb-2 footer-link-row">
+                            <input type="text" name="footer_link_texts[]" class="form-control" placeholder="النص" value="{{ $link['text'] }}">
+                            <input type="text" name="footer_link_urls[]" class="form-control" placeholder="الرابط" value="{{ $link['url'] }}">
+                            <button type="button" class="btn btn-danger remove-footer-link">-</button>
+                        </div>
+                        @endforeach
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" id="add-footer-link">إضافة رابط</button>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">روابط التواصل الاجتماعي</label>
+                    <div id="footer-social-list">
+                        @php $footerSocial = config('ui.footer.social', []); @endphp
+                        @foreach($footerSocial as $i => $social)
+                        <div class="input-group mb-2 footer-social-row">
+                            <input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة" value="{{ $social['name'] }}">
+                            <input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط" value="{{ $social['url'] }}">
+                            <input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)" value="{{ $social['icon'] }}">
+                            <button type="button" class="btn btn-danger remove-footer-social">-</button>
+                        </div>
+                        @endforeach
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" id="add-footer-social">إضافة شبكة</button>
+                </div>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('add-footer-link').onclick = function() {
+                        const row = document.createElement('div');
+                        row.className = 'input-group mb-2 footer-link-row';
+                        row.innerHTML = `<input type="text" name="footer_link_texts[]" class="form-control" placeholder="النص"><input type="text" name="footer_link_urls[]" class="form-control" placeholder="الرابط"><button type="button" class="btn btn-danger remove-footer-link">-</button>`;
+                        document.getElementById('footer-links-list').appendChild(row);
+                    };
+                    document.getElementById('footer-links-list').addEventListener('click', function(e) {
+                        if(e.target.classList.contains('remove-footer-link')) {
+                            e.target.parentElement.remove();
+                        }
+                    });
+                    document.getElementById('add-footer-social').onclick = function() {
+                        const row = document.createElement('div');
+                        row.className = 'input-group mb-2 footer-social-row';
+                        row.innerHTML = `<input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة"><input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط"><input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)"><button type="button" class="btn btn-danger remove-footer-social">-</button>`;
+                        document.getElementById('footer-social-list').appendChild(row);
+                    };
+                    document.getElementById('footer-social-list').addEventListener('click', function(e) {
+                        if(e.target.classList.contains('remove-footer-social')) {
+                            e.target.parentElement.remove();
+                        }
+                    });
+                });
+                </script>
                 
                 <div class="form-group text-end">
                     <button type="submit" class="btn btn-primary">

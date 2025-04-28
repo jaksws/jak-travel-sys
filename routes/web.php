@@ -29,6 +29,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\DataFixController;
+use Illuminate\Support\Facades\File;
 
 // صفحة الترحيب
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -268,6 +269,45 @@ Route::group([
     // Admin settings routes
     Route::get('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'settings'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'updateSettings'])->name('settings.update');
+    
+    // Create page route
+    Route::post('/create-page', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'pageName' => 'required|string|max:255',
+        ]);
+
+        $pageName = strtolower(str_replace(' ', '-', $request->pageName));
+        $viewPath = resource_path("views/{$pageName}.blade.php");
+
+        // Check if the page already exists
+        if (File::exists($viewPath)) {
+            return redirect()->back()->with('error', 'Page already exists.');
+        }
+
+        // Create the Blade file
+        File::put($viewPath, "@extends('layouts.app')\n\n@section('title', '{$request->pageName}')\n\n@section('content')\n<div class=\"container py-5\">\n    <h1 class=\"mb-4\">{$request->pageName}</h1>\n    <p>This is the {$request->pageName} page. Add your content here.</p>\n</div>\n@endsection");
+
+        // Add the route dynamically
+        $routePath = base_path('routes/web.php');
+        File::append($routePath, "\nRoute::view('/{$pageName}', '{$pageName}')->name('{$pageName}');");
+
+        // Update footer links in the configuration
+        $footerConfigPath = config_path('ui.php');
+        $currentConfig = include $footerConfigPath;
+
+        $newLink = [
+            'text' => $request->pageName,
+            'url' => "/{$pageName}",
+        ];
+
+        $currentConfig['footer']['links'][] = $newLink;
+
+        // Save the updated configuration
+        $configContent = "<?php\n\nreturn " . var_export($currentConfig, true) . ";\n";
+        file_put_contents($footerConfigPath, $configContent);
+
+        return redirect()->back()->with('success', 'Page created successfully.');
+    })->name('createPage');
 });
 
 // Debug route
@@ -281,3 +321,13 @@ Route::prefix('agency')->group(function () {
         return view('agency.requests.index', ['requests' => $requests, 'services' => $services]);
     })->name('agency.requests.index');
 });
+
+// Privacy Policy route
+Route::view('/privacy', 'privacy')->name('privacy');
+
+// Terms and Conditions route
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/roles', 'roles')->name('roles');
+Route::view('/الخصوصية', 'الخصوصية')->name('الخصوصية');
+Route::view('/اتفاقية-المستخدم', 'اتفاقية-المستخدم')->name('اتفاقية-المستخدم');
+Route::view('/القوانين', 'القوانين')->name('القوانين');

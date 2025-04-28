@@ -325,6 +325,19 @@
             </div>
         </div>
     </div>
+
+    <!-- نموذج إنشاء صفحة جديدة -->
+    <div class="container py-5">
+        <h2>Create a New Page</h2>
+        <form action="{{ route('admin.createPage') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label for="pageName" class="form-label">Page Name</label>
+                <input type="text" class="form-control" id="pageName" name="pageName" placeholder="Enter page name" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Page</button>
+        </form>
+    </div>
 </div>
 
 <!-- Modal: إضافة مستخدم جديد -->

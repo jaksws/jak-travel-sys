@@ -262,21 +262,21 @@
                             <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" width="40" height="40" class="me-2" onerror="this.style.display='none'">
                             <h5 class="m-0">{{ config('app.name', 'وكالات السفر') }}</h5>
                         </div>
-                        <p class="text-secondary">نظام متكامل لإدارة وكالات السفر والسبوكلاء والعملاء، يوفر حلولاً شاملة لعمليات الحجز وإدارة الخدمات السياحية.</p>
+                        <p class="text-secondary">{{ config('ui.footer.text', 'نظام متكامل لإدارة وكالات السفر والسبوكلاء والعملاء، يوفر حلولاً شاملة لعمليات الحجز وإدارة الخدمات السياحية.') }}</p>
                         <div class="social-icons">
-                            <a href="#" class="me-2 social-icon"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="me-2 social-icon"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="me-2 social-icon"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                            @foreach(config('ui.footer.social', []) as $social)
+                                <a href="{{ $social['url'] }}" class="me-2 social-icon" target="_blank">
+                                    <i class="fab fa-{{ $social['icon'] ?? 'globe' }}"></i>
+                                </a>
+                            @endforeach
                         </div>
                     </div>
                     <div class="col-sm-6 col-lg-2 mb-4 mb-lg-0">
                         <h6 class="fw-bold mb-3">روابط سريعة</h6>
                         <ul class="list-unstyled footer-links">
-                            <li class="mb-2"><a href="{{ url('/') }}"><i class="fas fa-chevron-left me-1 small"></i> {{ __('v2.dashboard') }}</a></li>
-                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> {{ __('About Us') }}</a></li>
-                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> {{ __('Services') }}</a></li>
-                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> {{ __('Terms & Conditions') }}</a></li>
+                            @foreach(config('ui.footer.links', []) as $link)
+                                <li class="mb-2"><a href="{{ $link['url'] }}"><i class="fas fa-chevron-left me-1 small"></i> {{ $link['text'] }}</a></li>
+                            @endforeach
                         </ul>
                     </div>
                     <div class="col-sm-6 col-lg-2 mb-4 mb-lg-0">
@@ -326,13 +326,13 @@
                 <hr>
                 <div class="row align-items-center py-3">
                     <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                        <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'وكالات السفر') }}. {{ __('All rights reserved') }}</p>
+                        <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'وكالات السفر') }}. {{ config('ui.footer.text', __('All rights reserved')) }}</p>
                     </div>
                     <div class="col-md-6 text-center text-md-end">
                         <div class="footer-meta d-flex flex-wrap justify-content-center justify-content-md-end">
-                            <span class="mx-2"><a href="#">الخصوصية</a></span>
-                            <span class="mx-2"><a href="#">الشروط والأحكام</a></span>
-                            <span class="mx-2"><a href="#">الأمان</a></span>
+                            @foreach(config('ui.footer.links', []) as $link)
+                                <span class="mx-2"><a href="{{ $link['url'] }}">{{ $link['text'] }}</a></span>
+                            @endforeach
                             <span class="version ms-3 text-muted">
                                 <i class="fas fa-code-branch me-1 small"></i> v{{ config('app.version', '1.1') }}
                             </span>
@@ -341,7 +341,6 @@
                 </div>
             </div>
         </footer>
-    </div>
     
     <!-- تضمين سكريبت الوضع المظلم -->
     @if(config('v1_features.dark_mode.enabled', false))

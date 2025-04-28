@@ -349,6 +349,9 @@ class DashboardController extends Controller
      */
     public function updateSettings(Request $request)
     {
+        \Log::info('Received settings update request', $request->all());
+        \Log::info('Footer settings before update', config('ui.footer'));
+
         $validated = $request->validate([
             'multilingual' => 'nullable|in:on',
             'dark_mode' => 'nullable|in:on',
@@ -389,7 +392,81 @@ class DashboardController extends Controller
         $configContent .= "];\n";
         
         file_put_contents($configPath, $configContent);
+
+        // تحديث إعدادات الفوتر
+        $footer = [
+            'text' => $request->footer_text ?? config('ui.footer.text', ''),
+            'links' => [],
+            'social' => [],
+        ];
+        if ($request->has('footer_link_texts')) {
+            foreach ($request->footer_link_texts as $index => $text) {
+                if (!empty($text) && !empty($request->footer_link_urls[$index])) {
+                    $footer['links'][] = [
+                        'text' => $text,
+                        'url' => $request->footer_link_urls[$index],
+                    ];
+                }
+            }
+        }
+        if ($request->has('footer_social_names')) {
+            foreach ($request->footer_social_names as $index => $name) {
+                if (!empty($name) && !empty($request->footer_social_urls[$index])) {
+                    $footer['social'][] = [
+                        'name' => $name,
+                        'url' => $request->footer_social_urls[$index],
+                        'icon' => $request->footer_social_icons[$index] ?? 'globe',
+                    ];
+                }
+            }
+        }
+        // تحديث ملف ui.php
+        $this->updateUIConfig([
+            'footer' => $footer
+        ]);
+
+        // معالجة الحذف والتعديل للروابط
+        $existingLinks = config('ui.footer.links', []);
+        $newLinks = $footer['links'];
+
+        // حذف الصفحات المرتبطة بالروابط المحذوفة
+        foreach ($existingLinks as $existingLink) {
+            $existsInNewLinks = collect($newLinks)->firstWhere('url', $existingLink['url']);
+            if (!$existsInNewLinks) {
+                $pageName = strtolower(str_replace(' ', '-', $existingLink['text']));
+                $viewPath = resource_path("views/{$pageName}.blade.php");
+
+                // حذف ملف الصفحة إذا كان موجودًا
+                if (File::exists($viewPath)) {
+                    File::delete($viewPath);
+                }
+
+                // حذف route الخاص بالصفحة
+                $routePath = base_path('routes/web.php');
+                $routeContent = File::get($routePath);
+                $routeContent = preg_replace("/Route::view\('\/{$pageName}', '{$pageName}'\)->name\('{$pageName}'\);\\n/", '', $routeContent);
+                File::put($routePath, $routeContent);
+            }
+        }
+
+        // تحديث الصفحات عند تعديل الروابط
+        foreach ($newLinks as $newLink) {
+            $pageName = strtolower(str_replace(' ', '-', $newLink['text']));
+            $viewPath = resource_path("views/{$pageName}.blade.php");
+
+            // إنشاء الصفحة إذا لم تكن موجودة
+            if (!File::exists($viewPath)) {
+                File::put($viewPath, "@extends('layouts.app')\n\n@section('title', '{$newLink['text']}')\n\n@section('content')\n<div class=\"container py-5\">\n    <h1 class=\"mb-4\">{$newLink['text']}</h1>\n    <p>This is the {$newLink['text']} page. Add your content here.</p>\n</div>\n@endsection");
+
+                // إضافة route للصفحة
+                $routePath = base_path('routes/web.php');
+                File::append($routePath, "\nRoute::view('/{$pageName}', '{$pageName}')->name('{$pageName}');");
+            }
+        }
         
+        \Log::info('Footer settings after update', $footer);
+        \Log::info('Settings update completed successfully.');
+
         // مسح ذاكرة التخزين المؤقت للتكوين
         \Artisan::call('config:clear');
         
@@ -715,6 +792,11 @@ class DashboardController extends Controller
         // دمج الإعدادات الجديدة
         $newConfig = array_merge($currentConfig, $data);
         
+        \Log::info('Updating UI config with data:', $data);
+        \Log::info('Current UI config:', $currentConfig);
+        \Log::info('New UI config:', $newConfig);
+        \Log::info('UI config after update:', $newConfig);
+
         // إنشاء محتوى ملف التكوين
         $configContent = "<?php\n\nreturn " . var_export($newConfig, true) . ";\n";
         
