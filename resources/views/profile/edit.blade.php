@@ -125,6 +125,55 @@
                                 @enderror
                             </div>
                         </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_number" class="form-label">رقم الهوية</label>
+                                <input type="text" class="form-control @error('id_number') is-invalid @enderror" id="id_number" name="id_number" value="{{ old('id_number', auth()->user()->id_number) }}">
+                                @error('id_number')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="passport_number" class="form-label">رقم جواز السفر</label>
+                                <input type="text" class="form-control @error('passport_number') is-invalid @enderror" id="passport_number" name="passport_number" value="{{ old('passport_number', auth()->user()->passport_number) }}">
+                                @error('passport_number')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nationality" class="form-label">الجنسية</label>
+                                <input type="text" class="form-control @error('nationality') is-invalid @enderror" id="nationality" name="nationality" value="{{ old('nationality', auth()->user()->nationality) }}">
+                                @error('nationality')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">المدينة</label>
+                                <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city', auth()->user()->city) }}">
+                                @error('city')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="country" class="form-label">الدولة</label>
+                                <input type="text" class="form-control @error('country') is-invalid @enderror" id="country" name="country" value="{{ old('country', auth()->user()->country) }}">
+                                @error('country')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="preferred_currency" class="form-label">العملة المفضلة</label>
+                                <input type="text" class="form-control @error('preferred_currency') is-invalid @enderror" id="preferred_currency" name="preferred_currency" value="{{ old('preferred_currency', auth()->user()->preferred_currency) }}">
+                                @error('preferred_currency')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                         
                         <button type="submit" class="btn btn-warning">
                             <i class="fas fa-save me-1"></i> حفظ التغييرات

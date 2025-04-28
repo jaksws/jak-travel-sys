@@ -6,6 +6,9 @@ use App\Http\Controllers\Admin\DashboardController;
 // ... comments ...
 
 Route::middleware(['auth', 'isAdmin'])->group(function () {
+    // Dashboard route
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     // ... dashboard and ui routes ...
 
     // إدارة المستخدمين
