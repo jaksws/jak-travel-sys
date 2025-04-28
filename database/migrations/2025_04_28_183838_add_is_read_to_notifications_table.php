@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->boolean('is_read')->default(false)->after('read_at');
+            // Commenting out the addition of the 'is_read' column to avoid duplication
+            // $table->boolean('is_read')->default(false)->after('read_at');
         });
     }
 

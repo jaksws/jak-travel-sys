@@ -19,7 +19,8 @@ return new class extends Migration
                 $table->string('title')->default('إشعار جديد');
                 $table->text('message')->nullable();
                 $table->string('type')->default('general');
-                $table->boolean('is_read')->default(false);
+                // Commenting out the addition of the 'is_read' column to avoid duplication
+                // $table->boolean('is_read')->default(false);
                 $table->json('data')->nullable();
                 $table->string('link')->nullable();
                 $table->timestamps();
