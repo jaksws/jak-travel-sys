@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->boolean('is_read')->default(false)->after('read_at');
+            if (!Schema::hasColumn('notifications', 'is_read')) {
+                $table->boolean('is_read')->default(false)->after('read_at');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->dropColumn('is_read');
+            if (Schema::hasColumn('notifications', 'is_read')) {
+                $table->dropColumn('is_read');
+            }
         });
     }
 };

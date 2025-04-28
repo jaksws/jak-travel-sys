@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'multilingual' => false,
-    'dark_mode' => false,
-    'payment_system' => false,
-    'enhanced_ui' => false,
+    'multilingual' => true,
+    'dark_mode' => true,
+    'payment_system' => true,
+    'enhanced_ui' => true,
     'ai_features' => false,
     'backup' => array (
   'multilingual' => 
