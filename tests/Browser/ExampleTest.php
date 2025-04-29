@@ -15,6 +15,7 @@ class ExampleTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
+                    ->pause(1000) // Add a pause to wait for rendering
                     ->assertSee('مرحباً بك في نظام وكالات السفر');
         });
     }
