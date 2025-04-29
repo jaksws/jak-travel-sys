@@ -55,7 +55,6 @@ jobs:
       - name: Create storage symlink
         run: php artisan storage:link
 
-      # Add Node.js and Vite build steps
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
@@ -91,7 +90,7 @@ jobs:
         run: php artisan app:database-backup -vvv
 
       - name: Run Migrations
-        run: php artisan migrate:safe --force -vvv
+        run: php artisan migrate --force -vvv
 
       - name: Seed Database
         run: php artisan db:seed -vvv
@@ -122,4 +121,4 @@ jobs:
           APP_FALLBACK_LOCALE: en
           APP_TIMEZONE: UTC
           APP_LOCALE_FALLBACK: en
-          APP_LOCALE_FALLBACKS: en        
+          APP_LOCALE_FALLBACKS: en
