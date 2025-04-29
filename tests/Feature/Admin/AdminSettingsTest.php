@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Validation\ValidationException;
 
 class AdminSettingsTest extends AdminTestCase
 {
@@ -50,10 +51,14 @@ class AdminSettingsTest extends AdminTestCase
     public function test_settings_validation()
     {
         $this->loginAsAdmin();
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
         $data = [
-            'dark_mode' => 'invalid_value',
+            'dark_mode' => 'invalid_value', // Send an invalid value
         ];
-        $this->post(route('admin.settings.update'), $data);
+        $response = $this->post(route('admin.settings.update'), $data);
+
+        // Assert that the response is a redirect back
+        $response->assertStatus(302);
+        // Assert that the session has validation errors for the 'dark_mode' field
+        $response->assertSessionHasErrors('dark_mode');
     }
 }
