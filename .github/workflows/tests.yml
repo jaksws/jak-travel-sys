@@ -44,6 +44,13 @@ jobs:
       - name: Generate app key
         run: php artisan key:generate
 
+      - name: Create SQLite Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+      - name: Create storage symlink
+        run: php artisan storage:link
+        
       # Add Node.js and Vite build steps
       - name: Install Node.js
         uses: actions/setup-node@v3
