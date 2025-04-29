@@ -87,19 +87,19 @@ jobs:
           fi
 
       - name: Backup Database
-        run: php artisan app:database-backup -vvv
+        run: php artisan app:database-backup --verbose
 
       - name: Run Migrations
-        run: php artisan migrate --force -vvv
+        run: php artisan migrate:safe --force --verbose
 
       - name: Seed Database
-        run: php artisan db:seed -vvv
+        run: php artisan db:seed --verbose
 
       - name: Check Application Status
-        run: php artisan app:check-status -vvv
+        run: php artisan app:check-status --verbose
 
       - name: Execute tests
-        run: php artisan test -vvv
+        run: php artisan test --verbose
         env:
           APP_ENV: testing
           DB_CONNECTION: sqlite
