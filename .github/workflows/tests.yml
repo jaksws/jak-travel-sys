@@ -34,23 +34,27 @@ jobs:
         run: composer install --prefer-dist --no-interaction
 
       - name: Apply version-specific compatibility fixes
-        run: |
-          # Apply fixes based on the PHP version being tested
-          php -f app/Compatibility/apply-fixes.php ${{ matrix.php }}
+        run: php -f app/Compatibility/apply-fixes.php ${{ matrix.php }}
 
       - name: Copy environment file
         run: cp .env.example .env
-
-      - name: Generate app key
-        run: php artisan key:generate
 
       - name: Create SQLite Database
         run: |
           mkdir -p database
           touch database/database.sqlite
+
+      - name: Ensure .env is configured for SQLite
+        run: |
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=database/database.sqlite" >> .env
+
+      - name: Generate app key
+        run: php artisan key:generate
+
       - name: Create storage symlink
         run: php artisan storage:link
-        
+
       # Add Node.js and Vite build steps
       - name: Install Node.js
         uses: actions/setup-node@v3
@@ -71,13 +75,10 @@ jobs:
           ls -la public/build/
           echo "Checking .vite subdirectory:"
           ls -la public/build/.vite/
-          # Workaround: Copy manifest from .vite subdir if it exists there
-          # Ideally, Vite config should output manifest to public/build/ directly
           if [ -f "public/build/.vite/manifest.json" ] && [ ! -f "public/build/manifest.json" ]; then
             echo "Copying manifest.json from .vite directory..."
             cp public/build/.vite/manifest.json public/build/manifest.json
           fi
-          # Verify manifest exists in the expected location
           if [ -f "public/build/manifest.json" ]; then
             echo "manifest.json found in public/build:"
             cat public/build/manifest.json
