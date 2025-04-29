@@ -35,14 +35,8 @@ jobs:
 
       - name: Apply version-specific compatibility fixes
         run: |
-          if [[ "${{ matrix.php }}" == "8.3" ]]; then
-            # Apply PHP 8.3 specific fixes if needed
-            php -f app/Compatibility/apply-fixes.php
-          fi
-          if [[ "${{ matrix.php }}" == "8.4" ]]; then
-            # Apply PHP 8.4 specific fixes if needed
-            php -f app/Compatibility/apply-fixes.php
-          fi
+          # Apply fixes based on the PHP version being tested
+          php -f app/Compatibility/apply-fixes.php ${{ matrix.php }}
 
       - name: Copy environment file
         run: cp .env.example .env
@@ -68,36 +62,34 @@ jobs:
           npm run build
           echo "Checking build output:"
           ls -la public/build/
+          echo "Checking .vite subdirectory:"
+          ls -la public/build/.vite/
+          # Workaround: Copy manifest from .vite subdir if it exists there
+          # Ideally, Vite config should output manifest to public/build/ directly
+          if [ -f "public/build/.vite/manifest.json" ] && [ ! -f "public/build/manifest.json" ]; then
+            echo "Copying manifest.json from .vite directory..."
+            cp public/build/.vite/manifest.json public/build/manifest.json
+          fi
+          # Verify manifest exists in the expected location
           if [ -f "public/build/manifest.json" ]; then
-            echo "manifest.json exists!"
+            echo "manifest.json found in public/build:"
             cat public/build/manifest.json
           else
-            echo "ERROR: manifest.json not found!"
+            echo "ERROR: manifest.json not found in public/build/ or public/build/.vite/"
             exit 1
           fi
 
-          # Check .vite subdirectory where manifest is actually located
-          echo "Checking .vite subdirectory:"
-          ls -la public/build/.vite/
-
-          # Temporary fix to bypass failure
-          if [ ! -f "public/build/.vite/manifest.json" ]; then
-            echo "{}" > public/build/.vite/manifest.json
-            echo "⚠️ Temporary manifest.json created for debugging"
-          fi
-          cp public/build/.vite/manifest.json public/build/manifest.json
-
       - name: Backup Database
-        run: php artisan app:database-backup
+        run: php artisan app:database-backup -vvv
 
       - name: Check Application Status
-        run: php artisan app:check-status
+        run: php artisan app:check-status -vvv
 
       - name: Run Migrations
-        run: php artisan migrate:safe --force
+        run: php artisan migrate:safe --force -vvv
 
       - name: Seed Database
-        run: php artisan db:seed
+        run: php artisan db:seed -vvv
 
       - name: Execute tests
-        run: php artisan test
+        run: php artisan test -vvv
