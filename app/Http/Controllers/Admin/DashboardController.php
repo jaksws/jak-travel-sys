@@ -352,125 +352,155 @@ class DashboardController extends Controller
         \Log::info('Received settings update request', $request->all());
         \Log::info('Footer settings before update', config('ui.footer'));
 
-        $validated = $request->validate([
-            'multilingual' => 'nullable|in:on',
-            'dark_mode' => 'nullable|in:on',
-            'payment_system' => 'nullable|in:on',
-            'enhanced_ui' => 'nullable|in:on',
-            'ai_features' => 'nullable|in:on',
-        ]);
+        try {
+            $validated = $request->validate([
+                'multilingual' => 'nullable|in:on',
+                'dark_mode' => 'nullable|in:on',
+                'payment_system' => 'nullable|in:on',
+                'enhanced_ui' => 'nullable|in:on',
+                'ai_features' => 'nullable|in:on',
+                'footer_text' => 'nullable|string',
+            ]);
 
-        // تحديث الإعدادات
-        $settings = [
-            'multilingual' => $request->has('multilingual'),
-            'dark_mode' => $request->has('dark_mode'),
-            'payment_system' => $request->has('payment_system'),
-            'enhanced_ui' => $request->has('enhanced_ui'),
-            'ai_features' => $request->has('ai_features'),
-        ];
-        
-        // حفظ الإعدادات في ملف التكوين
-        $configPath = config_path('v1_features.php');
-        $configContent = "<?php\n\nreturn [\n";
-        
-        foreach ($settings as $key => $value) {
-            $configContent .= "    '{$key}' => " . ($value ? 'true' : 'false') . ",\n";
-        }
-        
-        // الحفاظ على الإعدادات الأخرى
-        $currentSettings = config('v1_features');
-        foreach ($currentSettings as $key => $value) {
-            if (!array_key_exists($key, $settings)) {
-                $boolValue = $value ? 'true' : 'false';
-                if (!is_bool($value)) {
-                    $boolValue = is_array($value) ? var_export($value, true) : "'{$value}'";
-                }
-                $configContent .= "    '{$key}' => {$boolValue},\n";
+            // تحديث الإعدادات
+            $settings = [
+                'multilingual' => $request->has('multilingual'),
+                'dark_mode' => $request->has('dark_mode'),
+                'payment_system' => $request->has('payment_system'),
+                'enhanced_ui' => $request->has('enhanced_ui'),
+                'ai_features' => $request->has('ai_features'),
+            ];
+            
+            \Log::info('Processed v1_features settings before saving:', $settings);
+
+            // حفظ الإعدادات في ملف التكوين
+            $configPath = config_path('v1_features.php');
+            $configContent = "<?php\n\nreturn [\n";
+            
+            foreach ($settings as $key => $value) {
+                $configContent .= "    '{$key}' => " . ($value ? 'true' : 'false') . ",\n";
             }
-        }
-        
-        $configContent .= "];\n";
-        
-        file_put_contents($configPath, $configContent);
-
-        // تحديث إعدادات الفوتر
-        $footer = [
-            'text' => $request->footer_text ?? config('ui.footer.text', ''),
-            'links' => [],
-            'social' => [],
-        ];
-        if ($request->has('footer_link_texts')) {
-            foreach ($request->footer_link_texts as $index => $text) {
-                if (!empty($text) && !empty($request->footer_link_urls[$index])) {
-                    $footer['links'][] = [
-                        'text' => $text,
-                        'url' => $request->footer_link_urls[$index],
-                    ];
+            
+            // الحفاظ على الإعدادات الأخرى
+            $currentSettings = config('v1_features');
+            foreach ($currentSettings as $key => $value) {
+                if (!array_key_exists($key, $settings)) {
+                    $boolValue = $value ? 'true' : 'false';
+                    if (!is_bool($value)) {
+                        $boolValue = is_array($value) ? var_export($value, true) : "'{$value}'";
+                    }
+                    $configContent .= "    '{$key}' => {$boolValue},\n";
                 }
             }
-        }
-        if ($request->has('footer_social_names')) {
-            foreach ($request->footer_social_names as $index => $name) {
-                if (!empty($name) && !empty($request->footer_social_urls[$index])) {
-                    $footer['social'][] = [
-                        'name' => $name,
-                        'url' => $request->footer_social_urls[$index],
-                        'icon' => $request->footer_social_icons[$index] ?? 'globe',
-                    ];
+            
+            $configContent .= "];\n";
+            
+            file_put_contents($configPath, $configContent);
+            \Log::info('Finished writing v1_features.php');
+
+            // تحديث إعدادات الفوتر
+            $footer = config('ui.footer', []); // Load existing footer config
+            $footer['text'] = $request->input('footer_text', ''); // Update only the text
+            $footer['links'] = []; // Reset links
+            $footer['social'] = []; // Reset social links
+
+            // Rebuild links from request
+            if ($request->has('footer_link_texts')) {
+                foreach ($request->footer_link_texts as $index => $text) {
+                    if (!empty($text) && !empty($request->footer_link_urls[$index])) {
+                        $footer['links'][] = [
+                            'text' => $text,
+                            'url' => $request->footer_link_urls[$index],
+                        ];
+                    }
                 }
             }
-        }
-        // تحديث ملف ui.php
-        $this->updateUIConfig([
-            'footer' => $footer
-        ]);
 
-        // معالجة الحذف والتعديل للروابط
-        $existingLinks = config('ui.footer.links', []);
-        $newLinks = $footer['links'];
+            // Rebuild service links from request
+            $footer['services'] = []; // Reset service links
+            if ($request->has('footer_service_link_texts')) {
+                foreach ($request->footer_service_link_texts as $index => $text) {
+                    if (!empty($text) && !empty($request->footer_service_link_urls[$index])) {
+                        $footer['services'][] = [
+                            'text' => $text,
+                            'url' => $request->footer_service_link_urls[$index],
+                        ];
+                    }
+                }
+            }
 
-        // حذف الصفحات المرتبطة بالروابط المحذوفة
-        foreach ($existingLinks as $existingLink) {
-            $existsInNewLinks = collect($newLinks)->firstWhere('url', $existingLink['url']);
-            if (!$existsInNewLinks) {
-                $pageName = strtolower(str_replace(' ', '-', $existingLink['text']));
+            // Rebuild social links from request
+            if ($request->has('footer_social_names')) {
+                foreach ($request->footer_social_names as $index => $name) {
+                    if (!empty($name) && !empty($request->footer_social_urls[$index])) {
+                        $footer['social'][] = [
+                            'name' => $name,
+                            'url' => $request->footer_social_urls[$index],
+                            'icon' => $request->footer_social_icons[$index] ?? 'globe',
+                        ];
+                    }
+                }
+            }
+            
+            \Log::info('Processed footer settings before saving:', $footer);
+
+            // تحديث ملف ui.php
+            $this->updateUIConfig([
+                'footer' => $footer
+            ]);
+
+            // معالجة الحذف والتعديل للروابط
+            $existingLinks = config('ui.footer.links', []);
+            $newLinks = $footer['links'];
+
+            // حذف الصفحات المرتبطة بالروابط المحذوفة
+            foreach ($existingLinks as $existingLink) {
+                $existsInNewLinks = collect($newLinks)->firstWhere('url', $existingLink['url']);
+                if (!$existsInNewLinks) {
+                    $pageName = strtolower(str_replace(' ', '-', $existingLink['text']));
+                    $viewPath = resource_path("views/{$pageName}.blade.php");
+
+                    // حذف ملف الصفحة إذا كان موجودًا
+                    if (File::exists($viewPath)) {
+                        File::delete($viewPath);
+                    }
+
+                    // حذف route الخاص بالصفحة
+                    $routePath = base_path('routes/web.php');
+                    $routeContent = File::get($routePath);
+                    $routeContent = preg_replace("/Route::view\('\/{$pageName}', '{$pageName}')->name\('{$pageName}'\);\\n/", '', $routeContent);
+                    File::put($routePath, $routeContent);
+                }
+            }
+
+            // تحديث الصفحات عند تعديل الروابط
+            foreach ($newLinks as $newLink) {
+                $pageName = strtolower(str_replace(' ', '-', $newLink['text']));
                 $viewPath = resource_path("views/{$pageName}.blade.php");
 
-                // حذف ملف الصفحة إذا كان موجودًا
-                if (File::exists($viewPath)) {
-                    File::delete($viewPath);
+                // إنشاء الصفحة إذا لم تكن موجودة
+                if (!File::exists($viewPath)) {
+                    File::put($viewPath, "@extends('layouts.app')\n\n@section('title', '{$newLink['text']}')\n\n@section('content')\n<div class=\"container py-5\">\n    <h1 class=\"mb-4\">{$newLink['text']}</h1>\n    <p>This is the {$newLink['text']} page. Add your content here.</p>\n</div>\n@endsection");
+
+                    // إضافة route للصفحة
+                    $routePath = base_path('routes/web.php');
+                    File::append($routePath, "\nRoute::view('/{$pageName}', '{$pageName}')->name('{$pageName}');");
                 }
-
-                // حذف route الخاص بالصفحة
-                $routePath = base_path('routes/web.php');
-                $routeContent = File::get($routePath);
-                $routeContent = preg_replace("/Route::view\('\/{$pageName}', '{$pageName}'\)->name\('{$pageName}'\);\\n/", '', $routeContent);
-                File::put($routePath, $routeContent);
             }
+            
+            \Log::info('Footer settings after update', $footer);
+            \Log::info('Settings update completed successfully.');
+
+            // مسح ذاكرة التخزين المؤقت للتكوين
+            \Artisan::call('config:clear');
+            
+            return redirect('/admin/settings')->with('success', 'تم تحديث إعدادات النظام بنجاح');
+        } catch (\Exception $e) {
+            \Log::error('Error updating settings: ' . $e->getMessage(), [
+                'exception' => $e
+            ]);
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث الإعدادات: ' . $e->getMessage());
         }
-
-        // تحديث الصفحات عند تعديل الروابط
-        foreach ($newLinks as $newLink) {
-            $pageName = strtolower(str_replace(' ', '-', $newLink['text']));
-            $viewPath = resource_path("views/{$pageName}.blade.php");
-
-            // إنشاء الصفحة إذا لم تكن موجودة
-            if (!File::exists($viewPath)) {
-                File::put($viewPath, "@extends('layouts.app')\n\n@section('title', '{$newLink['text']}')\n\n@section('content')\n<div class=\"container py-5\">\n    <h1 class=\"mb-4\">{$newLink['text']}</h1>\n    <p>This is the {$newLink['text']} page. Add your content here.</p>\n</div>\n@endsection");
-
-                // إضافة route للصفحة
-                $routePath = base_path('routes/web.php');
-                File::append($routePath, "\nRoute::view('/{$pageName}', '{$pageName}')->name('{$pageName}');");
-            }
-        }
-        
-        \Log::info('Footer settings after update', $footer);
-        \Log::info('Settings update completed successfully.');
-
-        // مسح ذاكرة التخزين المؤقت للتكوين
-        \Artisan::call('config:clear');
-        
-        return redirect('/admin/settings')->with('success', 'تم تحديث إعدادات النظام بنجاح');
     }
 
     /**

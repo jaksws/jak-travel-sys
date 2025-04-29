@@ -98,6 +98,20 @@
                     <button type="button" class="btn btn-sm btn-secondary" id="add-footer-link">إضافة رابط</button>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">روابط الخدمات بالفوتر</label>
+                    <div id="footer-service-links-list">
+                        @php $footerServiceLinks = config('ui.footer.services', []); @endphp
+                        @foreach($footerServiceLinks as $i => $link)
+                        <div class="input-group mb-2 footer-service-link-row">
+                            <input type="text" name="footer_service_link_texts[]" class="form-control" placeholder="النص" value="{{ $link['text'] }}">
+                            <input type="text" name="footer_service_link_urls[]" class="form-control" placeholder="الرابط" value="{{ $link['url'] }}">
+                            <button type="button" class="btn btn-danger remove-footer-service-link">-</button>
+                        </div>
+                        @endforeach
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" id="add-footer-service-link">إضافة رابط خدمة</button>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">روابط التواصل الاجتماعي</label>
                     <div id="footer-social-list">
                         @php $footerSocial = config('ui.footer.social', []); @endphp
@@ -122,6 +136,17 @@
                     };
                     document.getElementById('footer-links-list').addEventListener('click', function(e) {
                         if(e.target.classList.contains('remove-footer-link')) {
+                            e.target.parentElement.remove();
+                        }
+                    });
+                    document.getElementById('add-footer-service-link').onclick = function() {
+                        const row = document.createElement('div');
+                        row.className = 'input-group mb-2 footer-service-link-row';
+                        row.innerHTML = `<input type="text" name="footer_service_link_texts[]" class="form-control" placeholder="النص"><input type="text" name="footer_service_link_urls[]" class="form-control" placeholder="الرابط"><button type="button" class="btn btn-danger remove-footer-service-link">-</button>`;
+                        document.getElementById('footer-service-links-list').appendChild(row);
+                    };
+                    document.getElementById('footer-service-links-list').addEventListener('click', function(e) {
+                        if(e.target.classList.contains('remove-footer-service-link')) {
                             e.target.parentElement.remove();
                         }
                     });

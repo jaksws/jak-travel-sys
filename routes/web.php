@@ -34,6 +34,9 @@ use Illuminate\Support\Facades\File;
 // صفحة الترحيب
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+// صفحة الخدمات العامة
+Route::get('/services', [App\Http\Controllers\HomeController::class, 'publicServices'])->name('public.services');
+
 // تسجيل مسارات المصادقة مرة واحدة فقط
 Auth::routes();
 
@@ -331,3 +334,4 @@ Route::view('/roles', 'roles')->name('roles');
 Route::view('/الخصوصية', 'الخصوصية')->name('الخصوصية');
 Route::view('/اتفاقية-المستخدم', 'اتفاقية-المستخدم')->name('اتفاقية-المستخدم');
 Route::view('/القوانين', 'القوانين')->name('القوانين');
+Route::view('/t1', 't1')->name('t1');

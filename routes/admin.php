@@ -31,9 +31,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
         Route::delete('/requests/{request}', [DashboardController::class, 'destroyRequest'])->name('requests.destroy'); // Assuming destroyRequest method exists or will be created
     });
 
-    // إدارة الطلبات - Remove from here
-    // Route::get('/requests', [DashboardController::class, 'requests'])->name('requests.index');
-    // Route::post('/requests', [DashboardController::class, 'storeRequest'])->name('requests.store');
-
     // ... system logs and settings routes ...
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index'); // Add this line for displaying settings
+    Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
 });

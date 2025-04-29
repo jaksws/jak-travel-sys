@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Service;
 
 class HomeController extends Controller
 {
@@ -39,7 +40,24 @@ class HomeController extends Controller
             }
         }
         
-        // Otherwise show welcome page
-        return view('welcome');
+        // Fetch active services for public view
+        $services = Service::where('status', 'active')->orderBy('type')->get()->groupBy('type');
+        
+        // Otherwise show welcome page with services
+        return view('welcome', compact('services'));
+    }
+
+    /**
+     * Show the public services page.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function publicServices()
+    {
+        // Fetch active services for public view
+        $services = Service::where('status', 'active')->orderBy('type')->get()->groupBy('type');
+        
+        // Show public services page
+        return view('public.services', compact('services'));
     }
 }

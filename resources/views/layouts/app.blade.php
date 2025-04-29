@@ -282,10 +282,9 @@
                     <div class="col-sm-6 col-lg-2 mb-4 mb-lg-0">
                         <h6 class="fw-bold mb-3">خدماتنا</h6>
                         <ul class="list-unstyled footer-links">
-                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> تذاكر السفر</a></li>
-                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> حجز الفنادق</a></li>
-                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> برامج سياحية</a></li>
-                            <li class="mb-2"><a href="#"><i class="fas fa-chevron-left me-1 small"></i> تأشيرات السفر</a></li>
+                            @foreach(config('ui.footer.services', []) as $link)
+                                <li class="mb-2"><a href="{{ $link['url'] }}"><i class="fas fa-chevron-left me-1 small"></i> {{ $link['text'] }}</a></li>
+                            @endforeach
                         </ul>
                     </div>
                     <div class="col-lg-4">
