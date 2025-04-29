@@ -17,14 +17,12 @@ class AdminDashboardTest extends DuskTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->artisan('migrate:fresh'); // Reset the database state
         $this->adminUser = User::factory()->create([
             'role' => 'admin',
-            'is_admin' => 1,
             'status' => 'active',
         ]);
         $this->targetUser = User::factory()->create([
-            'role' => 'admin',
+            'role' => 'customer',
             'status' => 'active',
         ]);
     }

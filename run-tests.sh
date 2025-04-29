@@ -52,20 +52,26 @@ echo "استخدام Node.js من: $NODE_EXECUTABLE"
 # تثبيت الاعتماديات الأمامية
 npm install
 
-# إعداد بيئة Laravel Dusk بشكل صحيح قبل تشغيل اختبارات Dusk على Windows
+# إعداد بيئة Laravel Dusk بشكل صحيح قبل تشغيل اختبارات Dusk
+echo "إعداد بيئة Laravel Dusk..."
 if [ "$OS_TYPE" = "Windows" ]; then
-  echo "إعداد بيئة Laravel Dusk..."
   set APP_ENV=testing
   set DB_CONNECTION=sqlite
   set DB_DATABASE=%cd%\database\database.sqlite
 
-  if [ ! -f "database/database.sqlite" ]; then
-    type nul > database\database.sqlite
-  fi
+  touch database/database.sqlite
+  php artisan dusk:configure --force
+else
+  export APP_ENV=testing
+  export DB_CONNECTION=sqlite
+  export DB_DATABASE=$(pwd)/database/database.sqlite
 
-  php artisan migrate:fresh --seed --env=testing
-  php artisan dusk
+  touch database/database.sqlite
+  php artisan dusk:configure --force
 fi
+
+php artisan migrate:fresh --seed --env=testing
+php artisan dusk
 
 # تشغيل الاختبارات
 if $PHP_EXECUTABLE -r "echo (int)(extension_loaded('xdebug') || extension_loaded('pcov'));" | grep -q 1; then

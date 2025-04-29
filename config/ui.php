@@ -69,31 +69,15 @@ return array (
   ),
   'footer' => 
   array (
-    'text' => 'جميع الحقوق محفوظة',
+    'text' => '',
     'links' => 
     array (
-      0 => 
-      array (
-        'text' => 'اتفاقية المستخدم',
-        'url' => '/terms',
-      ),
     ),
     'social' => 
     array (
-      0 => 
-      array (
-        'name' => 'تويتر',
-        'url' => 'https://twitter.com/sdftravelagency',
-        'icon' => 'twitter',
-      ),
     ),
     'services' => 
     array (
-      0 => 
-      array (
-        'text' => 'قائمة الخدمات',
-        'url' => '/services',
-      ),
     ),
   ),
 );

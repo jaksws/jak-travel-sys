@@ -468,7 +468,17 @@ class DashboardController extends Controller
                     // حذف route الخاص بالصفحة
                     $routePath = base_path('routes/web.php');
                     $routeContent = File::get($routePath);
-                    $routeContent = preg_replace("/Route::view\('\/{$pageName}', '{$pageName}')->name\('{$pageName}'\);\\n/", '', $routeContent);
+                    
+                    // Quote the page name for use in regex, using '/' as the delimiter
+                    $quotedPageName = preg_quote($pageName, '/');
+                    
+                    // Build the pattern to find the route definition, allowing for optional whitespace
+                    // and making the trailing newline optional
+                    $pattern = "/Route::view\\(\\s*'\\/{$quotedPageName}'\\s*,\\s*'{$quotedPageName}'\\s*\\)\\s*->name\\(\\s*'{$quotedPageName}'\\s*\\)\\s*;\\s*\\n?/";
+                    
+                    // Remove the route definition
+                    $routeContent = preg_replace($pattern, '', $routeContent);
+                    
                     File::put($routePath, $routeContent);
                 }
             }
