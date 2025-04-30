@@ -31,7 +31,7 @@ jobs:
           coverage: none
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -47,16 +47,12 @@ jobs:
             php -f app/Compatibility/apply-fixes.php
           fi
 
-      - name: Copy and configure .env
-        run: |
-          cp .env.example .env
-          echo "DB_CONNECTION=sqlite" >> .env
-          echo "DB_DATABASE=$(pwd)/database/database.sqlite" >> .env
+      - name: Copy environment file
+        run: cp .env.example .env
 
       - name: Generate app key
         run: php artisan key:generate
 
-      # Add Node.js and Vite build steps
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
@@ -64,7 +60,7 @@ jobs:
           cache: 'npm'
 
       - name: Cache NPM dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
@@ -80,33 +76,19 @@ jobs:
       - name: Build assets
         run: |
           npm run build
-          echo "Checking build output:"
-          ls -la public/build/
-          if [ -f "public/build/manifest.json" ]; then
-            echo "manifest.json exists!"
-          else
-            echo "ERROR: manifest.json not found!"
-            exit 1
-          fi
-
-          # Check .vite subdirectory where manifest is actually located
-          echo "Checking .vite subdirectory:"
-          ls -la public/build/.vite/
-
           if [ ! -f "public/build/.vite/manifest.json" ]; then
             echo "{}" > public/build/.vite/manifest.json
-            echo "⚠️ Temporary manifest.json created for debugging"
           fi
           cp public/build/.vite/manifest.json public/build/manifest.json
 
       - name: Backup Database
         run: php artisan app:database-backup
 
-      - name: Create SQLite database file
+      - name: Ensure SQLite database file creation
         run: |
-          mkdir -p database
-          touch database/database.sqlite
-          echo "SQLite database file created at database/database.sqlite"
+          if [ ! -f "database/database.sqlite" ]; then
+            touch database/database.sqlite
+          fi
 
       - name: Check Application Status
         run: php artisan app:check-status
