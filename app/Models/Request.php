@@ -15,7 +15,7 @@ class Request extends Model
      *
      * @var string
      */
-    protected $table = 'requests';
+    protected $table = 'service_requests';
 
     protected $fillable = [
         'service_id', 

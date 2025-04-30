@@ -94,7 +94,7 @@ class CheckFeaturesDatabaseIntegrity extends Command
         
         // التحقق من ميزات الطلبات والعروض
         if (!empty($features['request_management'])) {
-            $requestsTable = Schema::hasTable('travel_requests') ? 'travel_requests' : 'requests';
+            $requestsTable = Schema::hasTable('travel_requests') ? 'travel_requests' : 'service_requests';
             if (!Schema::hasTable($requestsTable)) {
                 $issues[] = 'ميزة إدارة الطلبات نشطة لكن جدول الطلبات غير موجود';
             }
@@ -185,9 +185,9 @@ class CheckFeaturesDatabaseIntegrity extends Command
             }
         }
 
-        // Check for the existence of the `requests` table
-        if (!Schema::hasTable('requests')) {
-            $issues[] = "The 'requests' table does not exist.";
+        // Check for the existence of the `service_requests` table
+        if (!Schema::hasTable('service_requests')) {
+            $issues[] = "The 'service_requests' table does not exist.";
         }
         
         if (empty($issues)) {
