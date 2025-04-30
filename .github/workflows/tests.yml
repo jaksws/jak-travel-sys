@@ -30,11 +30,22 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
           coverage: none
 
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction
 
       - name: Apply version-specific compatibility fixes
-        run: php -f app/Compatibility/apply-fixes.php ${{ matrix.php }}
+        run: |
+          if [[ "${{ matrix.php }}" == "8.3" || "${{ matrix.php }}" == "8.4" ]]; then
+            php -f app/Compatibility/apply-fixes.php
+          fi
 
       - name: Copy environment file
         run: cp .env.example .env
@@ -86,11 +97,24 @@ jobs:
             exit 1
           fi
 
-      - name: Backup Database
-        run: php artisan app:database-backup --verbose
+      - name: Ensure SQLite database file creation
+        run: |
+          if [ ! -f "database/database.sqlite" ]; then
+            touch database/database.sqlite
+          fi
+
+      - name: Check and Create Migrations Table
+        run: |
+          if ! php artisan migrate:status; then
+            echo "Migrations table not found. Creating..."
+            php artisan migrate:install
+          fi
 
       - name: Run Migrations
         run: php artisan migrate --force --verbose
+
+      - name: Backup Database
+        run: php artisan app:database-backup --verbose
 
       - name: Seed Database
         run: php artisan db:seed --verbose
@@ -120,5 +144,8 @@ jobs:
           APP_LOCALE: en
           APP_FALLBACK_LOCALE: en
           APP_TIMEZONE: UTC
-          APP_LOCALE_FALLBACK: en
-          APP_LOCALE_FALLBACKS: en
+
+      - name: Send failure notification
+        if: failure()
+        run: echo "⚠️ The GitHub Actions workflow failed."
+

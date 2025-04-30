@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Request as TravelRequest;
+use App\Models\Request as ServiceRequest;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,7 @@ class RequestController extends Controller
     public function index(Request $request)
     {
         // For agents, show requests related to their agency
-        $query = TravelRequest::query();
+        $query = ServiceRequest::query();
         
         if (Auth::user()->isAgent()) {
             $query->where('agency_id', Auth::user()->agency_id);
@@ -38,7 +38,7 @@ class RequestController extends Controller
             abort(403, 'Unauthorized');
         }
         
-        $requests = TravelRequest::with(['service', 'user'])->latest()->paginate(15);
+        $requests = ServiceRequest::with(['service', 'user'])->latest()->paginate(15);
         
         return view('admin.requests.index', compact('requests'));
     }
@@ -54,28 +54,39 @@ class RequestController extends Controller
     /**
      * Store a newly created request in storage.
      */
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'service_id'    => 'required|exists:services,id',
-            'title'         => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'required_date' => 'nullable|date',
-            'notes'         => 'nullable|string',
-        ]);
+    
+  public function store(Request $request)
+{
+    $data = $request->validate([
+        'service_id'    => 'required|exists:services,id',
+        'title'         => 'required|string|max:255',
+        'description'   => 'nullable|string',
+        'required_date' => 'nullable|date',
+        'notes'         => 'nullable|string',
+    ]);
 
-        $data['user_id'] = Auth::id();
-        $data['status']  = 'pending';
+    $service = Service::findOrFail($request->service_id);
 
-        $req = TravelRequest::create($data);
+    $serviceRequest = ServiceRequest::create([
+        'service_id' => $service->id,
+        'user_id' => Auth::id(),
+        'agency_id' => $service->agency_id,
+        'title' => $request->title,
+        'description' => $request->description,
+        'required_date' => $request->required_date,
+        'notes' => $request->notes,
+        'status' => 'pending'
+    ]);
 
-        return redirect()->route('requests.show', $req);
-    }
+    return redirect()->route('requests.show', $serviceRequest)
+                     ->with('success', 'تم إنشاء طلبك بنجاح. سيتم التواصل معك قريباً');
+}
+
 
     /**
      * Display the specified request.
      */
-    public function show(TravelRequest $request)
+    public function show(ServiceRequest $request)
     {
         return view('requests.show', ['request' => $request]);
     }
