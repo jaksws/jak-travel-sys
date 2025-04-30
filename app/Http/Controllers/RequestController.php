@@ -94,7 +94,7 @@ class RequestController extends Controller
     /**
      * Update the specified request in storage.
      */
-    public function update(Request $httpRequest, TravelRequest $request)
+    public function update(Request $httpRequest, ServiceRequest $request)
     {
         if ($request->user_id !== Auth::id() || $request->status !== 'pending') {
             abort(403);
