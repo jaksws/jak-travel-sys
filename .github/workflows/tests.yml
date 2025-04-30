@@ -123,7 +123,7 @@ jobs:
         run: php artisan app:check-status
 
       - name: Execute tests
-        run: ./vendor/bin/phpunit -v
+        run: php artisan test
         env:
           APP_ENV: testing
           DB_CONNECTION: sqlite
