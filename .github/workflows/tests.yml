@@ -53,6 +53,20 @@ jobs:
       - name: Generate app key
         run: php artisan key:generate
 
+      - name: Ensure SQLite database file creation
+        run: |
+          if [ ! -f "database/database.sqlite" ]; then
+            touch database/database.sqlite
+          fi
+
+      - name: Check Database Structure
+        run: |
+          php artisan migrate:status
+          # تأكد من أن الجداول والحقول موجودة
+          php artisan db:table-exists users || php artisan migrate
+          php artisan db:table-exists agencies || php artisan migrate
+          php artisan db:table-exists services || php artisan migrate
+
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
@@ -84,12 +98,6 @@ jobs:
       - name: Backup Database
         run: php artisan app:database-backup
 
-      - name: Ensure SQLite database file creation
-        run: |
-          if [ ! -f "database/database.sqlite" ]; then
-            touch database/database.sqlite
-          fi
-
       - name: Check Application Status
         run: php artisan app:check-status
 
@@ -101,3 +109,8 @@ jobs:
 
       - name: Execute tests
         run: php artisan test
+
+      # إضافة خطوة لإرسال إشعار في حالة الفشل
+      - name: Send failure notification
+        if: failure()
+        run: echo "العملية فشلت في مرحلة معينة"
