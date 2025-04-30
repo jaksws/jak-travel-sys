@@ -60,8 +60,8 @@ jobs:
           echo "DB_CONNECTION=sqlite" >> .env
           echo "DB_DATABASE=database/database.sqlite" >> .env
 
-      - name: Generate app key
-        run: php artisan key:generate
+      - name: Generate app key and export
+        run: echo "APP_KEY=$(php artisan key:generate --show)" >> $GITHUB_ENV
 
       - name: Create storage symlink
         run: php artisan storage:link
@@ -111,19 +111,19 @@ jobs:
           fi
 
       - name: Run Migrations
-        run: php artisan migrate --force --verbose
+        run: php artisan migrate --force
 
       - name: Backup Database
-        run: php artisan app:database-backup --verbose
+        run: php artisan app:database-backup
 
       - name: Seed Database
-        run: php artisan db:seed --verbose
+        run: php artisan db:seed
 
       - name: Check Application Status
-        run: php artisan app:check-status --verbose
+        run: php artisan app:check-status
 
       - name: Execute tests
-        run: php artisan test --verbose
+        run: ./vendor/bin/phpunit -v
         env:
           APP_ENV: testing
           DB_CONNECTION: sqlite
@@ -136,7 +136,6 @@ jobs:
           FILESYSTEM_DRIVER: local
           LOG_CHANNEL: stack
           LOG_LEVEL: debug
-          APP_KEY: base64:$(php artisan key:generate --show)
           APP_URL: http://localhost
           APP_DEBUG: true
           APP_PORT: 8000
@@ -148,4 +147,3 @@ jobs:
       - name: Send failure notification
         if: failure()
         run: echo "⚠️ The GitHub Actions workflow failed."
-
