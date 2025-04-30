@@ -46,6 +46,14 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Install PHP dependencies
         timeout-minutes: 10
         env:
@@ -71,6 +79,14 @@ jobs:
             exit 1
           fi
           
+      - name: Cache NPM dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - name: Install Node.js Dependencies
         run: npm ci
         
