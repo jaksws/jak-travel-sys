@@ -187,8 +187,14 @@ class DashboardController extends Controller
         }
         $user->save();
 
-        // تحديث أو إنشاء معلومات الوكالة إذا كان الدور وكالة
+                // تحديث أو إنشاء معلومات الوكالة إذا كان الدور وكالة
         if ($request->role === 'agency' && $request->filled('agency_name')) {
+            $request->validate([
+                'agency_name' => 'required|string',
+                'agency_address' => 'required|string',
+                'agency_phone' => 'required|string',
+                'agency_license_number' => 'required|string',
+            ]);
             $agency = $user->agency ?? new \App\Models\Agency();
             $agency->user_id = $user->id;
             $agency->name = $request->agency_name;
@@ -198,6 +204,7 @@ class DashboardController extends Controller
             $agency->email = $user->email; // إصلاح: تمرير البريد الإلكتروني للوكالة
             $agency->save();
         }
+
 
         return redirect()->route('admin.users.index')->with('success', 'تم تحديث بيانات المستخدم بنجاح');
     }
