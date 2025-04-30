@@ -20,9 +20,9 @@ class RequestSeeder extends Seeder
      */
     public function run(): void
     {
-        // Check if the 'requests' table exists before seeding
-        if (!Schema::hasTable('requests')) {
-            $this->command->error("The 'requests' table does not exist. Please run the migrations first.");
+        // Check if the 'service_requests' table exists before seeding
+        if (!Schema::hasTable('service_requests')) {
+            $this->command->error("The 'service_requests' table does not exist. Please run the migrations first.");
             return;
         }
 
