@@ -106,6 +106,15 @@ jobs:
       - name: Backup Database
         run: php artisan app:database-backup
 
+      - name: Ensure SQLite database file creation
+        run: |
+          if [ ! -f "database/database.sqlite" ]; then
+            touch database/database.sqlite
+            echo "SQLite database file created."
+          else
+            echo "SQLite database file already exists."
+          fi
+
       - name: Check Application Status
         run: php artisan app:check-status
 
