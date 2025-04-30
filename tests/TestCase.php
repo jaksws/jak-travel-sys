@@ -19,7 +19,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         
         // Set up the app for testing
-        $this->withoutExceptionHandling();
+        // $this->withoutExceptionHandling(); // تم التعليق حتى تعمل اختبارات التحقق بشكل صحيح
     }
     
     /**
