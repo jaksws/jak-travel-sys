@@ -15,7 +15,7 @@ return new class extends Migration
         if (!Schema::hasTable('quotes')) {
             Schema::create('quotes', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('request_id')->constrained('service_requests')->onDelete('cascade');
+                $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
                 $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
                 $table->foreignId('subagent_id')->nullable()->constrained('users')->onDelete('cascade');
                 $table->decimal('price', 10, 2);
