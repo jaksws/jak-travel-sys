@@ -90,7 +90,7 @@ jobs:
         run: php artisan app:database-backup --verbose
 
       - name: Run Migrations
-        run: php artisan migrate:safe --force --verbose
+        run: php artisan migrate --force --verbose
 
       - name: Seed Database
         run: php artisan db:seed --verbose
