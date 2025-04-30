@@ -61,11 +61,11 @@ jobs:
 
       - name: Check Database Structure
         run: |
-          php artisan migrate:status
-          # تأكد من أن الجداول والحقول موجودة
-          php artisan db:table-exists users || php artisan migrate
-          php artisan db:table-exists agencies || php artisan migrate
-          php artisan db:table-exists services || php artisan migrate
+          # التحقق من أن جدول migrations موجود
+          if ! php artisan migrate:status; then
+            echo "جدول الترحيلات غير موجود، إنشاءه الآن..."
+            php artisan migrate:install
+          fi
 
       - name: Install Node.js
         uses: actions/setup-node@v3
