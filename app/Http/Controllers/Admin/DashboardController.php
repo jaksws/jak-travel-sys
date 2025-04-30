@@ -336,6 +336,9 @@ class DashboardController extends Controller
             'payment_system' => config('v1_features.payment_system'),
             'enhanced_ui' => config('v1_features.enhanced_ui'),
             'ai_features' => config('v1_features.ai_features'),
+            'contact_phone' => config('ui.footer.contact.phone', ''),
+            'contact_email' => config('ui.footer.contact.email', ''),
+            'contact_address' => config('ui.footer.contact.address', ''),
         ];
         
         return view('admin.settings', compact('settings'));
@@ -366,6 +369,9 @@ class DashboardController extends Controller
             'footer_social_names.*' => 'nullable|string',
             'footer_social_urls.*' => 'nullable|url',
             'footer_social_icons.*' => 'nullable|string',
+            'contact_phone' => 'nullable|string',
+            'contact_email' => 'nullable|email',
+            'contact_address' => 'nullable|string',
         ]);
 
         // تحديث الإعدادات
@@ -454,7 +460,12 @@ class DashboardController extends Controller
 
         // تحديث ملف ui.php
         $this->updateUIConfig([
-            'footer' => $footer
+            'footer' => $footer,
+            'contact' => [
+                'phone' => $request->input('contact_phone', ''),
+                'email' => $request->input('contact_email', ''),
+                'address' => $request->input('contact_address', ''),
+            ],
         ]);
 
         // معالجة الحذف والتعديل للروابط والصفحات المرتبطة

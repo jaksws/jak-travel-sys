@@ -79,5 +79,11 @@ return array (
     'services' => 
     array (
     ),
+    'contact' => 
+    array (
+      'phone' => '',
+      'email' => '',
+      'address' => '',
+    ),
   ),
 );

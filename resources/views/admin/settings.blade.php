@@ -126,6 +126,18 @@
                     </div>
                     <button type="button" class="btn btn-sm btn-secondary" id="add-footer-social">إضافة شبكة</button>
                 </div>
+                <div class="mb-3">
+                    <label for="contact_phone" class="form-label">رقم الهاتف</label>
+                    <input type="text" class="form-control" id="contact_phone" name="contact_phone" value="{{ config('ui.footer.contact.phone', '') }}">
+                </div>
+                <div class="mb-3">
+                    <label for="contact_email" class="form-label">البريد الإلكتروني</label>
+                    <input type="email" class="form-control" id="contact_email" name="contact_email" value="{{ config('ui.footer.contact.email', '') }}">
+                </div>
+                <div class="mb-3">
+                    <label for="contact_address" class="form-label">العنوان الفعلي</label>
+                    <input type="text" class="form-control" id="contact_address" name="contact_address" value="{{ config('ui.footer.contact.address', '') }}">
+                </div>
                 <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('add-footer-link').onclick = function() {
@@ -153,7 +165,7 @@
                     document.getElementById('add-footer-social').onclick = function() {
                         const row = document.createElement('div');
                         row.className = 'input-group mb-2 footer-social-row';
-                        row.innerHTML = `<input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة"><input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط"><input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)"><button type="button" class="btn btn-danger remove-footer-social">-</button>`;
+                        row.innerHTML = `<input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة"><input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط"><input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)" title="أدخل اسم الأيقونة مثل: facebook"><button type="button" class="btn btn-danger remove-footer-social">-</button>`;
                         document.getElementById('footer-social-list').appendChild(row);
                     };
                     document.getElementById('footer-social-list').addEventListener('click', function(e) {
@@ -167,6 +179,9 @@
                 <div class="form-group text-end">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save me-1"></i> حفظ الإعدادات
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-undo me-1"></i> إعادة تعيين
                     </button>
                 </div>
             </form>
