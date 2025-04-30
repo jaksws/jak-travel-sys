@@ -54,20 +54,33 @@ class RequestController extends Controller
     /**
      * Store a newly created request in storage.
      */
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'service_id'    => 'required|exists:services,id',
-            'title'         => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'required_date' => 'nullable|date',
-            'notes'         => 'nullable|string',
-        ]);
+    
+  public function store(Request $request)
+{
+    $data = $request->validate([
+        'service_id'    => 'required|exists:services,id',
+        'title'         => 'required|string|max:255',
+        'description'   => 'nullable|string',
+        'required_date' => 'nullable|date',
+        'notes'         => 'nullable|string',
+    ]);
 
-        $data['user_id'] = Auth::id();
-        $data['status']  = 'pending';
+    $service = Service::findOrFail($request->service_id);
 
-        $req = TravelRequest::create($data);
+    $serviceRequest = ServiceRequest::create([
+        'service_id' => $service->id,
+        'user_id' => Auth::id(),
+        'agency_id' => $service->agency_id,
+        'title' => $request->title,
+        'description' => $request->description,
+        'required_date' => $request->required_date,
+        'notes' => $request->notes,
+        'status' => 'pending'
+    ]);
+
+    return redirect()->route('requests.show', $serviceRequest)
+                     ->with('success', 'تم إنشاء طلبك بنجاح. سيتم التواصل معك قريباً');
+}
 
         return redirect()->route('requests.show', $req);
 
@@ -83,7 +96,7 @@ class RequestController extends Controller
     /**
      * Update the specified request in storage.
      */
-    public function update(Request $httpRequest, TravelRequest $request)
+    public function update(Request $httpRequest, ServiceRequest $request)
     {
         if ($request->user_id !== Auth::id() || $request->status !== 'pending') {
             abort(403);
