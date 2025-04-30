@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 
 class CheckApplicationStatus extends Command
 {
@@ -12,7 +13,7 @@ class CheckApplicationStatus extends Command
     public function handle()
     {
         $this->info('جاري التحقق من حالة التطبيق...');
-        
+
         // التحقق من اتصال قاعدة البيانات
         $this->info('التحقق من اتصال قاعدة البيانات...');
         try {
@@ -58,13 +59,33 @@ class CheckApplicationStatus extends Command
             $this->info('✓ ملفات الترجمة العربية موجودة');
         }
 
-        // تنظيف الكاش والتأكد من تحميل التغييرات
+        // تنظيف الكاش
         $this->info('تنظيف الكاش...');
-        $this->call('cache:clear');
-        $this->call('config:clear');
-        $this->call('route:clear');
-        $this->call('view:clear');
-        
+        try {
+            // التحقق من وجود جدول 'cache' قبل تنفيذ الكاش
+            if (Schema::hasTable('cache')) {
+                $this->callSilent('cache:clear');
+            } else {
+                $this->warn('✗ جدول cache غير موجود، تم تخطي cache:clear');
+            }
+        } catch (\Exception $e) {
+            $this->warn('✗ حدث خطأ أثناء تنفيذ cache:clear: ' . $e->getMessage());
+        }
+
+        $this->callSilent('config:clear');
+        $this->callSilent('route:clear');
+        $this->callSilent('view:clear');
+
+        // إذا كانت المجلدات غير موجودة، ننشئ الرابط
+        $this->info('التحقق من وجود الرابط العام...');
+        if (!file_exists(public_path('storage'))) {
+            $this->info('✗ المجلد public/storage غير موجود، سيتم إنشاء الرابط');
+            $this->call('storage:link');
+        } else {
+            $this->info('✓ الرابط العام موجود');
+        }
+
+        // إرجاع حالة التطبيق
         $this->info('تم الانتهاء من فحص حالة التطبيق!');
     }
 }
