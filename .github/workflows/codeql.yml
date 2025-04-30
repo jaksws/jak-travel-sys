@@ -97,4 +97,6 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
+        # The category value is prefixed with '/language:' to group analysis results
+        # by language, which is useful when analyzing multiple languages in the same workflow.
         category: "/language:${{matrix.language}}"
