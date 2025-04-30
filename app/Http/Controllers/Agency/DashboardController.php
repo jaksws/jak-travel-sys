@@ -25,8 +25,8 @@ class DashboardController extends Controller
         $stats = [
             'services_count' => Service::where('agency_id', $agency_id)->count(),
             'active_services_count' => Service::where('agency_id', $agency_id)->where('status', 'active')->count(),
-            'subagents_count' => User::where('agency_id', $agency_id)->where('user_type', 'subagent')->count(),
-            'customers_count' => User::where('agency_id', $agency_id)->where('user_type', 'customer')->count(),
+            'subagents_count' => User::where('agency_id', $agency_id)->where('role', 'subagent')->count(),
+            'customers_count' => User::where('agency_id', $agency_id)->where('role', 'customer')->count(),
             'requests_count' => ServiceRequest::where('agency_id', $agency_id)->count(),
             'quotes_count' => Quote::whereHas('request', function($query) use ($agency_id) {
                 $query->where('agency_id', $agency_id);

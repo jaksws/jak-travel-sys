@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('symbol');
             $table->boolean('is_default')->default(false);
             $table->decimal('exchange_rate', 10, 4)->default(1.0000); // Base rate compared to default currency
-            $table->boolean('is_active')->default(true);
+            $table->string('status')->default('active'); // Use status instead of is_active
             $table->timestamps();
         });
 
@@ -49,7 +49,9 @@ return new class extends Migration
         });
 
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn('default_currency');
+            if (Schema::hasColumn('agencies', 'default_currency')) {
+                $table->dropColumn('default_currency');
+            }
         });
 
         Schema::table('quotes', function (Blueprint $table) {

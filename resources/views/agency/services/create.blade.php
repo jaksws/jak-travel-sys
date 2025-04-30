@@ -53,24 +53,34 @@
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="base_price" class="form-label">السعر الأساسي</label>
-                            <div class="input-group">
-                                <input type="number" step="0.01" min="0" class="form-control @error('base_price') is-invalid @enderror" id="base_price" name="base_price" value="{{ old('base_price') }}" required>
-                                <select class="form-select" name="currency_code" id="currency_code">
-                                    @foreach(\App\Models\Currency::where('is_active', true)->get() as $currency)
-                                        <option value="{{ $currency->code }}" {{ $currency->is_default ? 'selected' : '' }}>
-                                            {{ $currency->code }} ({{ $currency->symbol }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @error('base_price')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <label for="base_price" class="form-label">السعر الأساسي*</label>
+                        <div class="input-group">
+                            <input type="number" step="0.01" min="0" class="form-control @error('base_price') is-invalid @enderror" id="base_price" name="base_price" value="{{ old('base_price') }}" required>
+                            <select class="form-select" name="currency_id" id="currency_id" required>
+                                <option value="">-- العملة --</option>
+                                {{-- Use the $currencies variable passed from the controller --}}
+                                @foreach($currencies as $currency)
+                                    <option value="{{ $currency->id }}" {{ old('currency_id') == $currency->id ? 'selected' : '' }}>{{ $currency->code }} ({{ $currency->symbol }})</option>
+                                @endforeach
+                            </select>
                         </div>
+                        @error('base_price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @error('currency_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                    
+                    <div class="col-md-6">
+                        <label for="price" class="form-label">السعر النهائي</label>
+                        <input type="number" step="0.01" min="0" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price') }}">
+                        @error('price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="commission_rate" class="form-label">نسبة العمولة (%)</label>

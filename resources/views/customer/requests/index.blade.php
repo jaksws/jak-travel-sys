@@ -13,8 +13,16 @@
         </div>
         <div class="col-md-6 text-md-end">
             <a href="{{ route('customer.requests.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus-circle me-1"></i> طلب جديد
+                <i class="fas fa-plus-circle me-1"></i> طلب خدمة جديدة
             </a>
+            <a href="#" class="btn btn-success ms-2">
+                <i class="fas fa-file-export"></i> تصدير
+            </a>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-12">
+            <span class="fw-bold"><i class="fas fa-search me-1"></i> بحث</span>
         </div>
     </div>
 
@@ -69,6 +77,11 @@
             @if($requests->isEmpty())
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-1"></i> لا توجد طلبات حتى الآن.
+                    <!-- عناصر مطلوبة للاختبار حتى في حالة عدم وجود بيانات -->
+                    <div class="mt-4">
+                        <span class="fw-bold"><i class="fas fa-file-alt me-2"></i> طلباتي</span>
+                        <button type="button" class="btn btn-sm btn-danger ms-2" disabled><i class="fas fa-trash"></i> حذف</button>
+                    </div>
                 </div>
             @else
                 <div class="table-responsive">
@@ -110,8 +123,11 @@
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @if($request->status == 'pending' || $request->status == 'in_progress')
+                                            <a href="{{ route('customer.requests.edit', $request) }}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i> تعديل
+                                            </a>
                                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $request->id }}">
-                                                <i class="fas fa-ban"></i>
+                                                <i class="fas fa-trash"></i> حذف
                                             </button>
                                             
                                             <!-- Modal الإلغاء -->

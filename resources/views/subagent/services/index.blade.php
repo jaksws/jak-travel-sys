@@ -14,6 +14,20 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-end">
+            <a href="{{ route('subagent.services.create') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i> إضافة خدمة جديدة
+            </a>
+        </div>
+    </div>
+
+    @if(auth()->check())
+        <div class="alert alert-info">
+            نوع المستخدم الحالي: {{ auth()->user()->role }}
+        </div>
+    @endif
+
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}

@@ -28,13 +28,11 @@ class NotificationTest extends TestCase
             'message' => 'هذا إشعار تجريبي',
             'link' => '/test-link'
         ]);
-        $notification->user_id = $user->id;
         $notification->save();
         
         $this->assertDatabaseHas('notifications', [
             'id' => $notification->id,
-            'notifiable_id' => $user->id,
-            'user_id' => $user->id
+            'notifiable_id' => $user->id
         ]);
         
         $this->assertJson($notification->data);
@@ -47,18 +45,15 @@ class NotificationTest extends TestCase
     public function it_belongs_to_a_user()
     {
         $user = User::factory()->create();
-        
         $notification = new Notification();
         $notification->id = Str::uuid()->toString();
-        $notification->type = 'App\Notifications\TestNotification';
-        $notification->notifiable_type = 'App\Models\User';
+        $notification->type = 'App\\Notifications\\TestNotification';
+        $notification->notifiable_type = 'App\\Models\\User';
         $notification->notifiable_id = $user->id;
         $notification->data = json_encode(['message' => 'اختبار العلاقة مع المستخدم']);
-        $notification->user_id = $user->id;
         $notification->save();
-        
-        $this->assertInstanceOf(User::class, $notification->user);
-        $this->assertEquals($user->id, $notification->user->id);
+        $this->assertInstanceOf(User::class, $notification->notifiable);
+        $this->assertEquals($user->id, $notification->notifiable->id);
     }
     
     #[Test]
@@ -72,7 +67,6 @@ class NotificationTest extends TestCase
         $notification->notifiable_type = 'App\Models\User';
         $notification->notifiable_id = $user->id;
         $notification->data = json_encode(['message' => 'اختبار تغيير حالة القراءة']);
-        $notification->user_id = $user->id;
         $notification->save();
         
         $this->assertNull($notification->read_at);
@@ -95,7 +89,6 @@ class NotificationTest extends TestCase
         $notification1->notifiable_type = 'App\Models\User';
         $notification1->notifiable_id = $user->id;
         $notification1->data = json_encode(['title' => 'إشعار غير مقروء']);
-        $notification1->user_id = $user->id;
         $notification1->save();
         
         // إنشاء إشعار مقروء
@@ -106,7 +99,6 @@ class NotificationTest extends TestCase
         $notification2->notifiable_id = $user->id;
         $notification2->data = json_encode(['title' => 'إشعار مقروء']);
         $notification2->read_at = now();
-        $notification2->user_id = $user->id;
         $notification2->save();
         
         // الحصول على الإشعارات غير المقروءة
@@ -136,7 +128,6 @@ class NotificationTest extends TestCase
         $notification->notifiable_type = 'App\Models\User';
         $notification->notifiable_id = $user->id;
         $notification->data = json_encode($testData);
-        $notification->user_id = $user->id;
         $notification->save();
         
         // التأكد من أن البيانات تُفكك بشكل صحيح من تنسيق JSON

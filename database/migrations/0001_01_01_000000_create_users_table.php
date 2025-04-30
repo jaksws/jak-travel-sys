@@ -17,6 +17,20 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default('customer'); // Consolidated role
+            $table->string('status')->default('active'); // Consolidated status
+            $table->foreignId('agency_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('avatar')->nullable();
+            $table->string('id_number')->nullable();
+            $table->string('passport_number')->nullable();
+            $table->string('nationality')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->nullable();
+            $table->string('preferred_currency')->nullable();
+            $table->json('notification_preferences')->nullable();
+            $table->string('locale', 10)->default('ar');
+            $table->string('theme')->nullable(); // Consolidated theme preference
+            $table->boolean('email_notifications')->default(true); // Defaulting to true, adjust if needed
             $table->rememberToken();
             $table->timestamps();
         });

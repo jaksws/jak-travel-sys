@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('email')->unique();
             $table->text('address')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->string('status')->default('active'); // Use status instead of is_active
             $table->timestamps();
         });
     }

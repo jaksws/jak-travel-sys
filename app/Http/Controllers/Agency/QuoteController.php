@@ -51,7 +51,7 @@ class QuoteController extends Controller
 
         // الحصول على السبوكلاء التابعين للوكالة
         $subagents = User::where('agency_id', Auth::user()->agency_id)
-                                   ->where('user_type', 'subagent')
+                                   ->where('role', 'subagent')
                                    ->get();
 
         // الحصول على الطلبات التابعة للوكالة
@@ -82,7 +82,7 @@ class QuoteController extends Controller
                                  ->get();
                                  
         $subagents = User::where('agency_id', Auth::user()->agency_id)
-                         ->where('user_type', 'subagent')
+                         ->where('role', 'subagent')
                          ->where('is_active', true)
                          ->get();
                          
@@ -108,7 +108,7 @@ class QuoteController extends Controller
                                   
         // التحقق من أن السبوكيل ينتمي للوكالة
         $subagent = User::where('agency_id', Auth::user()->agency_id)
-                       ->where('user_type', 'subagent')
+                       ->where('role', 'subagent')
                        ->findOrFail($request->subagent_id);
         
         $quote = Quote::create([
@@ -155,7 +155,7 @@ class QuoteController extends Controller
         }
         
         $subagents = User::where('agency_id', Auth::user()->agency_id)
-                         ->where('user_type', 'subagent')
+                         ->where('role', 'subagent')
                          ->where('is_active', true)
                          ->get();
                          

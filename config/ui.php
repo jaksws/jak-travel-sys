@@ -69,23 +69,15 @@ return array (
   ),
   'footer' => 
   array (
-    'text' => 'All rights reserved',
+    'text' => '',
     'links' => 
     array (
-      0 => 
-      array (
-        'text' => 'Privacy Policy',
-        'url' => '/privacy',
-      ),
     ),
     'social' => 
     array (
-      0 => 
-      array (
-        'name' => 'Twitter',
-        'url' => 'https://twitter.com',
-        'icon' => 'twitter',
-      ),
+    ),
+    'services' => 
+    array (
     ),
   ),
 );

@@ -35,7 +35,7 @@ class CurrencyController extends Controller
             'name' => $request->name,
             'symbol' => $request->symbol,
             'exchange_rate' => $request->exchange_rate,
-            'is_active' => true,
+            'status' => 'active',
             'is_default' => false,
         ]);
 
@@ -74,13 +74,14 @@ class CurrencyController extends Controller
                             ->with('error', 'لا يمكن تعطيل العملة الافتراضية');
         }
 
+        $newStatus = $currency->isActive() ? 'inactive' : 'active';
         $currency->update([
-            'is_active' => !$currency->is_active
+            'status' => $newStatus
         ]);
 
-        $status = $currency->is_active ? 'تفعيل' : 'تعطيل';
+        $statusMessage = $newStatus === 'active' ? 'تفعيل' : 'تعطيل';
         return redirect()->route('agency.settings.currencies')
-                        ->with('success', "تم $status العملة بنجاح");
+                        ->with('success', "تم $statusMessage العملة بنجاح");
     }
 
     /**
@@ -89,31 +90,50 @@ class CurrencyController extends Controller
     public function setAsDefault(Currency $currency)
     {
         // التأكد من أن العملة مفعلة
-        if (!$currency->is_active) {
-            $currency->update(['is_active' => true]);
+        if (!$currency->isActive()) {
+            $currency->update(['status' => 'active']);
         }
+
+        // حفظ سعر الصرف الأصلي للعملة التي ستصبح افتراضية
+        $originalExchangeRate = $currency->exchange_rate;
 
         // إلغاء تعيين العملة الافتراضية السابقة
         Currency::where('is_default', true)->update(['is_default' => false]);
 
-        // تعيين العملة الجديدة كافتراضية
+        // تعيين العملة الجديدة كافتراضية وتحديث سعر صرفها إلى 1
         $currency->update(['is_default' => true, 'exchange_rate' => 1.0000]);
 
         // تحديث أسعار الصرف للعملات الأخرى نسبة للعملة الجديدة
-        $this->recalculateExchangeRates($currency);
+        // التأكد من أن سعر الصرف الأصلي ليس صفراً لتجنب القسمة على صفر
+        if ($originalExchangeRate != 0) {
+            $this->recalculateExchangeRates($currency, $originalExchangeRate);
+        } else {
+            \Log::error("Attempted to set currency ID {$currency->id} as default with zero original exchange rate.");
+        }
 
         return redirect()->route('agency.settings.currencies')
-                        ->with('success', "تم تعيين {$currency->name} كعملة افتراضية بنجاح");
+                        ->with('success', "تم تعيين {$currency->name} كعملة افتراضية بنجاح وتم تحديث أسعار الصرف الأخرى.");
     }
 
     /**
      * إعادة حساب أسعار الصرف للعملات عند تغيير العملة الافتراضية
+     *
+     * @param Currency $defaultCurrency العملة الافتراضية الجديدة
+     * @param float $originalDefaultRate سعر الصرف الأصلي للعملة الافتراضية الجديدة (قبل أن يصبح 1)
      */
-    private function recalculateExchangeRates(Currency $defaultCurrency)
+    private function recalculateExchangeRates(Currency $defaultCurrency, float $originalDefaultRate)
     {
-        // هذه الوظيفة ستقوم بإعادة حساب أسعار صرف العملات الأخرى 
-        // نسبة إلى العملة الافتراضية الجديدة
-        // سيتم تنفيذها في نسخة مستقبلية
+        // جلب جميع العملات الأخرى (غير الافتراضية)
+        $otherCurrencies = Currency::where('id', '!=', $defaultCurrency->id)->get();
+
+        foreach ($otherCurrencies as $otherCurrency) {
+            // حساب سعر الصرف الجديد نسبةً للعملة الافتراضية الجديدة
+            // new_rate = old_rate / original_rate_of_new_default
+            $newExchangeRate = $otherCurrency->exchange_rate / $originalDefaultRate;
+
+            // تحديث سعر صرف العملة
+            $otherCurrency->update(['exchange_rate' => $newExchangeRate]);
+        }
     }
 
     /**
@@ -126,8 +146,19 @@ class CurrencyController extends Controller
                             ->with('error', 'لا يمكن حذف العملة الافتراضية');
         }
 
-        // التحقق من عدم استخدام العملة في أي خدمات أو عروض أسعار
-        // سيتم تنفيذ هذه الوظيفة في نسخة مستقبلية
+        // التحقق من عدم استخدام العملة في أي خدمات
+        if ($currency->services()->exists()) {
+            return redirect()->route('agency.settings.currencies')
+                            ->with('error', 'لا يمكن حذف العملة لأنها مستخدمة في بعض الخدمات.');
+        }
+
+        // التحقق من عدم استخدام العملة في أي عروض أسعار
+        if ($currency->quotes()->exists()) {
+            return redirect()->route('agency.settings.currencies')
+                            ->with('error', 'لا يمكن حذف العملة لأنها مستخدمة في بعض عروض الأسعار.');
+        }
+
+        // يمكنك إضافة المزيد من عمليات التحقق هنا إذا كانت العملة مرتبطة بنماذج أخرى
 
         $currency->delete();
 

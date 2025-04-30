@@ -16,7 +16,7 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $query = User::where('agency_id', auth()->user()->agency_id)
-                    ->where('user_type', 'customer');
+                    ->where('role', 'customer');
 
         // Aplicar filtros
         if ($request->has('search') && !empty($request->search)) {
@@ -62,7 +62,7 @@ class CustomerController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'user_type' => 'customer',
+            'role' => 'customer',
             'agency_id' => auth()->user()->agency_id,
             'parent_id' => auth()->id(),
             'is_active' => true,
@@ -78,7 +78,7 @@ class CustomerController extends Controller
     public function show(User $customer)
     {
         // Verificar que el cliente pertenece a la agencia
-        if ($customer->agency_id !== auth()->user()->agency_id || $customer->user_type !== 'customer') {
+        if ($customer->agency_id !== auth()->user()->agency_id || $customer->role !== 'customer') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا العميل');
         }
 
@@ -91,7 +91,7 @@ class CustomerController extends Controller
     public function edit(User $customer)
     {
         // Verificar que el cliente pertenece a la agencia
-        if ($customer->agency_id !== auth()->user()->agency_id || $customer->user_type !== 'customer') {
+        if ($customer->agency_id !== auth()->user()->agency_id || $customer->role !== 'customer') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا العميل');
         }
 
@@ -104,7 +104,7 @@ class CustomerController extends Controller
     public function update(Request $request, User $customer)
     {
         // Verificar que el cliente pertenece a la agencia
-        if ($customer->agency_id !== auth()->user()->agency_id || $customer->user_type !== 'customer') {
+        if ($customer->agency_id !== auth()->user()->agency_id || $customer->role !== 'customer') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا العميل');
         }
 
@@ -135,7 +135,7 @@ class CustomerController extends Controller
     public function destroy(User $customer)
     {
         // Verificar que el cliente pertenece a la agencia
-        if ($customer->agency_id !== auth()->user()->agency_id || $customer->user_type !== 'customer') {
+        if ($customer->agency_id !== auth()->user()->agency_id || $customer->role !== 'customer') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا العميل');
         }
 
@@ -157,7 +157,7 @@ class CustomerController extends Controller
     public function toggleStatus(User $customer)
     {
         // Verificar que el cliente pertenece a la agencia
-        if ($customer->agency_id !== auth()->user()->agency_id || $customer->user_type !== 'customer') {
+        if ($customer->agency_id !== auth()->user()->agency_id || $customer->role !== 'customer') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا العميل');
         }
 

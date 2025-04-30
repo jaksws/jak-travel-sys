@@ -50,8 +50,52 @@ jobs:
       - name: Copy environment file
         run: cp .env.example .env
 
-      - name: Generate app key
-        run: php artisan key:generate
+      - name: Create SQLite Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Ensure .env is configured for SQLite
+        run: |
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=database/database.sqlite" >> .env
+
+      - name: Generate app key and export
+        run: echo "APP_KEY=$(php artisan key:generate --show)" >> $GITHUB_ENV
+
+      - name: Create storage symlink
+        run: php artisan storage:link
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Copy debug Vite config
+        run: cp vite.config.debug.js vite.config.js
+
+      - name: Build assets
+        run: |
+          npm run build
+          echo "Checking build output:"
+          ls -la public/build/
+          echo "Checking .vite subdirectory:"
+          ls -la public/build/.vite/
+          if [ -f "public/build/.vite/manifest.json" ] && [ ! -f "public/build/manifest.json" ]; then
+            echo "Copying manifest.json from .vite directory..."
+            cp public/build/.vite/manifest.json public/build/manifest.json
+          fi
+          if [ -f "public/build/manifest.json" ]; then
+            echo "manifest.json found in public/build:"
+            cat public/build/manifest.json
+          else
+            echo "ERROR: manifest.json not found in public/build/ or public/build/.vite/"
+            exit 1
+          fi
 
       - name: Ensure SQLite database file creation
         run: |
@@ -61,9 +105,8 @@ jobs:
 
       - name: Check and Create Migrations Table
         run: |
-          # التحقق من وجود جدول migrations
           if ! php artisan migrate:status; then
-            echo "جدول الترحيلات غير موجود، إنشاءه الآن..."
+            echo "Migrations table not found. Creating..."
             php artisan migrate:install
           fi
 
@@ -73,16 +116,34 @@ jobs:
       - name: Backup Database
         run: php artisan app:database-backup
 
-      - name: Check Application Status
-        run: php artisan app:check-status
-
       - name: Seed Database
         run: php artisan db:seed
 
+      - name: Check Application Status
+        run: php artisan app:check-status
+
       - name: Execute tests
         run: php artisan test
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          MAIL_MAILER: array
+          BROADCAST_DRIVER: array
+          FILESYSTEM_DRIVER: local
+          LOG_CHANNEL: stack
+          LOG_LEVEL: debug
+          APP_URL: http://localhost
+          APP_DEBUG: true
+          APP_PORT: 8000
+          APP_NAME: 'Laravel'
+          APP_LOCALE: en
+          APP_FALLBACK_LOCALE: en
+          APP_TIMEZONE: UTC
 
-      # إضافة خطوة لإرسال إشعار في حالة الفشل
       - name: Send failure notification
         if: failure()
-        run: echo "العملية فشلت في مرحلة معينة"
+        run: echo "⚠️ The GitHub Actions workflow failed."

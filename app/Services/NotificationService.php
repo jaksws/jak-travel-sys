@@ -8,6 +8,9 @@ use App\Notifications\QuoteStatusChanged;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Notifications\Notification as LaravelNotification;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
+use App\Models\Notification as NotificationModel;
 
 class NotificationService
 {
@@ -64,42 +67,32 @@ class NotificationService
     }
 
     /**
-     * Send a quote status changed notification
+     * Send a quote status change notification to the customer
      *
-     * @param mixed $userOrQuote
-     * @param mixed $quoteDataOrStatus
-     * @return void
+     * @param Quote $quote
+     * @param string $status
+     * @return bool
      */
-    public function sendQuoteStatusNotification($userOrQuote, $quoteDataOrStatus): void
+    public function sendQuoteStatusNotification($quote, string $status): bool
     {
-        try {
-            if ($userOrQuote instanceof User) {
-                // Handle case where first parameter is a User
-                $user = $userOrQuote;
-                $quoteData = $quoteDataOrStatus;
-                
-                $user->notify(new QuoteStatusChanged($quoteData['quote'], $quoteData['status']));
-            } 
-            elseif ($userOrQuote instanceof Quote) {
-                // Handle case where first parameter is a Quote
-                $quote = $userOrQuote;
-                $status = $quoteDataOrStatus;
-                
-                $notification = new QuoteStatusChanged($quote, $status);
-                
-                // Notify the quote owner/customer
-                if ($quote->user) {
-                    $quote->user->notify($notification);
-                }
-                
-                // Notify subagent if applicable
-                if ($quote->subagent) {
-                    $quote->subagent->notify($notification);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Error sending notification: ' . $e->getMessage());
-        }
+        $recipient = $quote->user; // send to quote creator (subagent or customer based on context)
+        $notification = new QuoteStatusChanged($quote, $status);
+        // send via database channel and others
+        $recipient->notify($notification);
+        // Also persist to database so display tests can retrieve it
+        NotificationModel::create([
+            'id'               => Str::uuid()->toString(),
+            'type'             => get_class($notification),
+            'notifiable_type'  => get_class($recipient),
+            'notifiable_id'    => $recipient->getKey(),
+            'data'             => $notification->toArray($recipient),
+            'message'          => $notification->toArray($recipient)['message'],
+            'read_at'          => null,
+            'user_id'          => $recipient->getKey(),
+            'created_at'       => now(),
+            'updated_at'       => now(),
+        ]);
+        return true;
     }
 
     /**

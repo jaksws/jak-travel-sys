@@ -57,7 +57,7 @@ class RequestController extends Controller
                           ->get();
         
         $customers = User::where('agency_id', auth()->user()->agency_id)
-                         ->where('user_type', 'customer')
+                         ->where('role', 'customer')
                          ->where('is_active', true)
                          ->get();
                          
@@ -83,7 +83,7 @@ class RequestController extends Controller
         
         // Verificar que el cliente pertenece a la agencia
         $customer = User::where('agency_id', auth()->user()->agency_id)
-                       ->where('user_type', 'customer')
+                       ->where('role', 'customer')
                        ->findOrFail($request->customer_id);
         
         $serviceRequest = ServiceRequest::create([
@@ -140,7 +140,7 @@ class RequestController extends Controller
                           ->get();
         
         $customers = User::where('agency_id', auth()->user()->agency_id)
-                         ->where('user_type', 'customer')
+                         ->where('role', 'customer')
                          ->where('is_active', true)
                          ->get();
                          
@@ -172,7 +172,7 @@ class RequestController extends Controller
         
         // Verificar que el cliente pertenece a la agencia
         $customer = User::where('agency_id', auth()->user()->agency_id)
-                       ->where('user_type', 'customer')
+                       ->where('role', 'customer')
                        ->findOrFail($httpRequest->customer_id);
         
         $request->update([
@@ -250,7 +250,7 @@ class RequestController extends Controller
         
         // Verificar que los subagentes pertenecen a la agencia
         $subagents = User::where('agency_id', auth()->user()->agency_id)
-                        ->where('user_type', 'subagent')
+                        ->where('role', 'subagent')
                         ->whereIn('id', $httpRequest->subagents)
                         ->get();
                         

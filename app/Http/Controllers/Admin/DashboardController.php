@@ -176,13 +176,29 @@ class DashboardController extends Controller
         $user->email = $request->email;
         $user->role = $request->role;
         $user->status = $request->status;
-        
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
-        
+        // ربط السبوكيل بالوكالة المختارة عند اختيار الدور سبوكيل
+        if ($request->role === 'subagent' && $request->filled('agency_id')) {
+            $user->agency_id = $request->agency_id;
+        } elseif ($request->role !== 'subagent') {
+            $user->agency_id = null;
+        }
         $user->save();
-        
+
+        // تحديث أو إنشاء معلومات الوكالة إذا كان الدور وكالة
+        if ($request->role === 'agency' && $request->filled('agency_name')) {
+            $agency = $user->agency ?? new \App\Models\Agency();
+            $agency->user_id = $user->id;
+            $agency->name = $request->agency_name;
+            $agency->address = $request->agency_address;
+            $agency->phone = $request->agency_phone;
+            $agency->license_number = $request->agency_license_number;
+            $agency->email = $user->email; // إصلاح: تمرير البريد الإلكتروني للوكالة
+            $agency->save();
+        }
+
         return redirect()->route('admin.users.index')->with('success', 'تم تحديث بيانات المستخدم بنجاح');
     }
 
@@ -199,6 +215,37 @@ class DashboardController extends Controller
         $user->save();
         
         return redirect()->back()->with('success', 'تم تغيير حالة المستخدم بنجاح');
+    }
+
+    /**
+     * إنشاء مستخدم جديد من لوحة تحكم الأدمن
+     */
+    public function storeUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:admin,agency,subagent,customer',
+        ]);
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->role = $request->role;
+        $user->status = 'active';
+        $user->save();
+        return redirect()->route('admin.users.index')->with('success', 'تم إنشاء المستخدم بنجاح');
+    }
+
+    /**
+     * حذف مستخدم من لوحة تحكم الأدمن
+     */
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'تم حذف المستخدم بنجاح');
     }
 
     /**
@@ -233,6 +280,24 @@ class DashboardController extends Controller
         $services = Service::all();
 
         return view('admin.requests.index', compact('requests', 'services'));
+    }
+
+    /**
+     * Store a new request created by admin
+     */
+    public function storeRequest(Request $req)
+    {
+        $data = $req->validate([
+            'service_id' => 'required|exists:services,id',
+            'user_id'    => 'required|exists:users,id',
+            'title'      => 'required|string|max:255',
+            'description'=> 'nullable|string',
+            'required_date' => 'nullable|date',
+            'notes'      => 'nullable|string',
+            'status'     => 'nullable|string',
+        ]);
+        TravelRequest::create($data);
+        return redirect()->route('admin.requests.index');
     }
 
     /**
@@ -284,6 +349,25 @@ class DashboardController extends Controller
      */
     public function updateSettings(Request $request)
     {
+        \Log::info('Received settings update request', $request->all());
+        \Log::info('Footer settings before update', config('ui.footer'));
+
+        $validated = $request->validate([
+            'multilingual' => 'nullable|in:on',
+            'dark_mode' => 'nullable|in:on',
+            'payment_system' => 'nullable|in:on',
+            'enhanced_ui' => 'nullable|in:on',
+            'ai_features' => 'nullable|in:on',
+            'footer_text' => 'nullable|string',
+            'footer_link_texts.*' => 'nullable|string',
+            'footer_link_urls.*' => 'nullable|url',
+            'footer_service_link_texts.*' => 'nullable|string',
+            'footer_service_link_urls.*' => 'nullable|url',
+            'footer_social_names.*' => 'nullable|string',
+            'footer_social_urls.*' => 'nullable|url',
+            'footer_social_icons.*' => 'nullable|string',
+        ]);
+
         // تحديث الإعدادات
         $settings = [
             'multilingual' => $request->has('multilingual'),
@@ -292,34 +376,147 @@ class DashboardController extends Controller
             'enhanced_ui' => $request->has('enhanced_ui'),
             'ai_features' => $request->has('ai_features'),
         ];
-        
+
+        \Log::info('Processed v1_features settings before saving:', $settings);
+
         // حفظ الإعدادات في ملف التكوين
         $configPath = config_path('v1_features.php');
         $configContent = "<?php\n\nreturn [\n";
-        
-        foreach ($settings as $key => $value) {
-            $configContent .= "    '{$key}' => " . ($value ? 'true' : 'false') . ",\n";
-        }
-        
-        // الحفاظ على الإعدادات الأخرى
+
         $currentSettings = config('v1_features');
-        foreach ($currentSettings as $key => $value) {
-            if (!array_key_exists($key, $settings)) {
-                $boolValue = $value ? 'true' : 'false';
-                if (!is_bool($value)) {
-                    $boolValue = is_array($value) ? var_export($value, true) : "'{$value}'";
-                }
-                $configContent .= "    '{$key}' => {$boolValue},\n";
+        $mergedSettings = array_merge($currentSettings, $settings);
+
+        foreach ($mergedSettings as $key => $value) {
+            if (is_bool($value)) {
+                $configContent .= "    '{$key}' => " . ($value ? 'true' : 'false') . ",\n";
+            } elseif (is_array($value)) {
+                $configContent .= "    '{$key}' => " . var_export($value, true) . ",\n";
+            } else {
+                $configContent .= "    '{$key}' => '" . addslashes($value) . "',\n";
             }
         }
-        
+
         $configContent .= "];\n";
-        
+
         file_put_contents($configPath, $configContent);
-        
-        // مسح ذاكرة التخزين المؤقت للتكوين
+        \Log::info('Finished writing v1_features.php');
+
+        // تحديث إعدادات الفوتر
+        $footer = config('ui.footer', []);
+        $footer['text'] = $request->input('footer_text', '');
+
+        $existingLinks = $footer['links'] ?? [];
+        $existingServiceLinks = $footer['services'] ?? [];
+        $existingSocialLinks = $footer['social'] ?? [];
+
+        $footer['links'] = [];
+        $footer['services'] = [];
+        $footer['social'] = [];
+
+        // Rebuild links from request
+        if ($request->has('footer_link_texts')) {
+            foreach ($request->footer_link_texts as $index => $text) {
+                if (!empty($text) && isset($request->footer_link_urls[$index]) && !empty($request->footer_link_urls[$index])) {
+                    $footer['links'][] = [
+                        'text' => $text,
+                        'url' => $request->footer_link_urls[$index],
+                    ];
+                }
+            }
+        }
+
+        // Rebuild service links from request
+        if ($request->has('footer_service_link_texts')) {
+            foreach ($request->footer_service_link_texts as $index => $text) {
+                if (!empty($text) && isset($request->footer_service_link_urls[$index]) && !empty($request->footer_service_link_urls[$index])) {
+                    $footer['services'][] = [
+                        'text' => $text,
+                        'url' => $request->footer_service_link_urls[$index],
+                    ];
+                }
+            }
+        }
+
+        // Rebuild social links from request
+        if ($request->has('footer_social_names')) {
+            foreach ($request->footer_social_names as $index => $name) {
+                if (!empty($name) && isset($request->footer_social_urls[$index]) && !empty($request->footer_social_urls[$index])) {
+                    $footer['social'][] = [
+                        'name' => $name,
+                        'url' => $request->footer_social_urls[$index],
+                        'icon' => $request->footer_social_icons[$index] ?? 'globe',
+                    ];
+                }
+            }
+        }
+
+        \Log::info('Processed footer settings before saving:', $footer);
+
+        // تحديث ملف ui.php
+        $this->updateUIConfig([
+            'footer' => $footer
+        ]);
+
+        // معالجة الحذف والتعديل للروابط والصفحات المرتبطة
+        $newLinks = $footer['links'];
+
+        // حذف الصفحات المرتبطة بالروابط المحذوفة
+        foreach ($existingLinks as $existingLink) {
+            $existsInNewLinks = collect($newLinks)->firstWhere('url', $existingLink['url']);
+            if (!$existsInNewLinks && isset($existingLink['text'])) {
+                $pageName = strtolower(str_replace(' ', '-', $existingLink['text']));
+                $viewPath = resource_path("views/{$pageName}.blade.php");
+
+                if (File::exists($viewPath)) {
+                    File::delete($viewPath);
+                    \Log::info("Deleted view file: {$viewPath}");
+                }
+
+                $routePath = base_path('routes/web.php');
+                if (File::exists($routePath)) {
+                    $routeContent = File::get($routePath);
+
+                    $quotedPageName = preg_quote($pageName, '/');
+                    $pattern = "/Route::view\\(\\s*'\\/{$quotedPageName}'\\s*,\\s*'{$quotedPageName}'\\s*\\)\\s*->name\\(\\s*'{$quotedPageName}'\\s*\\)\\s*;\\s*\\n?/";
+
+                    $newRouteContent = preg_replace($pattern, '', $routeContent);
+                    if ($newRouteContent !== $routeContent) {
+                        File::put($routePath, $newRouteContent);
+                        \Log::info("Removed route for page: {$pageName}");
+                    }
+                }
+            }
+        }
+
+        // تحديث أو إنشاء الصفحات عند تعديل/إضافة الروابط
+        foreach ($newLinks as $newLink) {
+            if (isset($newLink['text'])) {
+                $pageName = strtolower(str_replace(' ', '-', $newLink['text']));
+                $viewPath = resource_path("views/{$pageName}.blade.php");
+
+                if (!File::exists($viewPath)) {
+                    $viewContent = "@extends('layouts.app')\n\n@section('title', '{$newLink['text']}')\n\n@section('content')\n<div class=\"container py-5\">\n    <h1 class=\"mb-4\">{$newLink['text']}</h1>\n    <p>This is the {$newLink['text']} page. Add your content here.</p>\n</div>\n@endsection";
+                    File::put($viewPath, $viewContent);
+                    \Log::info("Created view file: {$viewPath}");
+
+                    $routePath = base_path('routes/web.php');
+                    if (File::exists($routePath)) {
+                        $routeContent = File::get($routePath);
+                        $routeDefinition = "Route::view('/{$pageName}', '{$pageName}')->name('{$pageName}');";
+                        if (strpos($routeContent, $routeDefinition) === false) {
+                            File::append($routePath, "\n" . $routeDefinition);
+                            \Log::info("Added route for page: {$pageName}");
+                        }
+                    }
+                }
+            }
+        }
+
+        \Log::info('Footer settings after update', $footer);
+        \Log::info('Settings update completed successfully.');
+
         \Artisan::call('config:clear');
-        
+
         return redirect('/admin/settings')->with('success', 'تم تحديث إعدادات النظام بنجاح');
     }
 
@@ -642,6 +839,11 @@ class DashboardController extends Controller
         // دمج الإعدادات الجديدة
         $newConfig = array_merge($currentConfig, $data);
         
+        \Log::info('Updating UI config with data:', $data);
+        \Log::info('Current UI config:', $currentConfig);
+        \Log::info('New UI config:', $newConfig);
+        \Log::info('UI config after update:', $newConfig);
+
         // إنشاء محتوى ملف التكوين
         $configContent = "<?php\n\nreturn " . var_export($newConfig, true) . ";\n";
         

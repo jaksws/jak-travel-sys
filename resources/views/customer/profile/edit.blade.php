@@ -252,7 +252,7 @@
                         <div class="mb-3">
                             <label for="preferred_currency" class="form-label">العملة المفضلة</label>
                             <select class="form-select @error('preferred_currency') is-invalid @enderror" id="preferred_currency" name="preferred_currency">
-                                @foreach(\App\Models\Currency::where('is_active', true)->get() as $currency)
+                                @foreach(\App\Models\Currency::where('status', 'active')->get() as $currency)
                                     <option value="{{ $currency->code }}" {{ auth()->user()->preferred_currency == $currency->code ? 'selected' : '' }}>
                                         {{ $currency->name }} ({{ $currency->code }})
                                     </option>

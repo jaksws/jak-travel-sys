@@ -11,7 +11,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">إدارة المستخدمين</h1>
-        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal" dusk="add-user-button">
             <i class="fas fa-plus"></i> إضافة مستخدم جديد
         </a>
     </div>
@@ -83,7 +83,7 @@
                     </thead>
                     <tbody>
                         @forelse($users as $index => $user)
-                            <tr>
+                            <tr dusk="user-row-{{ $user->id }}">
                                 <td>{{ $users->firstItem() + $index }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
@@ -115,15 +115,15 @@
                                 <td>{{ $user->created_at->format('Y-m-d') }}</td>
                                 <td class="text-center">
                                     <div class="btn-group">
-                                        <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-info" title="عرض">
+                                        <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-info" title="عرض" dusk="view-user-{{ $user->id }}">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning" title="تعديل">
+                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning" title="تعديل" dusk="edit-user-{{ $user->id }}">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <button type="button" class="btn btn-sm btn-{{ $user->status === 'active' ? 'danger' : 'success' }}" 
                                                 title="{{ $user->status === 'active' ? 'تعطيل' : 'تفعيل' }}"
-                                                onclick="document.getElementById('toggle-form-{{ $user->id }}').submit();">
+                                                onclick="document.getElementById('toggle-form-{{ $user->id }}').submit();" dusk="toggle-status-{{ $user->id }}">
                                             <i class="fas fa-{{ $user->status === 'active' ? 'ban' : 'check' }}"></i>
                                         </button>
                                         <form id="toggle-form-{{ $user->id }}" action="{{ route('admin.users.toggle-status', $user->id) }}" method="POST" style="display: none;">
@@ -151,10 +151,10 @@
 </div>
 
 <!-- نموذج إضافة مستخدم جديد -->
-<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true" dusk="create-user-modal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('admin.users.store') }}" method="POST">
+            <form action="{{ route('admin.users.store') }}" method="POST" dusk="create-user-form">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="createUserModalLabel">إضافة مستخدم جديد</h5>
@@ -164,23 +164,23 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="name" class="form-label">الاسم</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name" required dusk="create-user-name">
                         </div>
                         <div class="col-md-6">
                             <label for="email" class="form-label">البريد الإلكتروني</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" required dusk="create-user-email">
                         </div>
                         <div class="col-md-6">
                             <label for="password" class="form-label">كلمة المرور</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password" required dusk="create-user-password">
                         </div>
                         <div class="col-md-6">
                             <label for="password_confirmation" class="form-label">تأكيد كلمة المرور</label>
-                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required dusk="create-user-password-confirm">
                         </div>
                         <div class="col-md-6">
                             <label for="role" class="form-label">نوع المستخدم</label>
-                            <select class="form-select" id="role" name="role" required>
+                            <select class="form-select" id="role" name="role" required dusk="create-user-role">
                                 <option value="admin">مسؤول</option>
                                 <option value="agency">وكالة</option>
                                 <option value="subagent">سبوكيل</option>
@@ -189,7 +189,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="status" class="form-label">الحالة</label>
-                            <select class="form-select" id="status" name="status" required>
+                            <select class="form-select" id="status" name="status" required dusk="create-user-status">
                                 <option value="active" selected>نشط</option>
                                 <option value="inactive">معطل</option>
                             </select>
@@ -198,7 +198,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-primary">إضافة المستخدم</button>
+                    <button type="submit" class="btn btn-primary" dusk="create-user-submit">إضافة المستخدم</button>
                 </div>
             </form>
         </div>

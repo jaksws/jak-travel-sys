@@ -44,14 +44,19 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn([
+            $columns = [
+                'settings',
                 'notification_settings',
-                'email_settings',
-                'commission_settings',
-                'price_decimals',
-                'price_display_format',
-                'auto_convert_prices',
-            ]);
+                'theme',
+                'locale',
+                'currency_id',
+                'commission_rate',
+            ];
+            foreach ($columns as $col) {
+                if (Schema::hasColumn('agencies', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
     }
 };

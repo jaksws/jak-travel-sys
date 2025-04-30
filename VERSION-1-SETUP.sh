@@ -20,8 +20,7 @@ git checkout -b version-1.0
 
 # تحديث ملف composer.json للنسخة 1.0
 echo "تحديث معلومات الإصدار..."
-sed -i 's/"version": "1.0.0"/"version": "1.0.0-dev"/g' composer.json 2>/dev/null || 
-  sed -i '' 's/"version": "1.0.0"/"version": "1.0.0-dev"/g' composer.json
+sed -i 's/"version": "1.0.0"/"version": "1.0.0"/g' composer.json || echo "خطأ في تحديث ملف composer.json"
 
 # إنشاء ملف تكوين لميزات النسخة 1.0
 echo "إنشاء ملف تكوين للنسخة 1.0..."
@@ -29,42 +28,59 @@ cat > config/v1_features.php << 'EOL'
 <?php
 
 return [
-    // إعدادات ميزات النسخة 1.0
     'multilingual' => [
-        'enabled' => false,
-        'available_locales' => ['ar', 'en', 'fr', 'tr'],
+        'enabled' => true,
+        'available_locales' => ['ar', 'en', 'fr', 'tr', 'es', 'id', 'ur'],
         'default_locale' => 'ar',
     ],
-    
     'dark_mode' => [
-        'enabled' => false,
-        'default' => 'light', // 'light', 'dark', 'system'
+        'enabled' => true,
+        'default' => 'system',
     ],
-    
     'payment_system' => [
-        'enabled' => false,
-        'test_mode' => true,
-        'gateways' => [
-            'mada' => false,
-            'visa' => false,
-            'mastercard' => false,
-            'apple_pay' => false,
-            'google_pay' => false,
+        'enabled' => true,
+        'providers' => [
+            'mada' => [
+                'enabled' => true,
+                'test_mode' => true,
+            ],
+            'visa' => [
+                'enabled' => true,
+                'test_mode' => true,
+            ],
+            'mastercard' => [
+                'enabled' => true,
+                'test_mode' => true,
+            ],
+            'apple_pay' => [
+                'enabled' => true,
+                'test_mode' => true,
+            ],
+            'google_pay' => [
+                'enabled' => true,
+                'test_mode' => true,
+            ],
         ],
     ],
-    
-    'ai_features' => [
-        'enabled' => false,
-        'virtual_assistant' => false,
-        'recommendations' => false,
-        'smart_pricing' => false,
-        'customer_analysis' => false,
+    'enhanced_ui' => [
+        'enabled' => true,
     ],
-    
-    'mobile_apps' => [
-        'enabled' => false,
-        'api_version' => '1.0',
-        'push_notifications' => false,
+    'analytics' => [
+        'enabled' => true,
+        'modules' => [
+            'dashboard' => true,
+            'reports' => true,
+            'customer_insights' => true,
+            'market_trends' => true,
+        ],
+    ],
+    'additional_languages' => [
+        'enabled' => true,
+        'languages' => [
+            'es' => true,
+            'id' => true,
+            'ur' => true,
+        ],
     ],
 ];
 EOL
@@ -158,55 +174,59 @@ cat > config/v1_features.php << 'EOL'
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | ميزات الإصدار 1.0
-    |--------------------------------------------------------------------------
-    |
-    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 1.0 من النظام
-    | يمكنك تفعيل أو تعطيل أي من هذه الميزات حسب الحاجة
-    |
-    */
-
     'multilingual' => [
-        'enabled' => false,
-        'available_locales' => ['ar', 'en', 'fr', 'tr'],
+        'enabled' => true,
+        'available_locales' => ['ar', 'en', 'fr', 'tr', 'es', 'id', 'ur'],
         'default_locale' => 'ar',
     ],
-
     'dark_mode' => [
-        'enabled' => false,
-        'default' => 'light', // 'light', 'dark', 'system'
+        'enabled' => true,
+        'default' => 'system',
     ],
-
     'payment_system' => [
-        'enabled' => false,
+        'enabled' => true,
         'providers' => [
             'mada' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
             ],
             'visa' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
             ],
             'mastercard' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
             ],
             'apple_pay' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
             ],
             'google_pay' => [
-                'enabled' => false,
+                'enabled' => true,
                 'test_mode' => true,
             ],
         ],
     ],
-
     'enhanced_ui' => [
         'enabled' => true,
+    ],
+    'analytics' => [
+        'enabled' => true,
+        'modules' => [
+            'dashboard' => true,
+            'reports' => true,
+            'customer_insights' => true,
+            'market_trends' => true,
+        ],
+    ],
+    'additional_languages' => [
+        'enabled' => true,
+        'languages' => [
+            'es' => true,
+            'id' => true,
+            'ur' => true,
+        ],
     ],
 ];
 EOL

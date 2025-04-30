@@ -27,7 +27,7 @@
             <h6 class="m-0 font-weight-bold">بيانات المستخدم</h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+            <form action="{{ route('admin.users.update', $user->id) }}" method="POST" dusk="edit-user-form">
                 @csrf
                 @method('PUT')
                 
@@ -90,6 +90,16 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    
+                    <div class="col-md-6" id="subagent-agency-select" style="display: none;">
+                        <label for="agency_id" class="form-label">اختر الوكالة التابعة <span class="text-danger">*</span></label>
+                        <select class="form-select" id="agency_id" name="agency_id">
+                            <option value="">-- اختر وكالة --</option>
+                            @foreach(\App\Models\Agency::orderBy('name')->get() as $agency)
+                                <option value="{{ $agency->id }}" {{ old('agency_id', $user->agency_id) == $agency->id ? 'selected' : '' }}>{{ $agency->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 
                 <hr class="my-4">
@@ -121,11 +131,11 @@
                 </div>
                 
                 <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" dusk="delete-user-button">
                         <i class="fas fa-trash me-1"></i> حذف المستخدم
                     </button>
                     
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" dusk="update-user-submit">
                         <i class="fas fa-save me-1"></i> حفظ التغييرات
                     </button>
                 </div>
@@ -153,7 +163,7 @@
                 <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">نعم، قم بالحذف</button>
+                    <button type="submit" class="btn btn-danger" dusk="confirm-delete-button">نعم، قم بالحذف</button>
                 </form>
             </div>
         </div>
@@ -170,10 +180,20 @@
         roleSelect.addEventListener('change', function() {
             if (this.value === 'agency') {
                 agencyDetails.style.display = 'flex';
+                document.getElementById('subagent-agency-select').style.display = 'none';
+            } else if (this.value === 'subagent') {
+                agencyDetails.style.display = 'none';
+                document.getElementById('subagent-agency-select').style.display = 'block';
             } else {
                 agencyDetails.style.display = 'none';
+                document.getElementById('subagent-agency-select').style.display = 'none';
             }
         });
+
+        // عند تحميل الصفحة: إظهار اختيار الوكالة إذا كان الدور الحالي سبوكيل
+        if (roleSelect.value === 'subagent') {
+            document.getElementById('subagent-agency-select').style.display = 'block';
+        }
         
         // تبديل إظهار/إخفاء كلمة المرور
         const togglePassword = document.getElementById('toggle-password');

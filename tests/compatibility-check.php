@@ -29,19 +29,19 @@ $requiredExtensions = [
     'curl', 'fileinfo', 'zip', 'xml', 'tokenizer', 'ctype', 'gd'
 ];
 
+// Check for additional PHP extensions
+$requiredExtensions[] = 'intl';
+$requiredExtensions[] = 'soap';
+
 $missingExtensions = [];
 foreach ($requiredExtensions as $extension) {
     $loaded = extension_loaded($extension);
     echo "  - $extension: " . ($loaded ? "✅ متوفر" : "❌ غير متوفر") . "\n";
     if (!$loaded) {
-        $missingExtensions[] = $extension;
+        echo "  ⚠️ لتثبيت $extension، استخدم الأمر المناسب لنظام التشغيل الخاص بك.\n";
     }
 }
 
-if (count($missingExtensions) > 0) {
-    echo "\n  ⚠️ توجد توسعات مفقودة: " . implode(', ', $missingExtensions) . "\n";
-    echo "  يجب تثبيت هذه التوسعات لضمان عمل النظام بشكل صحيح.\n";
-}
 echo "\n";
 
 // Check memory limit

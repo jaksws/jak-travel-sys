@@ -139,3 +139,27 @@ fi
 echo ""
 echo "===== Ejecutando los tests de UI corregidos ====="
 $PHP_EXECUTABLE ./vendor/bin/phpunit --filter "AdminUIManagementTest"
+
+echo ""
+echo "========== بدء اختبارات Dusk (واجهة المستخدم الحقيقية) =========="
+# إعداد متغيرات البيئة لاختبار Dusk
+export APP_ENV=testing
+export DB_CONNECTION=sqlite
+export DB_DATABASE=$(pwd)/database/database.sqlite
+export SESSION_DRIVER=array
+
+# إنشاء قاعدة بيانات SQLite للاختبار إذا لم تكن موجودة
+if [ ! -f database/database.sqlite ]; then
+    echo "إنشاء قاعدة بيانات SQLite للاختبار..."
+    touch database/database.sqlite
+fi
+
+# تنفيذ الهجرات من جديد على قاعدة بيانات الاختبار
+$PHP_EXECUTABLE artisan migrate:fresh --seed --env=testing
+
+# تشغيل اختبارات Dusk
+if [ -f ./vendor/bin/dusk ]; then
+    $PHP_EXECUTABLE ./vendor/bin/dusk
+else
+    $PHP_EXECUTABLE artisan dusk
+fi

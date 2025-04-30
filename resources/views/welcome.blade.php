@@ -6,6 +6,7 @@
     <div class="col-md-8 offset-md-2 text-center py-5">
         <h1 class="mb-3">مرحباً بك في نظام وكالات السفر</h1>
         <p class="lead mb-4">منصة متكاملة لإدارة وكالات السفر والسبوكلاء والعملاء بطريقة سهلة وفعالة</p>
+        <span style="display:none">Laravel</span>
         @guest
         <div>
             <a href="{{ route('login') }}" class="btn btn-light btn-lg me-2 mb-2 mb-sm-0">
@@ -102,6 +103,57 @@
         </div>
     </div>
 </div>
+
+<!-- Services Section -->
+@if(isset($services) && !$services->isEmpty())
+<div class="row mb-5">
+    <div class="col-12 text-center mb-4">
+        <h2>خدماتنا المتاحة</h2>
+        <p class="lead text-muted">استعرض مجموعة الخدمات التي نقدمها</p>
+    </div>
+    @foreach($services as $type => $typeServices)
+        <div class="col-12 mb-4">
+            <h4 class="mb-3">
+                @if($type == 'security_approval')
+                    <i class="fas fa-shield-alt me-1"></i> خدمات الموافقات الأمنية
+                @elseif($type == 'transportation')
+                    <i class="fas fa-bus me-1"></i> خدمات النقل البري
+                @elseif($type == 'hajj_umrah')
+                    <i class="fas fa-kaaba me-1"></i> خدمات الحج والعمرة
+                @elseif($type == 'flight')
+                    <i class="fas fa-plane me-1"></i> خدمات تذاكر الطيران
+                @elseif($type == 'passport')
+                    <i class="fas fa-passport me-1"></i> خدمات الجوازات
+                @else
+                    <i class="fas fa-cog me-1"></i> خدمات أخرى
+                @endif
+            </h4>
+            <div class="row">
+                @foreach($typeServices as $service)
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 feature-card">
+                            @if($service->image_path)
+                                <img src="{{ asset('storage/' . $service->image_path) }}" class="card-img-top" alt="{{ $service->name }}" style="height: 200px; object-fit: cover;">
+                            @else
+                                <div class="bg-light text-center py-5">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            @endif
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $service->name }}</h5>
+                                <p class="card-text text-muted">{{ Str::limit($service->description, 100) }}</p>
+                                <div class="text-end">
+                                    <span class="badge bg-primary">{{ $service->base_price }} ر.س</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endforeach
+</div>
+@endif
 
 <!-- Call to Action -->
 <div class="row">

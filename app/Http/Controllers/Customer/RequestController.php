@@ -110,11 +110,11 @@ class RequestController extends Controller
             'request_id' => $request->id,
             'customer_id' => $request->customer_id,
             'auth_id' => auth()->id(),
-            'user_type' => auth()->user()->user_type
+            'role' => auth()->user()->role
         ]);
 
         // تعديل طريقة التحقق من أن الطلب ينتمي للعميل الحالي أو اي مستخدم لديه صلاحيات كافية
-        if ($request->customer_id != auth()->id() && auth()->user()->user_type == 'customer') {
+        if ($request->customer_id != auth()->id() && auth()->user()->role == 'customer') {
             // تسجيل محاولة الوصول غير المصرح بها للتصحيح
             Log::warning('Unauthorized access attempt', [
                 'request_id' => $request->id, 

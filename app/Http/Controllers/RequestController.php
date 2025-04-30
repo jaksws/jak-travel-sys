@@ -25,7 +25,7 @@ class RequestController extends Controller
         
         $requests = $query->with(['service', 'user'])->latest()->paginate(15);
         
-        return view('agent.requests.index', compact('requests'));
+        return view('agency.requests.index', compact('requests'));
     }
     
     /**
@@ -48,55 +48,67 @@ class RequestController extends Controller
      */
     public function create()
     {
-        $services = Service::where('status', 'active')->get();
-        
-        return view('requests.create', compact('services'));
+        return view('requests.create');
     }
 
     /**
      * Store a newly created request in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'required_date' => 'required|date|after:today',
-            'notes' => 'nullable|string'
-        ]);
+    
+  public function store(Request $request)
+{
+    $data = $request->validate([
+        'service_id'    => 'required|exists:services,id',
+        'title'         => 'required|string|max:255',
+        'description'   => 'nullable|string',
+        'required_date' => 'nullable|date',
+        'notes'         => 'nullable|string',
+    ]);
 
-        $service = Service::findOrFail($request->service_id);
-        
-        $serviceRequest = ServiceRequest::create([
-            'service_id' => $service->id,
-            'user_id' => Auth::id(),
-            'agency_id' => $service->agency_id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'required_date' => $request->required_date,
-            'notes' => $request->notes,
-            'status' => 'pending'
-        ]);
+    $service = Service::findOrFail($request->service_id);
 
-        return redirect()->route('requests.show', $serviceRequest)
-                         ->with('success', 'تم إنشاء طلبك بنجاح. سيتم التواصل معك قريباً');
-    }
+    $serviceRequest = ServiceRequest::create([
+        'service_id' => $service->id,
+        'user_id' => Auth::id(),
+        'agency_id' => $service->agency_id,
+        'title' => $request->title,
+        'description' => $request->description,
+        'required_date' => $request->required_date,
+        'notes' => $request->notes,
+        'status' => 'pending'
+    ]);
+
+    return redirect()->route('requests.show', $serviceRequest)
+                     ->with('success', 'تم إنشاء طلبك بنجاح. سيتم التواصل معك قريباً');
+}
+
 
     /**
      * Display the specified request.
      */
     public function show(ServiceRequest $request)
     {
-        // Check access permissions
-        if (Auth::id() !== $request->user_id && 
-            Auth::user()->agency_id !== $request->agency_id &&
-            !Auth::user()->isAdmin()) {
-            abort(403, 'غير مصرح لك بالوصول إلى هذا الطلب');
+        return view('requests.show', ['request' => $request]);
+    }
+
+    /**
+     * Update the specified request in storage.
+     */
+    public function update(Request $httpRequest, ServiceRequest $request)
+    {
+        if ($request->user_id !== Auth::id() || $request->status !== 'pending') {
+            abort(403);
         }
 
-        $request->load(['service', 'user', 'quotes']);
-        
-        return view('requests.show', compact('request'));
+        $data = $httpRequest->validate([
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'required_date' => 'required|date',
+            'notes'         => 'nullable|string',
+        ]);
+
+        $request->update($data);
+
+        return redirect()->route('requests.show', $request);
     }
 }

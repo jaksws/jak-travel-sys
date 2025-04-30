@@ -17,7 +17,7 @@ class SubagentController extends Controller
     public function index(Request $request)
     {
         $query = User::where('agency_id', auth()->user()->agency_id)
-                    ->where('user_type', 'subagent');
+                    ->where('role', 'subagent');
 
         // تطبيق عوامل التصفية
         if ($request->has('search') && !empty($request->search)) {
@@ -67,7 +67,7 @@ class SubagentController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'user_type' => 'subagent',
+            'role' => 'subagent',
             'agency_id' => auth()->user()->agency_id,
             'parent_id' => auth()->id(),
             'is_active' => true,
@@ -94,7 +94,7 @@ class SubagentController extends Controller
     public function show(User $subagent)
     {
         // التحقق من أن السبوكيل ينتمي لنفس الوكالة
-        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->user_type !== 'subagent') {
+        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->role !== 'subagent') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا السبوكيل');
         }
 
@@ -107,7 +107,7 @@ class SubagentController extends Controller
     public function edit(User $subagent)
     {
         // التحقق من أن السبوكيل ينتمي لنفس الوكالة
-        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->user_type !== 'subagent') {
+        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->role !== 'subagent') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا السبوكيل');
         }
 
@@ -124,7 +124,7 @@ class SubagentController extends Controller
     public function update(Request $request, User $subagent)
     {
         // التحقق من أن السبوكيل ينتمي لنفس الوكالة
-        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->user_type !== 'subagent') {
+        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->role !== 'subagent') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا السبوكيل');
         }
 
@@ -156,7 +156,7 @@ class SubagentController extends Controller
     public function destroy(User $subagent)
     {
         // التحقق من أن السبوكيل ينتمي لنفس الوكالة
-        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->user_type !== 'subagent') {
+        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->role !== 'subagent') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا السبوكيل');
         }
 
@@ -176,7 +176,7 @@ class SubagentController extends Controller
     public function toggleStatus(User $subagent)
     {
         // التحقق من أن السبوكيل ينتمي لنفس الوكالة
-        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->user_type !== 'subagent') {
+        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->role !== 'subagent') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا السبوكيل');
         }
 
@@ -193,7 +193,7 @@ class SubagentController extends Controller
     public function updateServices(Request $request, User $subagent)
     {
         // التحقق من أن السبوكيل ينتمي لنفس الوكالة
-        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->user_type !== 'subagent') {
+        if ($subagent->agency_id !== auth()->user()->agency_id || $subagent->role !== 'subagent') {
             abort(403, 'غير مصرح لك بالوصول إلى هذا السبوكيل');
         }
 

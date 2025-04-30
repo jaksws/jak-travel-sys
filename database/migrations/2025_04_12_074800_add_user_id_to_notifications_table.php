@@ -11,17 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('notifications')) {
-            Schema::table('notifications', function (Blueprint $table) {
-                if (!Schema::hasColumn('notifications', 'user_id')) {
-                    $table->foreignId('user_id')->nullable()->after('id');
-                }
-            });
-        } else {
+        if (!Schema::hasTable('notifications')) {
             // إنشاء الجدول إذا لم يكن موجودًا
             Schema::create('notifications', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('user_id')->nullable();
                 $table->string('title');
                 $table->text('message')->nullable();
                 $table->string('type')->default('general');
@@ -38,10 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            if (Schema::hasColumn('notifications', 'user_id')) {
-                $table->dropColumn('user_id');
-            }
-        });
+        Schema::dropIfExists('notifications');
     }
 };

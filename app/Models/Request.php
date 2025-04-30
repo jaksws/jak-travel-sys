@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Carbon\Carbon;
 
 class Request extends Model
 {
@@ -15,7 +16,7 @@ class Request extends Model
      *
      * @var string
      */
-    protected $table = 'service_requests';
+    protected $table = 'requests';
 
     protected $fillable = [
         'service_id', 
@@ -31,6 +32,31 @@ class Request extends Model
         'priority', 
         'requested_date'
     ];
+
+    protected $casts = [
+        'required_date' => 'date',
+        'requested_date' => 'date',
+    ];
+
+    /**
+     * Set the required date attribute (store only date)
+     */
+    public function setRequiredDateAttribute($value)
+    {
+        $this->attributes['required_date'] = optional(
+            Carbon::parse($value)
+        )->toDateString();
+    }
+
+    /**
+     * Set the requested date attribute (store only date)
+     */
+    public function setRequestedDateAttribute($value)
+    {
+        $this->attributes['requested_date'] = optional(
+            Carbon::parse($value)
+        )->toDateString();
+    }
 
     /**
      * Get the user (customer) that owns the request.

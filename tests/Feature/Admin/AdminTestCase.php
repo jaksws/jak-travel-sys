@@ -24,7 +24,6 @@ class AdminTestCase extends TestCase
         
         // Create an admin user for testing
         $this->admin = User::factory()->create([
-            'user_type' => 'admin',
             'role' => 'admin',
             'is_admin' => 1,
             'email' => 'admin@example.com',

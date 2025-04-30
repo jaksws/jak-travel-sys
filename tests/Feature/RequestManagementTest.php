@@ -15,10 +15,10 @@ class RequestManagementTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function client_can_create_new_request()
+    public function customer_can_create_new_request()
     {
         // تجهيز بيانات الاختبار
-        $client = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $service = Service::factory()->create();
         
         $requestData = [
@@ -30,7 +30,7 @@ class RequestManagementTest extends TestCase
         ];
         
         // تنفيذ الاختبار
-        $response = $this->actingAs($client)
+        $response = $this->actingAs($customer)
                          ->post(route('requests.store'), $requestData);
         
         // التحقق من النتائج
@@ -39,7 +39,7 @@ class RequestManagementTest extends TestCase
         
         // التحقق من وجود الطلب في قاعدة البيانات
         $this->assertDatabaseHas('requests', [
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'service_id' => $service->id,
             'title' => 'طلب حجز رحلة عمرة',
             'status' => 'pending' // الحالة الافتراضية للطلب الجديد
@@ -50,19 +50,19 @@ class RequestManagementTest extends TestCase
     public function agent_can_view_requests()
     {
         // تجهيز بيانات الاختبار
-        $agent = User::factory()->create(['role' => 'agent']);
-        $service = Service::factory()->create(['agency_id' => $agent->agency_id]);
+        $agency = User::factory()->create(['role' => 'agency']);
+        $service = Service::factory()->create(['agency_id' => $agency->agency_id]);
         
         // إنشاء بعض الطلبات للاختبار
         TravelRequest::factory()->count(5)->create(['service_id' => $service->id]);
         
         // تنفيذ الاختبار
-        $response = $this->actingAs($agent)
-                         ->get(route('agent.requests.index'));
+        $response = $this->actingAs($agency)
+                         ->get(route('agency.requests.index'));
         
         // التحقق من النتائج
         $response->assertStatus(200);
-        $response->assertViewIs('agent.requests.index');
+        $response->assertViewIs('agency.requests.index');
         $response->assertViewHas('requests');
     }
     
@@ -103,36 +103,41 @@ class RequestManagementTest extends TestCase
     }
     
     #[Test]
-    public function client_can_accept_quote()
+    public function customer_can_accept_quote()
     {
-        // تجهيز بيانات الاختبار
-        $client = User::factory()->create(['role' => 'client']);
-        $request = TravelRequest::factory()->create([
-            'user_id' => $client->id,
-            'status' => 'pending'
-        ]);
-        $quote = Quote::factory()->create([
-            'request_id' => $request->id,
-            'status' => 'pending'
-        ]);
-        
-        // تنفيذ الاختبار
-        $response = $this->actingAs($client)
-                         ->patch(route('quotes.accept', $quote->id));
-        
-        // التحقق من النتائج
-        $response->assertStatus(302);
-        
-        // التحقق من تحديث حالة عرض السعر والطلب
-        $this->assertDatabaseHas('quotes', [
-            'id' => $quote->id,
-            'status' => 'accepted'
-        ]);
-        
-        $this->assertDatabaseHas('requests', [
-            'id' => $request->id,
-            'status' => 'approved'
-        ]);
+        try {
+            // تجهيز بيانات الاختبار
+            $customer = User::factory()->create(['role' => 'customer']);
+            $subagent = User::factory()->create(['role' => 'subagent']);
+            $service = Service::factory()->create();
+            $request = TravelRequest::factory()->create([
+                'user_id' => $customer->id,
+                'service_id' => $service->id,
+                'status' => 'pending'
+            ]);
+            $quote = Quote::factory()->create([
+                'request_id' => $request->id,
+                'user_id' => $subagent->id,
+                'status' => 'pending'
+            ]);
+            // تنفيذ الاختبار
+            $response = $this->actingAs($customer)
+                             ->patch(route('quotes.accept', $quote->id));
+            // التحقق من النتائج
+            $response->assertStatus(302);
+            // التحقق من تحديث حالة عرض السعر والطلب
+            $this->assertDatabaseHas('quotes', [
+                'id' => $quote->id,
+                'status' => 'accepted'
+            ]);
+            $this->assertDatabaseHas('requests', [
+                'id' => $request->id,
+                'status' => 'approved'
+            ]);
+        } catch (\Throwable $e) {
+            fwrite(STDERR, "\n[customer_can_accept_quote ERROR] " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
+            throw $e;
+        }
     }
     
     #[Test]
@@ -159,12 +164,12 @@ class RequestManagementTest extends TestCase
     }
 
     #[Test]
-    public function client_can_update_request()
+    public function customer_can_update_request()
     {
         // تجهيز بيانات الاختبار
-        $client = User::factory()->create(['role' => 'client']);
+        $customer = User::factory()->create(['role' => 'customer']);
         $request = TravelRequest::factory()->create([
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'status' => 'pending'
         ]);
 
@@ -176,7 +181,7 @@ class RequestManagementTest extends TestCase
         ];
 
         // تنفيذ الاختبار
-        $response = $this->actingAs($client)
+        $response = $this->actingAs($customer)
                          ->patch(route('requests.update', $request->id), $updatedData);
 
         // التحقق من النتائج

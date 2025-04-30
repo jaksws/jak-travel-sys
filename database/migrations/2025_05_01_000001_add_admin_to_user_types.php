@@ -23,16 +23,13 @@ return new class extends Migration
         });
         
         // تحديث أي مستخدمين تم إنشاؤهم كمسؤولين في السابق
-        $roleColumn = $this->getRoleColumn();
-        if ($roleColumn) {
-            DB::table('users')
-                ->where($roleColumn, 'admin')
-                ->where(function($query) {
-                    $query->where('email', 'like', '%admin%')
-                          ->orWhere('name', 'like', '%admin%');
-                })
-                ->update(['is_admin' => true]);
-        }
+        DB::table('users')
+            ->where('role', 'admin')
+            ->where(function($query) {
+                $query->where('email', 'like', '%admin%')
+                      ->orWhere('name', 'like', '%admin%');
+            })
+            ->update(['is_admin' => true]);
     }
 
     /**
@@ -45,21 +42,5 @@ return new class extends Migration
                 $table->dropColumn('is_admin');
             }
         });
-    }
-    
-    /**
-     * تحديد عمود الدور المستخدم في النظام
-     */
-    private function getRoleColumn(): ?string
-    {
-        if (Schema::hasColumn('users', 'role')) {
-            return 'role';
-        } elseif (Schema::hasColumn('users', 'user_type')) {
-            return 'user_type';
-        } elseif (Schema::hasColumn('users', 'type')) {
-            return 'type';
-        }
-        
-        return null;
     }
 };

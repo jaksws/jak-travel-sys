@@ -10,6 +10,23 @@
 <div class="container-fluid">
     <h1 class="mb-4 text-xl font-bold">لوحة تحكم المسؤول</h1>
 
+    <!-- شريط إجراءات سريع للاختبارات -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="mb-3 d-flex flex-wrap gap-2">
+                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal" dusk="add-user-button"><i class="fas fa-plus"></i> إضافة مستخدم</a>
+                <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createRequestModal" dusk="add-request-button-dashboard"><i class="fas fa-plus"></i> إضافة طلب</a>
+                <a href="#" class="btn btn-info" id="export-requests-btn"><i class="fas fa-file-export"></i> تصدير</a>
+                <a href="#" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary" dusk="manage-users-link">إدارة المستخدمين</a>
+                <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary" dusk="manage-requests-link">إدارة الطلبات</a>
+                <a href="/admin/settings" class="btn btn-outline-dark" dusk="settings-link">الإعدادات</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">تسجيل الخروج</a>
+            </div>
+        </div>
+    </div>
+
     <!-- إحصائيات سريعة -->
     <div class="row mb-4">
         <div class="col-md-2 col-sm-6 mb-3">
@@ -280,25 +297,25 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="manage-users-link">
                                 <span><i class="fas fa-users me-2"></i> إدارة المستخدمين</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="{{ route('admin.requests.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="{{ route('admin.requests.index') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="manage-requests-link">
                                 <span><i class="fas fa-clipboard-list me-2"></i> إدارة الطلبات</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="{{ route('admin.system.logs') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="{{ route('admin.system.logs') }}" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="quick-link-system-logs">
                                 <span><i class="fas fa-file-alt me-2"></i> سجلات النظام</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <a href="/admin/settings" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between">
+                            <a href="/admin/settings" class="btn btn-light btn-block py-3 d-flex align-items-center justify-content-between" dusk="settings-link">
                                 <span><i class="fas fa-cog me-2"></i> إعدادات النظام</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
@@ -308,6 +325,132 @@
             </div>
         </div>
     </div>
+
+    <!-- نموذج إنشاء صفحة جديدة -->
+    <div class="container py-5">
+        <h2>Create a New Page</h2>
+        <form action="{{ route('admin.createPage') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label for="pageName" class="form-label">Page Name</label>
+                <input type="text" class="form-control" id="pageName" name="pageName" placeholder="Enter page name" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Page</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: إضافة مستخدم جديد -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ route('admin.users.store') }}">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="createUserModalLabel">إضافة مستخدم جديد</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="user-name" class="form-label">الاسم</label>
+            <input type="text" class="form-control" id="user-name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="user-email" class="form-label">البريد الإلكتروني</label>
+            <input type="email" class="form-control" id="user-email" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="user-password" class="form-label">كلمة المرور</label>
+            <input type="password" class="form-control" id="user-password" name="password" required>
+          </div>
+          <div class="mb-3">
+            <label for="user-password-confirm" class="form-label">تأكيد كلمة المرور</label>
+            <input type="password" class="form-control" id="user-password-confirm" name="password_confirmation" required>
+          </div>
+          <div class="mb-3">
+            <label for="user-role" class="form-label">الدور</label>
+            <select class="form-select" id="user-role" name="role" required>
+              <option value="admin">مسؤول</option>
+              <option value="agency">وكالة</option>
+              <option value="subagent">سبوكيل</option>
+              <option value="customer">عميل</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="user-status" class="form-label">الحالة</label>
+            <select class="form-select" id="user-status" name="status" required>
+              <option value="active">نشط</option>
+              <option value="inactive">معطل</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: إضافة طلب جديد -->
+<div class="modal fade" id="createRequestModal" tabindex="-1" aria-labelledby="createRequestModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ route('admin.requests.store') }}">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="createRequestModalLabel">إضافة طلب جديد</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="request-title" class="form-label">عنوان الطلب</label>
+            <input type="text" class="form-control" id="request-title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="request-user" class="form-label">العميل</label>
+            <select class="form-select" id="request-user" name="user_id" required>
+              <option value="">اختر عميلاً</option>
+              @foreach(App\Models\User::where('role', 'customer')->get() as $customer)
+                <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->email }})</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="request-service" class="form-label">الخدمة</label>
+            <select class="form-select" id="request-service" name="service_id" required>
+              <option value="">اختر خدمة</option>
+              @foreach(App\Models\Service::all() as $service)
+                <option value="{{ $service->id }}">{{ $service->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="request-date" class="form-label">تاريخ التنفيذ</label>
+            <input type="date" class="form-control" id="request-date" name="required_date">
+          </div>
+          <div class="mb-3">
+            <label for="request-status" class="form-label">الحالة</label>
+            <select class="form-select" id="request-status" name="status">
+              <option value="pending">قيد الانتظار</option>
+              <option value="in_progress">قيد التنفيذ</option>
+              <option value="completed">مكتملة</option>
+              <option value="cancelled">ملغاة</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="request-notes" class="form-label">ملاحظات</label>
+            <textarea class="form-control" id="request-notes" name="notes"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 @endsection
 
@@ -398,6 +541,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
+    });
+
+    // زر تصدير الطلبات
+    $(document).ready(function() {
+        $('#export-requests-btn').on('click', function(e) {
+            e.preventDefault();
+            window.location.href = "{{ route('admin.requests.index', ['export' => 'csv']) }}";
+        });
     });
 });
 </script>

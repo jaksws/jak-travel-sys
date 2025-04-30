@@ -24,7 +24,6 @@ return new class extends Migration
                 // لإدارة مشاكل SQLite، نحتاج إلى إنشاء جدول مؤقت بالهيكل الجديد ونقل البيانات
                 Schema::create('temp_notifications', function (Blueprint $table) {
                     $table->id();
-                    $table->foreignId('user_id')->constrained()->onDelete('cascade');
                     $table->string('title')->nullable();
                     $table->text('message')->nullable();
                     $table->string('type')->nullable();
@@ -40,7 +39,6 @@ return new class extends Migration
                 foreach ($oldNotifications as $notification) {
                     $newData = [
                         'id' => $notification->id,
-                        'user_id' => $notification->user_id,
                         'is_read' => $notification->is_read ?? false,
                         'data' => $notification->data ?? '{}',
                         'created_at' => $notification->created_at,
@@ -66,7 +64,6 @@ return new class extends Migration
             // في حالة عدم وجود الجدول، نقوم بإنشائه من الصفر
             Schema::create('notifications', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->string('title');
                 $table->text('message')->nullable();
                 $table->string('type')->nullable();

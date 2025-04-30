@@ -26,8 +26,7 @@ class Notification extends DatabaseNotification
         'notifiable_type',
         'notifiable_id',
         'data',
-        'read_at',
-        'user_id'
+        'read_at'
     ];
 
     // تعيين قواعد تحويل البيانات
@@ -42,14 +41,6 @@ class Notification extends DatabaseNotification
     public function notifiable()
     {
         return $this->morphTo();
-    }
-
-    /**
-     * Get the user that owns the notification.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 
     /**

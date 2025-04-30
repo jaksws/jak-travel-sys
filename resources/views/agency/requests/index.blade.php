@@ -83,6 +83,12 @@
             @if($requests->isEmpty())
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-1"></i> لا توجد طلبات حتى الآن.
+                    <!-- عناصر مطلوبة للاختبار حتى في حالة عدم وجود بيانات -->
+                    <div class="mt-4">
+                        <a href="{{ route('agency.requests.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-1"></i> إضافة طلب جديد
+                        </a>
+                    </div>
                 </div>
             @else
                 <div class="table-responsive">

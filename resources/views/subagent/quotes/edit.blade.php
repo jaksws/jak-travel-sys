@@ -36,7 +36,7 @@
                             <div class="input-group">
                                 <input type="number" step="0.01" min="0" class="form-control @error('price') is-invalid @enderror" id="price" name="price" value="{{ old('price', $quote->price) }}" required>
                                 <select name="currency_code" class="form-select" style="max-width: 120px;">
-                                    @foreach(\App\Models\Currency::where('is_active', true)->get() as $currency)
+                                    @foreach(\App\Models\Currency::where('status', 'active')->get() as $currency)
                                         <option value="{{ $currency->code }}" {{ $quote->currency_code == $currency->code ? 'selected' : '' }}>
                                             {{ $currency->code }}
                                         </option>

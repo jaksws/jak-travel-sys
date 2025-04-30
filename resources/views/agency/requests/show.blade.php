@@ -202,7 +202,7 @@
                             <label for="subagents" class="form-label">اختر السبوكلاء</label>
                             <select id="subagents" name="subagents[]" class="form-select" multiple size="8">
                                 @foreach(\App\Models\User::where('agency_id', auth()->user()->agency_id)
-                                        ->where('user_type', 'subagent')
+                                        ->where('role', 'subagent')
                                         ->get() as $subagent)
                                     <option value="{{ $subagent->id }}">{{ $subagent->name }}</option>
                                 @endforeach

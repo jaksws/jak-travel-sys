@@ -29,9 +29,13 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\DataFixController;
+use Illuminate\Support\Facades\File;
 
 // صفحة الترحيب
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// صفحة الخدمات العامة
+Route::get('/services', [App\Http\Controllers\HomeController::class, 'publicServices'])->name('public.services');
 
 // تسجيل مسارات المصادقة مرة واحدة فقط
 Auth::routes();
@@ -145,7 +149,9 @@ Route::prefix('subagent')->middleware(['auth', \App\Http\Middleware\SubagentMidd
     Route::get('/dashboard', [SubagentDashboardController::class, 'index'])->name('dashboard');
     
     // الخدمات المتاحة
+    Route::get('/services/create', [SubagentServiceController::class, 'create'])->name('services.create');
     Route::get('/services', [SubagentServiceController::class, 'index'])->name('services.index');
+    Route::post('/services', [SubagentServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{service}', [SubagentServiceController::class, 'show'])->name('services.show');
     
     // طلبات عروض الأسعار
@@ -171,6 +177,8 @@ Route::prefix('subagent')->middleware(['auth', \App\Http\Middleware\SubagentMidd
 // مسارات العميل
 Route::prefix('customer')->middleware(['auth', \App\Http\Middleware\CustomerMiddleware::class])->name('customer.')->group(function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/requests', [CustomerRequestController::class, 'index'])->name('requests.index');
+    Route::get('/quotes', [CustomerQuoteController::class, 'index'])->name('quotes.index');
     
     // الخدمات المتاحة
     Route::get('/services', [CustomerServiceController::class, 'index'])->name('services.index');
@@ -208,19 +216,18 @@ Route::get('/documents/{document}/download', [DocumentController::class, 'downlo
 
 // Add authentication middleware for all routes
 Route::middleware(['web', 'auth'])->group(function () {
-    // Client routes
+    // Customer routes
     Route::post('/requests', [RequestController::class, 'store'])->name('requests.store');
+    Route::patch('/requests/{request}', [RequestController::class, 'update'])->name('requests.update');
     Route::get('/requests/create', [RequestController::class, 'create'])->name('requests.create');
     Route::get('/requests/{request}', [RequestController::class, 'show'])->name('requests.show');
     
     // Quote routes
     Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
     Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+    Route::patch('/quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
     Route::patch('/quotes/{quote}/accept', [QuoteController::class, 'accept'])->name('quotes.accept');
     Route::patch('/quotes/{quote}/reject', [QuoteController::class, 'reject'])->name('quotes.reject');
-    
-    // Agent routes
-    Route::get('/agent/requests', [RequestController::class, 'index'])->name('agent.requests.index');
     
     // Admin routes
     Route::get('/admin/requests', [RequestController::class, 'adminIndex'])->name('admin.requests.index');
@@ -230,16 +237,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::patch('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     
     // Test routes for views that don't exist yet
-    Route::get('agent/requests', [DataFixController::class, 'getView'])->name('agent.requests.index')->defaults('viewName', 'agent.requests.index');
     Route::get('admin/requests', [DataFixController::class, 'getView'])->name('admin.requests.index')->defaults('viewName', 'admin.requests.index');
-});
-
-// Add these lines to fake the agent and admin routes
-Route::prefix('agent')->group(function () {
-    Route::get('requests', function () {
-        $requests = [];
-        return view('agent.requests.index', compact('requests'));
-    })->name('agent.requests.index');
 });
 
 // Define admin routes directly in web.php to ensure they are registered
@@ -251,9 +249,89 @@ Route::group([
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
-    // Users management
+    // إدارة الطلبات
+    Route::get('/requests', [\App\Http\Controllers\Admin\DashboardController::class, 'requests'])->name('requests.index');
+    Route::post('/requests', [\App\Http\Controllers\Admin\DashboardController::class, 'storeRequest'])->name('requests.store');
+    Route::get('/requests/{request}', [\App\Http\Controllers\Admin\DashboardController::class, 'showRequest'])->name('requests.show');
+    Route::get('/requests/{request}/edit', [\App\Http\Controllers\Admin\DashboardController::class, 'editRequest'])->name('requests.edit');
+    Route::put('/requests/{request}', [\App\Http\Controllers\Admin\DashboardController::class, 'updateRequest'])->name('requests.update');
+    Route::delete('/requests/{request}', [\App\Http\Controllers\Admin\DashboardController::class, 'destroyRequest'])->name('requests.destroy');
+
+    // إدارة المستخدمين (Admin Users Management)
     Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users.index');
+    Route::get('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'viewUser'])->name('users.show');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\DashboardController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'deleteUser'])->name('users.destroy');
+    Route::patch('/users/{id}/toggle-status', [\App\Http\Controllers\Admin\DashboardController::class, 'toggleUserStatus'])->name('users.toggle-status');
+    Route::post('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'storeUser'])->name('users.store');
     
     // System logs
     Route::get('/system/logs', [\App\Http\Controllers\Admin\DashboardController::class, 'logs'])->name('system.logs');
+    
+    // Admin settings routes
+    Route::get('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'settings'])->name('settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'updateSettings'])->name('settings.update');
+    
+    // Create page route
+    Route::post('/create-page', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'pageName' => 'required|string|max:255',
+        ]);
+
+        $pageName = strtolower(str_replace(' ', '-', $request->pageName));
+        $viewPath = resource_path("views/{$pageName}.blade.php");
+
+        // Check if the page already exists
+        if (File::exists($viewPath)) {
+            return redirect()->back()->with('error', 'Page already exists.');
+        }
+
+        // Create the Blade file
+        File::put($viewPath, "@extends('layouts.app')\n\n@section('title', '{$request->pageName}')\n\n@section('content')\n<div class=\"container py-5\">\n    <h1 class=\"mb-4\">{$request->pageName}</h1>\n    <p>This is the {$request->pageName} page. Add your content here.</p>\n</div>\n@endsection");
+
+        // Add the route dynamically
+        $routePath = base_path('routes/web.php');
+        File::append($routePath, "\nRoute::view('/{$pageName}', '{$pageName}')->name('{$pageName}');");
+
+        // Update footer links in the configuration
+        $footerConfigPath = config_path('ui.php');
+        $currentConfig = include $footerConfigPath;
+
+        $newLink = [
+            'text' => $request->pageName,
+            'url' => "/{$pageName}",
+        ];
+
+        $currentConfig['footer']['links'][] = $newLink;
+
+        // Save the updated configuration
+        $configContent = "<?php\n\nreturn " . var_export($currentConfig, true) . ";\n";
+        file_put_contents($footerConfigPath, $configContent);
+
+        return redirect()->back()->with('success', 'Page created successfully.');
+    })->name('createPage');
 });
+
+// Debug route
+Route::get('debug-admin-users', [\App\Http\Controllers\Admin\DashboardController::class, 'users']);
+
+// احذف جميع التعريفات الزائدة لمسار agency.requests.index وأبقي فقط على هذا التعريف:
+Route::prefix('agency')->group(function () {
+    Route::get('requests', function () {
+        $requests = collect();
+        $services = [];
+        return view('agency.requests.index', ['requests' => $requests, 'services' => $services]);
+    })->name('agency.requests.index');
+});
+
+// Privacy Policy route
+Route::view('/privacy', 'privacy')->name('privacy');
+
+// Terms and Conditions route
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/roles', 'roles')->name('roles');
+Route::view('/الخصوصية', 'الخصوصية')->name('الخصوصية');
+Route::view('/اتفاقية-المستخدم', 'اتفاقية-المستخدم')->name('اتفاقية-المستخدم');
+Route::view('/القوانين', 'القوانين')->name('القوانين');
+Route::view('/t1', 't1')->name('t1');

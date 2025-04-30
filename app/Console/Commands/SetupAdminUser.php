@@ -28,25 +28,19 @@ class SetupAdminUser extends Command
             return 1;
         }
         
-        // تحديد عمود الدور المستخدم في النظام
-        $roleColumn = null;
-        if (Schema::hasColumn('users', 'role')) {
-            $roleColumn = 'role';
-        } elseif (Schema::hasColumn('users', 'user_type')) {
-            $roleColumn = 'user_type';
-        } elseif (Schema::hasColumn('users', 'type')) {
-            $roleColumn = 'type';
-        } else {
-            $this->error('لا يوجد عمود لتحديد دور المستخدم في جدول المستخدمين!');
-            $this->line('يرجى التأكد من تنفيذ جميع ملفات الهجرة الخاصة بالمستخدمين.');
+        // تحديد عمود الدور المستخدم في النظام - Simplified
+        $roleColumn = 'role'; // Directly use 'role'
+        if (!Schema::hasColumn('users', $roleColumn)) {
+            $this->error("Column 'role' does not exist in the users table!");
+            $this->line('Please ensure migrations are run correctly.');
             return 1;
         }
         
-        // تحديد القيم المسموحة للعمود
-        $validUserTypes = $this->getValidUserTypes($roleColumn);
+        // تحديد القيم المسموحة للعمود - Simplified
+        $validUserTypes = ['admin', 'agency', 'subagent', 'customer']; 
         
         // اختيار القيمة المناسبة للمسؤول
-        $adminType = $this->determineAdminType($validUserTypes);
+        $adminType = 'admin'; // Directly use 'admin'
 
         // توضيح دور المسؤول في النظام
         $this->info('=== صلاحيات المسؤول (Admin) ===');
@@ -58,16 +52,6 @@ class SetupAdminUser extends Command
         $this->line('- مراقبة أنشطة النظام والتقارير');
         $this->line('');
 
-        if ($adminType !== 'admin') {
-            $this->warn("تم استخدام دور '{$adminType}' بدلاً من 'admin' نظراً لقيود قاعدة البيانات.");
-            $this->line("القيم المسموحة في حقل {$roleColumn} هي: " . implode(', ', $validUserTypes));
-        }
-
-        if (!$adminType) {
-            $this->error('لا يوجد قيمة مناسبة لدور المسؤول في النظام!');
-            return 1;
-        }
-        
         // التحقق من وجود مستخدمين بدور مسؤول
         $adminExists = $this->checkForExistingAdmin($roleColumn, $adminType);
         
@@ -113,72 +97,41 @@ class SetupAdminUser extends Command
                 'name' => $name,
                 'email' => $email,
                 'password' => Hash::make($password),
-                $roleColumn => $adminType, // استخدام نوع المستخدم المناسب
+                $roleColumn => $adminType, // Use role column
             ];
 
             // إضافة القيم الافتراضية للأعمدة الموجودة
-            if (in_array('is_active', $columns)) {
-                $userData['is_active'] = true;
-            }
-            
-            if (in_array('phone', $columns)) {
-                $userData['phone'] = $this->ask('رقم الهاتف (اختياري)') ?: null;
+            if (in_array('status', $columns)) {
+                $userData['status'] = 'active'; // Default to active
             }
             
             if (in_array('locale', $columns)) {
-                $userData['locale'] = 'ar'; // افتراضي: اللغة العربية
+                $userData['locale'] = 'en'; // Default admin locale to 'en'
             }
             
-            if (in_array('theme_preference', $columns)) {
-                $userData['theme_preference'] = 'light';
+            if (in_array('theme', $columns)) {
+                $userData['theme'] = 'light'; // Default admin theme
+            }
+
+            if (in_array('email_notifications', $columns)) {
+                $userData['email_notifications'] = true; // Default admin email notifications
             }
             
             // المسؤول لا ينتمي إلى أي وكالة، بل يدير جميع الوكالات
             if (in_array('agency_id', $columns)) {
-                $userData['agency_id'] = null;
-                $this->info('المسؤول لا ينتمي لأي وكالة محددة ولديه صلاحية على جميع الوكالات.');
+                $userData['agency_id'] = null; // Admin has no agency
             }
             
-            if (in_array('parent_id', $columns)) {
-                $userData['parent_id'] = null;
-            }
-            
-            // حذف البيانات غير الضرورية لتجنب أخطاء CHECK constraint
-            if (array_key_exists('agency_id', $userData) && $userData['agency_id'] === 'لا يوجد') {
-                $userData['agency_id'] = null;
-            }
-
-            // معالجة حقول التفضيلات
-            $preferencesColumns = ['preferences', 'user_preferences', 'notification_preferences'];
-            foreach ($preferencesColumns as $column) {
-                if (in_array($column, $columns)) {
-                    $userData[$column] = json_encode([]);
-                }
+            // معالجة حقول التفضيلات (assuming notification_preferences)
+            if (in_array('notification_preferences', $columns)) {
+                 $userData['notification_preferences'] = json_encode(['system' => true, 'email' => true]); // Example default
             }
             
             // إنشاء أو تحديث المستخدم المسؤول
             $user = User::updateOrCreate(
-                ['email' => $email],
+                ['email' => $email], // Find by email
                 $userData
             );
-            
-            // إضافة وسم خاص للمستخدم للإشارة إلى أنه مسؤول
-            if (in_array('is_superadmin', $columns)) {
-                $user->is_superadmin = true;
-                $user->save();
-                $hasSuperAdminFlag = true;
-            } else {
-                $hasSuperAdminFlag = false;
-            }
-            
-            // تعيين حقل is_admin إذا كان موجوداً
-            if (in_array('is_admin', $columns)) {
-                $user->is_admin = true;
-                $user->save();
-                $hasAdminFlag = true;
-            } else {
-                $hasAdminFlag = false;
-            }
             
             $this->info('تم إنشاء حساب المسؤول بنجاح!');
             $this->line('');
@@ -188,65 +141,12 @@ class SetupAdminUser extends Command
             $this->line("الدور: {$user->$roleColumn} (مسؤول)");
             $this->line("الصلاحية: إدارة جميع الوكالات");
             
-            // التحقق من الصلاحيات الإضافية
-            if ($hasSuperAdminFlag) {
-                $this->line("وسم المسؤول العام: مفعّل (is_superadmin = true)");
-            }
-            
-            if ($hasAdminFlag) {
-                $this->line("وسم المسؤول: مفعّل (is_admin = true)");
-            }
-            
-            if (!$hasSuperAdminFlag && !$hasAdminFlag && $adminType !== 'admin') {
-                $this->warn("ملاحظة: لم يتم العثور على وسم إضافي للمسؤول (is_admin/is_superadmin).");
-                $this->warn("الصلاحيات معتمدة فقط على حقل {$roleColumn} = '{$adminType}'");
-            }
-            
             return 0;
         } catch (\Exception $e) {
             $this->error("حدث خطأ أثناء إنشاء المستخدم: " . $e->getMessage());
             
-            // محاولة معالجة حالة خطأ CHECK constraint
-            if (strpos($e->getMessage(), 'CHECK constraint') !== false) {
-                $this->line('');
-                $this->warn("يبدو أن هناك قيودًا على حقل {$roleColumn} في قاعدة البيانات.");
-                $this->line("القيم المقبولة لحقل {$roleColumn} هي: " . implode(', ', $validUserTypes));
-                
-                $adminType = $this->choice(
-                    'يرجى اختيار قيمة صالحة لدور المستخدم المسؤول:',
-                    $validUserTypes
-                );
-                
-                try {
-                    // إعادة المحاولة باستخدام القيمة التي اختارها المستخدم
-                    $userData[$roleColumn] = $adminType;
-                    
-                    // حذف البيانات غير الضرورية لتجنب أخطاء CHECK constraint
-                    if (isset($userData['agency_id']) && $userData['agency_id'] === null) {
-                        unset($userData['agency_id']);
-                    }
-                    
-                    $user = User::updateOrCreate(
-                        ['email' => $email],
-                        $userData
-                    );
-                    
-                    $this->info('تم إنشاء حساب المسؤول بنجاح!');
-                    $this->line('');
-                    $this->line('تفاصيل الحساب:');
-                    $this->line("الاسم: {$user->name}");
-                    $this->line("البريد الإلكتروني: {$user->email}");
-                    $this->line("الدور: {$user->$roleColumn} (مسؤول)");
-                    
-                    return 0;
-                } catch (\Exception $e2) {
-                    $this->error("فشلت المحاولة الثانية لإنشاء المستخدم: " . $e2->getMessage());
-                }
-            }
-            
             if ($this->confirm('هل تريد محاولة إنشاء المستخدم باستخدام استعلام SQL مباشر؟', true)) {
                 try {
-                    // استخدام نوع المستخدم الذي تم اختياره
                     DB::insert(
                         "INSERT INTO users (name, email, password, {$roleColumn}, created_at, updated_at) 
                         VALUES (?, ?, ?, ?, ?, ?)",
@@ -270,7 +170,6 @@ class SetupAdminUser extends Command
                     $this->error("فشل إنشاء المستخدم: " . $sqlEx->getMessage());
                     $this->line("يرجى التحقق من هيكل قاعدة البيانات وإعادة المحاولة.");
                     
-                    // عرض معلومات إضافية للمساعدة في التشخيص
                     $this->line('');
                     $this->line('معلومات تشخيصية:');
                     $this->line('1. أعمدة جدول المستخدمين: ' . implode(', ', $columns));
@@ -289,7 +188,6 @@ class SetupAdminUser extends Command
      */
     private function setTerminalEncoding()
     {
-        // محاولة ضبط ترميز الطرفية
         if (function_exists('mb_internal_encoding')) {
             mb_internal_encoding('UTF-8');
         }
@@ -298,71 +196,13 @@ class SetupAdminUser extends Command
             mb_http_output('UTF-8');
         }
         
-        // محاولة ضبط محلية النظام (locale)
         if (function_exists('setlocale')) {
             setlocale(LC_ALL, 'ar_SA.UTF-8', 'ar_SA', 'ar');
         }
         
-        // تعيين ترميز خرج الـ PHP
         if (function_exists('ini_set')) {
             ini_set('default_charset', 'UTF-8');
         }
-    }
-    
-    /**
-     * الحصول على القيم الصالحة للعمود المحدد في جدول المستخدمين
-     */
-    private function getValidUserTypes(string $roleColumn): array
-    {
-        try {
-            // محاولة جلب القيم الصالحة من الجدول
-            $columnType = DB::select("PRAGMA table_info(users)");
-            foreach ($columnType as $column) {
-                if ($column->name === $roleColumn) {
-                    // للتعامل مع enum في SQLite
-                    if (strpos($column->type, 'enum') !== false) {
-                        preg_match("/enum\s*\(\s*'(.+?)'\s*\)/i", $column->type, $matches);
-                        if (isset($matches[1])) {
-                            return explode("','", $matches[1]);
-                        }
-                    }
-                }
-            }
-            
-            // إذا لم نجد القيم من الجدول، حاول استنتاجها من أحد المستخدمين الموجودين
-            $values = DB::table('users')->select($roleColumn)->distinct()->pluck($roleColumn)->filter()->toArray();
-            if (!empty($values)) {
-                return $values;
-            }
-            
-            // إذا لم يكن هناك مستخدمين، استخدم القيم المتوقعة
-            return ['admin', 'agency', 'subagent', 'customer'];
-        } catch (\Exception $e) {
-            // استخدم القيم الافتراضية كخطة بديلة
-            return ['agency', 'subagent', 'customer'];
-        }
-    }
-    
-    /**
-     * تحديد نوع المستخدم المناسب للمسؤول
-     */
-    private function determineAdminType(array $validUserTypes): string
-    {
-        // البحث عن أنسب دور للمستخدم المسؤول بترتيب الأفضلية
-        if (in_array('admin', $validUserTypes)) {
-            return 'admin';
-        } elseif (in_array('superadmin', $validUserTypes)) {
-            return 'superadmin';
-        } elseif (in_array('administrator', $validUserTypes)) {
-            return 'administrator';
-        } elseif (in_array('admin_user', $validUserTypes)) {
-            return 'admin_user';
-        } elseif (in_array('agency', $validUserTypes)) {
-            return 'agency'; // وكالة كأقرب دور للمسؤول
-        }
-        
-        // إذا لم يتم العثور على قيمة مناسبة، استخدم القيمة الأولى
-        return reset($validUserTypes) ?: '';
     }
     
     /**
@@ -370,19 +210,7 @@ class SetupAdminUser extends Command
      */
     private function checkForExistingAdmin(string $roleColumn, string $adminType): bool
     {
-        // التحقق مما إذا كان المستخدم من نوع 'admin' و 'agency' موجودًا
-        $query = User::where(function ($q) use ($roleColumn, $adminType) {
-            $q->where($roleColumn, $adminType)
-              ->orWhere($roleColumn, 'admin')
-              ->orWhere($roleColumn, 'Admin')
-              ->orWhere($roleColumn, 'superadmin');
-        });
-        
-        // إذا كان هناك عمود is_superadmin، تحقق منه أيضًا
-        if (Schema::hasColumn('users', 'is_superadmin')) {
-            $query->orWhere('is_superadmin', true);
-        }
-        
+        $query = User::where($roleColumn, $adminType);
         return $query->exists();
     }
 }

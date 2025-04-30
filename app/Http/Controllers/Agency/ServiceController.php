@@ -29,9 +29,9 @@ class ServiceController extends Controller
     {
         $serviceTypes = ServiceTypeHelper::getTypes();
         $subagents = \App\Models\User::where('agency_id', Auth::user()->agency_id)
-                                   ->where('user_type', 'subagent')
+                                   ->where('role', 'subagent')
                                    ->get();
-        $currencies = \App\Models\Currency::where('is_active', true)->get();
+        $currencies = \App\Models\Currency::where('status', 'active')->get(); // Use status field
         
         return view('agency.services.create', compact('serviceTypes', 'subagents', 'currencies'));
     }
@@ -46,7 +46,7 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'type' => 'required|string',
             'base_price' => 'required|numeric|min:0',
-            'currency_code' => 'required|exists:currencies,code',
+            'currency_id' => 'required|exists:currencies,id',
             'commission_rate' => 'required|numeric|min:0|max:100',
             'status' => 'required|in:active,inactive',
             'subagents' => 'nullable|array',
@@ -59,7 +59,7 @@ class ServiceController extends Controller
             'agency_id' => Auth::user()->agency_id,
             'type' => $request->type,
             'base_price' => $request->base_price,
-            'currency_code' => $request->currency_code,
+            'currency_id' => $request->currency_id,
             'commission_rate' => $request->commission_rate,
             'status' => $request->status,
         ]);
@@ -102,9 +102,9 @@ class ServiceController extends Controller
 
         $serviceTypes = ServiceTypeHelper::getTypes();
         $subagents = \App\Models\User::where('agency_id', Auth::user()->agency_id)
-                                   ->where('user_type', 'subagent')
+                                   ->where('role', 'subagent')
                                    ->get();
-        $currencies = \App\Models\Currency::where('is_active', true)->get();
+        $currencies = \App\Models\Currency::where('status', 'active')->get(); // Use status field
         
         $selectedSubagents = $service->subagents->pluck('id')->toArray();
         
@@ -126,7 +126,7 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'type' => 'required|string',
             'base_price' => 'required|numeric|min:0',
-            'currency_code' => 'required|exists:currencies,code',
+            'currency_id' => 'required|exists:currencies,id',
             'commission_rate' => 'required|numeric|min:0|max:100',
             'status' => 'required|in:active,inactive',
             'subagents' => 'nullable|array',
@@ -138,7 +138,7 @@ class ServiceController extends Controller
             'description' => $request->description,
             'type' => $request->type,
             'base_price' => $request->base_price,
-            'currency_code' => $request->currency_code,
+            'currency_id' => $request->currency_id,
             'commission_rate' => $request->commission_rate,
             'status' => $request->status,
         ]);

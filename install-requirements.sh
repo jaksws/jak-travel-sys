@@ -183,7 +183,7 @@ setup_sqlite() {
     fi
 }
 
-# تحديث ملف .env
+# تحديث ملف .env لتضمين إعدادات إضافية
 update_env_file() {
     local db_type="$1"
     local db_host="$2"
@@ -192,15 +192,15 @@ update_env_file() {
     local db_user="$5"
     local db_pass="$6"
     local db_path="$7"
-    
+
     if [ ! -f .env ] && [ -f .env.example ]; then
         echo -e "\nنسخ ملف .env.example إلى .env..."
         cp .env.example .env
     fi
-    
+
     if [ -f .env ]; then
         echo -e "\nتحديث ملف .env..."
-        
+
         # تحديث إعدادات قاعدة البيانات
         if [ "$db_type" == "sqlite" ]; then
             sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
@@ -213,7 +213,13 @@ update_env_file() {
             sed -i 's/DB_USERNAME=.*/DB_USERNAME='"$db_user"'/' .env
             sed -i 's/DB_PASSWORD=.*/DB_PASSWORD='"$db_pass"'/' .env
         fi
-        
+
+        # إضافة إعدادات إضافية
+        sed -i '/^APP_DEBUG=/c\APP_DEBUG=true' .env
+        sed -i '/^LOG_LEVEL=/c\LOG_LEVEL=debug' .env
+        sed -i '/^CACHE_DRIVER=/c\CACHE_DRIVER=array' .env
+        sed -i '/^QUEUE_CONNECTION=/c\QUEUE_CONNECTION=sync' .env
+
         echo "✅ تم تحديث ملف .env بنجاح"
     else
         echo "⚠️ ملف .env غير موجود ولم يتم العثور على ملف .env.example"

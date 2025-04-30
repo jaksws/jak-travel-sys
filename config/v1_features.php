@@ -1,82 +1,90 @@
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | ميزات الإصدار 1.0
-    |--------------------------------------------------------------------------
-    |
-    | هذا الملف يحدد حالة تفعيل ميزات الإصدار 1.0 من النظام
-    | يمكنك تفعيل أو تعطيل أي من هذه الميزات حسب الحاجة
-    |
-    */
-
-    'multilingual' => [
-        'enabled' => true,
-        'available_locales' => ['ar', 'en', 'fr', 'tr', 'es', 'id', 'ur'],
-        'default_locale' => 'ar',
-    ],
-
-    'dark_mode' => [
-        'enabled' => true,
-        'default' => 'system', // 'light', 'dark', 'system'
-    ],
-
-    'payment_system' => [
-        'enabled' => true,
-        'providers' => [
-            'mada' => [
-                'enabled' => true,
-                'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('MADA_MERCHANT_ID', ''),
-                    'api_key' => env('MADA_API_KEY', ''),
-                    'secret_key' => env('MADA_SECRET_KEY', ''),
-                ],
-            ],
-            'visa' => [
-                'enabled' => true,
-                'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('VISA_MERCHANT_ID', ''),
-                    'api_key' => env('VISA_API_KEY', ''),
-                ],
-            ],
-            'mastercard' => [
-                'enabled' => true,
-                'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('MASTERCARD_MERCHANT_ID', ''),
-                    'api_key' => env('MASTERCARD_API_KEY', ''),
-                ],
-            ],
-            'apple_pay' => [
-                'enabled' => true,
-                'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('APPLE_PAY_MERCHANT_ID', ''),
-                    'certificate_path' => env('APPLE_PAY_CERTIFICATE_PATH', ''),
-                ],
-            ],
-            'google_pay' => [
-                'enabled' => true,
-                'test_mode' => true,
-                'config' => [
-                    'merchant_id' => env('GOOGLE_PAY_MERCHANT_ID', ''),
-                    'api_key' => env('GOOGLE_PAY_API_KEY', ''),
-                ],
-            ],
-        ],
-    ],
-
-    'enhanced_ui' => [
-        'enabled' => true,
-    ],
-    
-    'ai_features' => [
+    'multilingual' => true,
+    'dark_mode' => true,
+    'payment_system' => true,
+    'enhanced_ui' => true,
+    'ai_features' => false,
+    'backup' => array (
+  'multilingual' => 
+  array (
+    'enabled' => false,
+    'available_locales' => 
+    array (
+      0 => 'ar',
+      1 => 'en',
+      2 => 'fr',
+      3 => 'tr',
+    ),
+    'default_locale' => 'ar',
+  ),
+  'dark_mode' => 
+  array (
+    'enabled' => false,
+    'default' => 'light',
+  ),
+  'payment_system' => 
+  array (
+    'enabled' => false,
+    'providers' => 
+    array (
+      'mada' => 
+      array (
         'enabled' => false,
-        'smart_pricing' => false,
-        'customer_recommendations' => false,
-        'virtual_assistant' => false,
-    ],
+        'test_mode' => true,
+        'config' => 
+        array (
+          'merchant_id' => '',
+          'api_key' => '',
+          'secret_key' => '',
+        ),
+      ),
+      'visa' => 
+      array (
+        'enabled' => false,
+        'test_mode' => true,
+        'config' => 
+        array (
+          'merchant_id' => '',
+          'api_key' => '',
+        ),
+      ),
+      'mastercard' => 
+      array (
+        'enabled' => false,
+        'test_mode' => true,
+        'config' => 
+        array (
+          'merchant_id' => '',
+          'api_key' => '',
+        ),
+      ),
+      'apple_pay' => 
+      array (
+        'enabled' => false,
+        'test_mode' => true,
+        'config' => 
+        array (
+          'merchant_id' => '',
+          'certificate_path' => '',
+        ),
+      ),
+      'google_pay' => 
+      array (
+        'enabled' => false,
+        'test_mode' => true,
+        'config' => 
+        array (
+          'merchant_id' => '',
+          'api_key' => '',
+        ),
+      ),
+    ),
+  ),
+  'enhanced_ui' => 
+  array (
+    'enabled' => true,
+  ),
+),
 ];

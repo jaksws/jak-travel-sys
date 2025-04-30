@@ -45,7 +45,7 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'user_type' => ['required', 'in:agency,subagent,customer'],
+            'role' => ['required', 'in:agency,subagent,customer'],
             'agency_id' => ['nullable', 'exists:agencies,id'],
         ]);
     }
@@ -63,12 +63,12 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'], // Make sure this is properly assigned
             'password' => Hash::make($data['password']),
-            'user_type' => $data['user_type'],
+            'role' => $data['role'],
             'phone' => $data['phone'] ?? null,
         ]);
 
         // If the user is of agency type, create an agency record
-        if ($data['user_type'] === 'agency') {
+        if ($data['role'] === 'agency') {
             // Create agency
             $agency = Agency::create([
                 'name' => $data['agency_name'] ?? $data['name'],
@@ -85,7 +85,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Redirect based on user type after registration
+     * Redirect based on user role after registration
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user

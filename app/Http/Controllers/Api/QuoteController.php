@@ -65,7 +65,7 @@ class QuoteController extends Controller
         $user = $request->user();
         
         // التحقق من الصلاحية (يجب أن يكون وكيل أو وكيل فرعي)
-        if ($user->role !== 'agent' && $user->role !== 'subagent') {
+        if ($user->role !== 'agency' && $user->role !== 'subagent') {
             return response()->json([
                 'message' => 'غير مصرح لك بإنشاء عروض أسعار'
             ], 403);
@@ -325,7 +325,7 @@ class QuoteController extends Controller
         // التحقق من صلاحية العملية (يجب أن يكون العميل صاحب الطلب)
         $user = auth()->user();
         
-        if ($user->role !== 'client' || $quote->request->user_id !== $user->id) {
+        if ($user->role !== 'customer' || $quote->request->user_id !== $user->id) {
             return response()->json([
                 'message' => 'غير مصرح لك بقبول هذا العرض'
             ], 403);
@@ -364,7 +364,7 @@ class QuoteController extends Controller
         // التحقق من صلاحية العملية (يجب أن يكون العميل صاحب الطلب)
         $user = auth()->user();
         
-        if ($user->role !== 'client' || $quote->request->user_id !== $user->id) {
+        if ($user->role !== 'customer' || $quote->request->user_id !== $user->id) {
             return response()->json([
                 'message' => 'غير مصرح لك برفض هذا العرض'
             ], 403);

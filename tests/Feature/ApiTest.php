@@ -22,8 +22,8 @@ class ApiTest extends TestCase
     {
         // إنشاء بيانات اختبار
         $agency = Agency::factory()->create();
-        $agent = User::factory()->create([
-            'role' => 'agent',
+        $agency = User::factory()->create([
+            'role' => 'agency',
             'agency_id' => $agency->id
         ]);
         
@@ -33,7 +33,7 @@ class ApiTest extends TestCase
         ]);
         
         // تجهيز المستخدم مع توكن API
-        Sanctum::actingAs($agent, ['*']);
+        Sanctum::actingAs($agency, ['*']);
         
         // تنفيذ الطلب
         $response = $this->getJson('/api/v1/services');
@@ -55,8 +55,8 @@ class ApiTest extends TestCase
     {
         // إنشاء بيانات اختبار
         $agency = Agency::factory()->create();
-        $agent = User::factory()->create([
-            'role' => 'agent',
+        $agency = User::factory()->create([
+            'role' => 'agency',
             'agency_id' => $agency->id
         ]);
         
@@ -77,7 +77,7 @@ class ApiTest extends TestCase
         ]);
         
         // تجهيز المستخدم مع توكن API
-        Sanctum::actingAs($agent, ['*']);
+        Sanctum::actingAs($agency, ['*']);
         
         // تنفيذ الطلب مع مرشح النوع
         $response = $this->getJson('/api/v1/services?type=' . ServiceTypeHelper::VISA);
@@ -92,8 +92,8 @@ class ApiTest extends TestCase
     {
         // إنشاء بيانات اختبار
         $agency = Agency::factory()->create();
-        $client = User::factory()->create([
-            'role' => 'client',
+        $customer = User::factory()->create([
+            'role' => 'customer',
             'agency_id' => $agency->id
         ]);
         
@@ -102,12 +102,12 @@ class ApiTest extends TestCase
         ]);
         
         // تجهيز المستخدم مع توكن API
-        Sanctum::actingAs($client, ['*']);
+        Sanctum::actingAs($customer, ['*']);
         
         // بيانات الطلب
         $requestData = [
             'service_id' => $service->id,
-            'user_id' => $client->id,  // Make sure we pass the user ID
+            'user_id' => $customer->id,  // Make sure we pass the user ID
             'title' => 'طلب خدمة عبر API',
             'description' => 'وصف تفصيلي للطلب المرسل عبر API',
             'required_date' => now()->addMonth()->format('Y-m-d'),
@@ -128,7 +128,7 @@ class ApiTest extends TestCase
         
         // التحقق من وجود الطلب في قاعدة البيانات
         $this->assertDatabaseHas('requests', [
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'service_id' => $service->id,
             'title' => 'طلب خدمة عبر API',
             'status' => 'pending'
@@ -145,8 +145,8 @@ class ApiTest extends TestCase
             'agency_id' => $agency->id
         ]);
         
-        $client = User::factory()->create([
-            'role' => 'client',
+        $customer = User::factory()->create([
+            'role' => 'customer',
             'agency_id' => $agency->id
         ]);
         
@@ -155,7 +155,7 @@ class ApiTest extends TestCase
         ]);
         
         $request = TravelRequest::factory()->create([
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'service_id' => $service->id
         ]);
         
@@ -167,7 +167,7 @@ class ApiTest extends TestCase
         ]);
         
         // تجهيز المستخدم مع توكن API
-        Sanctum::actingAs($client, ['*']);
+        Sanctum::actingAs($customer, ['*']);
         
         // تنفيذ الطلب
         $response = $this->getJson('/api/v1/quotes/' . $quote->id);
@@ -198,8 +198,8 @@ class ApiTest extends TestCase
     {
         // إنشاء بيانات اختبار
         $agency = Agency::factory()->create();
-        $client = User::factory()->create([
-            'role' => 'client',
+        $customer = User::factory()->create([
+            'role' => 'customer',
             'agency_id' => $agency->id
         ]);
 
@@ -208,12 +208,12 @@ class ApiTest extends TestCase
         ]);
 
         // تجهيز المستخدم مع توكن API
-        Sanctum::actingAs($client, ['*']);
+        Sanctum::actingAs($customer, ['*']);
 
         // بيانات الطلب
         $requestData = [
             'service_id' => $service->id,
-            'user_id' => $client->id,
+            'user_id' => $customer->id,
             'title' => 'طلب خدمة عبر API',
             'description' => 'وصف تفصيلي للطلب المرسل عبر API',
             'required_date' => now()->addMonth()->format('Y-m-d'),
@@ -238,8 +238,8 @@ class ApiTest extends TestCase
     public function it_checks_if_api_handles_errors_correctly()
     {
         // تجهيز المستخدم مع توكن API
-        $client = User::factory()->create(['role' => 'client']);
-        Sanctum::actingAs($client, ['*']);
+        $customer = User::factory()->create(['role' => 'customer']);
+        Sanctum::actingAs($customer, ['*']);
 
         // بيانات الطلب غير مكتملة
         $requestData = [
@@ -247,11 +247,8 @@ class ApiTest extends TestCase
             'description' => 'وصف تفصيلي للطلب المرسل عبر API'
         ];
 
-        // تنفيذ الطلب
         $response = $this->postJson('/api/v1/requests', $requestData);
-
-        // التحقق من النتائج
-        $response->assertStatus(422); // خطأ في التحقق من البيانات
+        $response->assertStatus(422);
         $response->assertJsonStructure([
             'message', 'errors' => ['service_id', 'required_date']
         ]);

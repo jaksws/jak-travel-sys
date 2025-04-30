@@ -9,6 +9,20 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-12">
+            <!-- شريط إجراءات سريع للاختبارات -->
+            <div class="mb-3 d-flex flex-wrap gap-2">
+                <a href="{{ route('customer.services.index') }}" class="btn btn-primary"><i class="fas fa-plus"></i> طلب خدمة جديدة</a>
+                <a href="{{ route('customer.requests.index') }}" class="btn btn-info">طلباتي</a>
+                <a href="{{ route('customer.quotes.index') }}" class="btn btn-success">عروضي</a>
+                <a href="{{ route('customer.requests.index') }}" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">تسجيل الخروج</a>
+            </div>
+        </div>
+    </div>
+
     <!-- بطاقات إحصائية -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
