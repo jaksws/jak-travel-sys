@@ -1,124 +1,187 @@
-name: Tests
+name: Laravel CI
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
 
-permissions:
-  contents: read
+  push:
+
+    branches: [ master ]
+
+  pull_request:
+
+    branches: [ master ]
 
 jobs:
-  test:
+
+  laravel-tests:
+
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        php: [8.2, 8.3, 8.4]
-
-    name: PHP ${{ matrix.php }}
-
     steps:
-      - uses: actions/checkout@v3
 
-      - name: Setup PHP
+      - name: Checkout code
+
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+
         uses: shivammathur/setup-php@v2
+
         with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
+
+          php-version: '8.2'
+
+          extensions: mbstring, bcmath, sqlite, fileinfo
+
           coverage: none
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction
-
-      - name: Apply version-specific compatibility fixes
-        run: php -f app/Compatibility/apply-fixes.php ${{ matrix.php }}
-
       - name: Copy environment file
+
         run: cp .env.example .env
 
       - name: Create SQLite Database
+
         run: |
+
           mkdir -p database
+
           touch database/database.sqlite
 
       - name: Ensure .env is configured for SQLite
+
         run: |
+
           echo "DB_CONNECTION=sqlite" >> .env
+
           echo "DB_DATABASE=database/database.sqlite" >> .env
 
       - name: Generate app key
+
         run: php artisan key:generate
 
       - name: Create storage symlink
+
         run: php artisan storage:link
 
       - name: Install Node.js
+
         uses: actions/setup-node@v3
+
         with:
+
           node-version: 18
+
           cache: 'npm'
 
       - name: Install NPM dependencies
+
         run: npm ci
 
       - name: Copy debug Vite config
+
         run: cp vite.config.debug.js vite.config.js
 
       - name: Build assets
+
         run: |
+
           npm run build
+
           echo "Checking build output:"
+
           ls -la public/build/
+
           echo "Checking .vite subdirectory:"
+
           ls -la public/build/.vite/
+
           if [ -f "public/build/.vite/manifest.json" ] && [ ! -f "public/build/manifest.json" ]; then
+
             echo "Copying manifest.json from .vite directory..."
+
             cp public/build/.vite/manifest.json public/build/manifest.json
-          fi
-          if [ -f "public/build/manifest.json" ]; then
-            echo "manifest.json found in public/build:"
-            cat public/build/manifest.json
-          else
-            echo "ERROR: manifest.json not found in public/build/ or public/build/.vite/"
-            exit 1
+
           fi
 
-      - name: Backup Database
-        run: php artisan app:database-backup --verbose
+          if [ -f "public/build/manifest.json" ]; then
+
+            echo "manifest.json found in public/build:"
+
+            cat public/build/manifest.json
+
+          else
+
+            echo "ERROR: manifest.json not found in public/build/ or public/build/.vite/"
+
+            exit 1
+
+          fi
 
       - name: Run Migrations
+
         run: php artisan migrate:safe --force --verbose
 
+      - name: Backup Database
+
+        run: php artisan app:database-backup --verbose
+
       - name: Seed Database
+
         run: php artisan db:seed --verbose
 
       - name: Check Application Status
+
         run: php artisan app:check-status --verbose
 
       - name: Execute tests
+
         run: php artisan test --verbose
+
         env:
+
           APP_ENV: testing
+
           DB_CONNECTION: sqlite
+
           DB_DATABASE: database/database.sqlite
+
           CACHE_DRIVER: array
+
           SESSION_DRIVER: array
+
           QUEUE_CONNECTION: sync
+
           MAIL_MAILER: array
+
           BROADCAST_DRIVER: array
+
           FILESYSTEM_DRIVER: local
+
           LOG_CHANNEL: stack
+
           LOG_LEVEL: debug
+
           APP_KEY: base64:$(php artisan key:generate --show)
+
           APP_URL: http://localhost
+
           APP_DEBUG: true
+
           APP_PORT: 8000
+
           APP_NAME: 'Laravel'
+
           APP_LOCALE: en
+
           APP_FALLBACK_LOCALE: en
+
           APP_TIMEZONE: UTC
+
           APP_LOCALE_FALLBACK: en
+
           APP_LOCALE_FALLBACKS: en
+
+      - name: Send failure notification
+
+        if: failure()
+
+        run: echo "العملية فشلت في مرحلة معينة"

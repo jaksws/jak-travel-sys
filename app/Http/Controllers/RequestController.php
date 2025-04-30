@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Request as TravelRequest;
+use App\Models\Request as ServiceRequest;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,7 @@ class RequestController extends Controller
     public function index(Request $request)
     {
         // For agents, show requests related to their agency
-        $query = TravelRequest::query();
+        $query = ServiceRequest::query();
         
         if (Auth::user()->isAgent()) {
             $query->where('agency_id', Auth::user()->agency_id);
@@ -38,7 +38,7 @@ class RequestController extends Controller
             abort(403, 'Unauthorized');
         }
         
-        $requests = TravelRequest::with(['service', 'user'])->latest()->paginate(15);
+        $requests = ServiceRequest::with(['service', 'user'])->latest()->paginate(15);
         
         return view('admin.requests.index', compact('requests'));
     }
@@ -70,12 +70,12 @@ class RequestController extends Controller
         $req = TravelRequest::create($data);
 
         return redirect()->route('requests.show', $req);
-    }
+
 
     /**
      * Display the specified request.
      */
-    public function show(TravelRequest $request)
+    public function show(ServiceRequest $request)
     {
         return view('requests.show', ['request' => $request]);
     }
