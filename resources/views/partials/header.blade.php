@@ -7,6 +7,9 @@
         <button class="navbar-toggler border-0 focus:outline-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="تبديل التنقل">
             <i class="fas fa-bars text-primary"></i>
         </button>
+        <button class="btn btn-primary d-md-none" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <!-- القائمة العلوية على اليمين -->
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
@@ -244,6 +247,11 @@
                 });
             });
         });
+    });
+
+    // Toggle sidebar visibility
+    document.getElementById('sidebarToggle').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.toggle('show');
     });
 </script>
 @endpush

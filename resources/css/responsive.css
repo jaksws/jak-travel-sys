@@ -20,11 +20,11 @@
         right: -250px;
         height: 100%;
         z-index: 1040;
-        transition: right 0.3s ease;
+        transition: right 0.3s ease; /* P554a */
     }
     
     .sidebar.show {
-        right: 0;
+        right: 0; /* P492e */
     }
     
     .main-content {

@@ -168,6 +168,7 @@
             position: sticky;
             top: 72px;
             padding-top: 20px;
+            transition: right 0.3s ease; /* P2e61 */
         }
         
         .sidebar .nav-link {
@@ -197,8 +198,58 @@
         
         @media (max-width: 767.98px) {
             .sidebar {
-                position: static;
-                margin-bottom: 20px;
+                position: fixed;
+                right: -250px; /* P492e */
+                width: 250px; /* P2ab4 */
+                height: 100%;
+                z-index: 1040;
+                transition: right 0.3s ease; /* P554a */
+            }
+            
+            .sidebar.show {
+                right: 0; /* P492e */
+            }
+            
+            .sidebar .nav-link {
+                display: block; /* P68cd */
+                padding: 10px 15px; /* P68cd */
+                margin: 5px 0; /* P68cd */
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 10px; /* P4dfd */
+            }
+            
+            .sidebar .nav-link span {
+                display: inline-block; /* P4dfd */
+                vertical-align: middle; /* P4dfd */
+            }
+            
+            .sidebar .nav-link.active {
+                background-color: var(--primary-color); /* P614a */
+                color: #fff; /* P614a */
+            }
+            
+            .sidebar .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1); /* P7847 */
+                color: #fff; /* P7847 */
+            }
+            
+            .main-content {
+                margin-right: 0;
+                width: 100%;
+            }
+            
+            .navbar-toggler {
+                display: block;
+            }
+            
+            .dashboard-stats .stat-card {
+                margin-bottom: 15px;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
             }
         }
         
@@ -221,7 +272,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <!-- Sidebar -->
-                        <div class="col-md-3 col-lg-2 sidebar">
+                        <div class="col-md-3 col-lg-2 sidebar collapsible"> <!-- P674c -->
                             @include('partials.sidebar')
                         </div>
                         
