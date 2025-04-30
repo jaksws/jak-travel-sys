@@ -160,7 +160,7 @@ jobs:
 
           LOG_LEVEL: debug
 
-          APP_KEY: base64:$(php artisan key:generate --show)
+          APP_KEY: ${{ env.APP_KEY }}
 
           APP_URL: http://localhost
 
