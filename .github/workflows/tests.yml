@@ -76,7 +76,10 @@ jobs:
             exit 1
           fi
 
-      - name: Run Migrations
+      - name: Run Initial Migrations
+        run: php artisan migrate --force --verbose
+
+      - name: Run Safe Migrations
         run: php artisan migrate:safe --force --verbose
 
       - name: Backup Database
