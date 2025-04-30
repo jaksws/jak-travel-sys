@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\Agency;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\QueryException;
 
 // Reviewed on 2023-10-01 by John Doe
 
@@ -53,51 +54,63 @@ class RequestSeeder extends Seeder
             // طلب موافقة أمنية
             $service = $services->where('type', 'security_approval')->first();
             if ($service) {
-                ServiceRequest::create([
-                    'service_id' => $service->id,
-                    'customer_id' => $customer->id,
-                    'agency_id' => $yemenAgency->id,
-                    'details' => 'أحتاج إلى موافقة أمنية لزيارة مصر لمدة شهر بغرض السياحة.',
-                    'priority' => 'normal',
-                    'status' => 'pending',
-                    'requested_date' => Carbon::now()->addDays(7),
-                    'created_at' => Carbon::now()->subDays(5),
-                    'updated_at' => Carbon::now()->subDays(5),
-                ]);
+                try {
+                    ServiceRequest::create([
+                        'service_id' => $service->id,
+                        'customer_id' => $customer->id,
+                        'agency_id' => $yemenAgency->id,
+                        'details' => 'أحتاج إلى موافقة أمنية لزيارة مصر لمدة شهر بغرض السياحة.',
+                        'priority' => 'normal',
+                        'status' => 'pending',
+                        'requested_date' => Carbon::now()->addDays(7),
+                        'created_at' => Carbon::now()->subDays(5),
+                        'updated_at' => Carbon::now()->subDays(5),
+                    ]);
+                } catch (QueryException $e) {
+                    $this->command->error("Failed to insert security approval request for customer ID {$customer->id}: " . $e->getMessage());
+                }
             }
             
             // طلب نقل بري
             $service = $services->where('type', 'transportation')->first();
             if ($service) {
-                ServiceRequest::create([
-                    'service_id' => $service->id,
-                    'customer_id' => $customer->id,
-                    'agency_id' => $yemenAgency->id,
-                    'details' => 'أحتاج إلى خدمة نقل من صنعاء إلى عدن لشخصين بتاريخ ' . Carbon::now()->addDays(10)->format('Y-m-d'),
-                    'priority' => 'urgent',
-                    'status' => 'in_progress',
-                    'requested_date' => Carbon::now()->addDays(10),
-                    'created_at' => Carbon::now()->subDays(3),
-                    'updated_at' => Carbon::now()->subDays(2),
-                ]);
+                try {
+                    ServiceRequest::create([
+                        'service_id' => $service->id,
+                        'customer_id' => $customer->id,
+                        'agency_id' => $yemenAgency->id,
+                        'details' => 'أحتاج إلى خدمة نقل من صنعاء إلى عدن لشخصين بتاريخ ' . Carbon::now()->addDays(10)->format('Y-m-d'),
+                        'priority' => 'urgent',
+                        'status' => 'in_progress',
+                        'requested_date' => Carbon::now()->addDays(10),
+                        'created_at' => Carbon::now()->subDays(3),
+                        'updated_at' => Carbon::now()->subDays(2),
+                    ]);
+                } catch (QueryException $e) {
+                    $this->command->error("Failed to insert transportation request for customer ID {$customer->id}: " . $e->getMessage());
+                }
             }
             
             // طلب تذكرة طيران
             $service = $services->where('type', 'flight')->first();
             if ($service) {
-                ServiceRequest::create([
-                    'service_id' => $service->id,
-                    'customer_id' => $customer->id,
-                    'agency_id' => $yemenAgency->id,
-                    'details' => 'أحتاج حجز تذكرة طيران من صنعاء إلى القاهرة ذهاب وعودة للفترة من ' . 
-                             Carbon::now()->addDays(15)->format('Y-m-d') . ' إلى ' . 
-                             Carbon::now()->addDays(30)->format('Y-m-d'),
-                    'priority' => 'normal',
-                    'status' => 'completed',
-                    'requested_date' => Carbon::now()->addDays(15),
-                    'created_at' => Carbon::now()->subDays(15),
-                    'updated_at' => Carbon::now()->subDays(10),
-                ]);
+                try {
+                    ServiceRequest::create([
+                        'service_id' => $service->id,
+                        'customer_id' => $customer->id,
+                        'agency_id' => $yemenAgency->id,
+                        'details' => 'أحتاج حجز تذكرة طيران من صنعاء إلى القاهرة ذهاب وعودة للفترة من ' . 
+                                 Carbon::now()->addDays(15)->format('Y-m-d') . ' إلى ' . 
+                                 Carbon::now()->addDays(30)->format('Y-m-d'),
+                        'priority' => 'normal',
+                        'status' => 'completed',
+                        'requested_date' => Carbon::now()->addDays(15),
+                        'created_at' => Carbon::now()->subDays(15),
+                        'updated_at' => Carbon::now()->subDays(10),
+                    ]);
+                } catch (QueryException $e) {
+                    $this->command->error("Failed to insert flight request for customer ID {$customer->id}: " . $e->getMessage());
+                }
             }
         }
     }

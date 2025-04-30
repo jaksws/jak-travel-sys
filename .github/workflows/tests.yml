@@ -85,6 +85,9 @@ jobs:
       - name: Backup Database
         run: php artisan app:database-backup --verbose
 
+      - name: Run Migrations Before Seeding
+        run: php artisan migrate --force --verbose
+
       - name: Seed Database
         run: php artisan db:seed --verbose
 
