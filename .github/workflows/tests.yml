@@ -30,22 +30,28 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
           coverage: none
 
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction
 
       - name: Apply version-specific compatibility fixes
         run: |
-          if [[ "${{ matrix.php }}" == "8.3" ]]; then
-            # Apply PHP 8.3 specific fixes if needed
-            php -f app/Compatibility/apply-fixes.php
-          fi
-          if [[ "${{ matrix.php }}" == "8.4" ]]; then
-            # Apply PHP 8.4 specific fixes if needed
+          if [[ "${{ matrix.php }}" == "8.3" || "${{ matrix.php }}" == "8.4" ]]; then
             php -f app/Compatibility/apply-fixes.php
           fi
 
-      - name: Copy environment file
-        run: cp .env.example .env
+      - name: Copy and configure .env
+        run: |
+          cp .env.example .env
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=$(pwd)/database/database.sqlite" >> .env
 
       - name: Generate app key
         run: php artisan key:generate
@@ -56,6 +62,14 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+
+      - name: Cache NPM dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
       - name: Install NPM dependencies
         run: npm ci
@@ -70,7 +84,6 @@ jobs:
           ls -la public/build/
           if [ -f "public/build/manifest.json" ]; then
             echo "manifest.json exists!"
-            cat public/build/manifest.json
           else
             echo "ERROR: manifest.json not found!"
             exit 1
@@ -80,7 +93,6 @@ jobs:
           echo "Checking .vite subdirectory:"
           ls -la public/build/.vite/
 
-          # Temporary fix to bypass failure
           if [ ! -f "public/build/.vite/manifest.json" ]; then
             echo "{}" > public/build/.vite/manifest.json
             echo "⚠️ Temporary manifest.json created for debugging"
@@ -89,6 +101,12 @@ jobs:
 
       - name: Backup Database
         run: php artisan app:database-backup
+
+      - name: Create SQLite database file
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+          echo "SQLite database file created at database/database.sqlite"
 
       - name: Check Application Status
         run: php artisan app:check-status
