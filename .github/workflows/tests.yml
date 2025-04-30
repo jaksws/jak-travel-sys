@@ -59,50 +59,22 @@ jobs:
             touch database/database.sqlite
           fi
 
-      - name: Check Database Structure
+      - name: Check and Create Migrations Table
         run: |
-          # التحقق من أن جدول migrations موجود
+          # التحقق من وجود جدول migrations
           if ! php artisan migrate:status; then
             echo "جدول الترحيلات غير موجود، إنشاءه الآن..."
             php artisan migrate:install
           fi
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Cache NPM dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Copy debug Vite config
-        run: cp vite.config.debug.js vite.config.js
-
-      - name: Build assets
-        run: |
-          npm run build
-          if [ ! -f "public/build/.vite/manifest.json" ]; then
-            echo "{}" > public/build/.vite/manifest.json
-          fi
-          cp public/build/.vite/manifest.json public/build/manifest.json
+      - name: Run Migrations
+        run: php artisan migrate --force
 
       - name: Backup Database
         run: php artisan app:database-backup
 
       - name: Check Application Status
         run: php artisan app:check-status
-
-      - name: Run Migrations
-        run: php artisan migrate:safe --force
 
       - name: Seed Database
         run: php artisan db:seed
