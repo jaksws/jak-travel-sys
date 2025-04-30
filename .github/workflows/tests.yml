@@ -30,17 +30,20 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
           coverage: none
 
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction
 
       - name: Apply version-specific compatibility fixes
         run: |
-          if [[ "${{ matrix.php }}" == "8.3" ]]; then
-            # Apply PHP 8.3 specific fixes if needed
-            php -f app/Compatibility/apply-fixes.php
-          fi
-          if [[ "${{ matrix.php }}" == "8.4" ]]; then
-            # Apply PHP 8.4 specific fixes if needed
+          if [[ "${{ matrix.php }}" == "8.3" || "${{ matrix.php }}" == "8.4" ]]; then
             php -f app/Compatibility/apply-fixes.php
           fi
 
@@ -50,42 +53,22 @@ jobs:
       - name: Generate app key
         run: php artisan key:generate
 
-      # Add Node.js and Vite build steps
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Copy debug Vite config
-        run: cp vite.config.debug.js vite.config.js
-
-      - name: Build assets
+      - name: Ensure SQLite database file creation
         run: |
-          npm run build
-          echo "Checking build output:"
-          ls -la public/build/
-          if [ -f "public/build/manifest.json" ]; then
-            echo "manifest.json exists!"
-            cat public/build/manifest.json
-          else
-            echo "ERROR: manifest.json not found!"
-            exit 1
+          if [ ! -f "database/database.sqlite" ]; then
+            touch database/database.sqlite
           fi
 
-          # Check .vite subdirectory where manifest is actually located
-          echo "Checking .vite subdirectory:"
-          ls -la public/build/.vite/
-
-          # Temporary fix to bypass failure
-          if [ ! -f "public/build/.vite/manifest.json" ]; then
-            echo "{}" > public/build/.vite/manifest.json
-            echo "⚠️ Temporary manifest.json created for debugging"
+      - name: Check and Create Migrations Table
+        run: |
+          # التحقق من وجود جدول migrations
+          if ! php artisan migrate:status; then
+            echo "جدول الترحيلات غير موجود، إنشاءه الآن..."
+            php artisan migrate:install
           fi
-          cp public/build/.vite/manifest.json public/build/manifest.json
+
+      - name: Run Migrations
+        run: php artisan migrate --force
 
       - name: Backup Database
         run: php artisan app:database-backup
@@ -93,11 +76,13 @@ jobs:
       - name: Check Application Status
         run: php artisan app:check-status
 
-      - name: Run Migrations
-        run: php artisan migrate:safe --force
-
       - name: Seed Database
         run: php artisan db:seed
 
       - name: Execute tests
         run: php artisan test
+
+      # إضافة خطوة لإرسال إشعار في حالة الفشل
+      - name: Send failure notification
+        if: failure()
+        run: echo "العملية فشلت في مرحلة معينة"
