@@ -16,20 +16,29 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // حماية إضافية: لا تسمح بتشغيل هذا السييدر إلا في بيئة الاختبار
+        // Extra protection: Only allow running this seeder in the testing environment
         if (!app()->environment('testing')) {
-            throw new \Exception('UserSeeder can only be run in the testing environment!');
+            // Show a warning and confirmation message to the user in the terminal
+            fwrite(STDOUT, "Warning: Running this seeder will affect user data.\n");
+            fwrite(STDOUT, "Are you sure you want to continue? Type 'yes' and press Enter to proceed, or anything else to skip: ");
+            $handle = fopen ("php://stdin","r");
+            $line = trim(fgets($handle));
+            fclose($handle);
+            if ($line !== 'yes') {
+                fwrite(STDOUT, "UserSeeder skipped.\n");
+                return; // Skip only this seeder
+            }
         }
 
         $isTesting = app()->environment('testing');
         $faker = \Faker\Factory::create();
 
-        // جلب الوكالات المنشأة سابقاً
+        // Fetch previously created agencies
         $yemenAgency = Agency::where('email', 'info@yemen-travel.com')->first();
         $gulfAgency = Agency::where('email', 'info@gulf-travel.com')->first();
         
         if ($yemenAgency) {
-            // إنشاء مستخدم وكيل لوكالة اليمن
+            // Create agency admin for Yemen agency
             $agencyAdminEmail = $isTesting ? $faker->unique()->safeEmail() : 'admin@yemen-travel.com';
             $agencyAdmin = User::firstOrCreate(
                 ['email' => $agencyAdminEmail],
@@ -45,7 +54,7 @@ class UserSeeder extends Seeder
                 ]
             );
             
-            // إنشاء سبوكلاء لوكالة اليمن
+            // Create subagents for Yemen agency
             $subagent1Email = $isTesting ? $faker->unique()->safeEmail() : 'ahmed@yemen-travel.com';
             $subagent1 = User::firstOrCreate(
                 ['email' => $subagent1Email],
@@ -76,7 +85,7 @@ class UserSeeder extends Seeder
                 ]
             );
             
-            // إنشاء عملاء لوكالة اليمن
+            // Create customers for Yemen agency
             $customer1Email = $isTesting ? $faker->unique()->safeEmail() : 'salem@example.com';
             User::firstOrCreate(
                 ['email' => $customer1Email],
@@ -109,7 +118,7 @@ class UserSeeder extends Seeder
         }
         
         if ($gulfAgency) {
-            // إنشاء مستخدم وكيل لوكالة الخليج
+            // Create agency admin for Gulf agency
             $gulfAdminEmail = $isTesting ? $faker->unique()->safeEmail() : 'admin@gulf-travel.com';
             $gulfAdmin = User::firstOrCreate(
                 ['email' => $gulfAdminEmail],
@@ -125,7 +134,7 @@ class UserSeeder extends Seeder
                 ]
             );
             
-            // إنشاء سبوكيل لوكالة الخليج
+            // Create subagent for Gulf agency
             $subagentEmail = $isTesting ? $faker->unique()->safeEmail() : 'khaled@gulf-travel.com';
             User::firstOrCreate(
                 ['email' => $subagentEmail],
@@ -141,7 +150,7 @@ class UserSeeder extends Seeder
                 ]
             );
             
-            // إنشاء عميل لوكالة الخليج
+            // Create customer for Gulf agency
             $customerEmail = $isTesting ? $faker->unique()->safeEmail() : 'abdullah@example.com';
             User::firstOrCreate(
                 ['email' => $customerEmail],
@@ -158,7 +167,7 @@ class UserSeeder extends Seeder
             );
         }
         
-        // إنشاء مستخدم متميز للاختبار السريع
+        // Create a premium user for quick testing
         $testUserEmail = $isTesting ? $faker->unique()->safeEmail() : 'test@example.com';
         User::firstOrCreate(
             ['email' => $testUserEmail],
@@ -189,7 +198,7 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // في بيئة الاختبار: تأكد من وجود مستخدم أدمن ثابت يمكن استخدامه في اختبارات Dusk
+        // In testing environment: Ensure a fixed admin user exists for Dusk tests
         if ($isTesting) {
             User::firstOrCreate(
                 ['email' => 'admin@dusk-test.com'],
