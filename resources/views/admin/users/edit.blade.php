@@ -145,7 +145,7 @@
 </div>
 
 <!-- نموذج تأكيد الحذف -->
-<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true" dusk="delete-user-modal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
