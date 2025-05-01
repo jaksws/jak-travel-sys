@@ -9,6 +9,7 @@
 @section('content')
 <div class="container-fluid" dusk="requests-page">
     <h1 class="mb-4 text-xl font-bold">لوحة تحكم المسؤول</h1>
+    <p class="mb-4">مرحباً، {{ auth()->user()->name }}</p>
 
     <!-- شريط إجراءات سريع للاختبارات -->
     <div class="row mb-4">

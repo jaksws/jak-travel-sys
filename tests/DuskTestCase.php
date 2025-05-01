@@ -54,6 +54,20 @@ abstract class DuskTestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // حماية إضافية: لا تسمح بتشغيل اختبارات Dusk إلا في بيئة الاختبار
+        if (!app()->environment('testing')) {
+            throw new \Exception('Dusk tests can only be run in the testing environment!');
+        }
+
+        // Ensure SQLite database file exists (for Dusk testing)
+        if (env('DB_CONNECTION') === 'sqlite' && env('DB_DATABASE') && !str_contains(env('DB_DATABASE'), ':memory:')) {
+            $dbPath = base_path(env('DB_DATABASE'));
+            if (!file_exists($dbPath)) {
+                // Create the SQLite file if it doesn't exist
+                file_put_contents($dbPath, '');
+            }
+        }
+
         // Run fresh migrations
         Artisan::call('migrate:fresh');
 

@@ -17,6 +17,11 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // حماية إضافية: لا تسمح بتشغيل اختبارات PHPUnit إلا في بيئة الاختبار
+        if (!app()->environment('testing')) {
+            throw new \Exception('PHPUnit tests can only be run in the testing environment!');
+        }
         
         // Set up the app for testing
         // $this->withoutExceptionHandling(); // تم التعليق حتى تعمل اختبارات التحقق بشكل صحيح
