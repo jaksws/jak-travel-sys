@@ -6,6 +6,7 @@ use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
 
@@ -44,5 +45,19 @@ abstract class DuskTestCase extends BaseTestCase
                 ChromeOptions::CAPABILITY, $options
             )
         );
+    }
+
+    /**
+     * Reset database before each test.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Run fresh migrations
+        Artisan::call('migrate:fresh');
+
+        // Seed the database if needed
+        Artisan::call('db:seed');
     }
 }
