@@ -36,6 +36,27 @@ return new class extends Migration
             if (!Schema::hasColumn('agencies', 'social_media_linkedin')) {
                 $table->string('social_media_linkedin')->nullable();
             }
+            if (!Schema::hasColumn('agencies', 'footer_text')) {
+                $table->json('footer_text')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'footer_links')) {
+                $table->json('footer_links')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'footer_services')) {
+                $table->json('footer_services')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'footer_social')) {
+                $table->json('footer_social')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'contact_phone')) {
+                $table->string('contact_phone')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'contact_email')) {
+                $table->string('contact_email')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'contact_address')) {
+                $table->string('contact_address')->nullable();
+            }
         });
     }
 
@@ -54,6 +75,13 @@ return new class extends Migration
                 'social_media_twitter',
                 'social_media_facebook',
                 'social_media_linkedin',
+                'footer_text',
+                'footer_links',
+                'footer_services',
+                'footer_social',
+                'contact_phone',
+                'contact_email',
+                'contact_address',
             ];
             foreach ($columns as $col) {
                 if (Schema::hasColumn('agencies', $col)) {
