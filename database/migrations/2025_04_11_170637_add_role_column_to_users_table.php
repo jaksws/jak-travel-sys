@@ -19,7 +19,7 @@ return new class extends Migration
             
             // إضافة عمود معرف الوكالة إذا لم يكن موجودًا
             if (!Schema::hasColumn('users', 'agency_id')) {
-                $table->foreignId('agency_id')->nullable()->after('id')->constrained()->nullOnDelete();
+                $table->foreignId('agency_id')->nullable()->after('id')->constrained('agencies')->nullOnDelete();
             }
         });
     }
