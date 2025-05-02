@@ -74,7 +74,7 @@ return new class extends Migration
         }
         
         // حذف عمود symbol_position من جدول currencies إذا كان موجوداً
-        if (Schema::hasTable('currencies') && Schema::hasColumn('symbol_position')) {
+        if (Schema::hasTable('currencies') && Schema::hasColumn('currencies', 'symbol_position')) {
             Schema::table('currencies', function (Blueprint $table) {
                 $table->dropColumn('symbol_position');
             });
