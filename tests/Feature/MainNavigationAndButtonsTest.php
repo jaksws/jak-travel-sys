@@ -10,7 +10,7 @@ class MainNavigationAndButtonsTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function welcome_page_has_main_dashboard_links_and_auth_buttons()
     {
         $response = $this->get('/');
@@ -20,7 +20,7 @@ class MainNavigationAndButtonsTest extends TestCase
         // لا تتحقق من روابط لوحة التحكم لأنها لا تظهر إلا بعد تسجيل الدخول
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function subagent_services_show_page_has_main_action_buttons()
     {
         $subagent = User::factory()->create(['role' => 'subagent']);
@@ -37,7 +37,7 @@ class MainNavigationAndButtonsTest extends TestCase
         $response->assertSee(route('subagent.quotes.index', ['service_id' => $service->id]));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_preferences_page_has_save_button()
     {
         $user = User::factory()->create();

@@ -125,7 +125,7 @@ class DashboardController extends Controller
         $orderDir = $request->order_dir ?? 'desc';
         $query->orderBy($orderBy, $orderDir);
 
-        $users = $query->paginate(15);
+        $users = $query->orderBy('created_at', 'desc')->paginate(15);
 
         return view('admin.users.index', compact('users'));
     }

@@ -66,7 +66,7 @@
                         </a>
                     </li>
                     <li class="nav-item mb-1">
-                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.requests.*') ? 'active' : '' }}" href="{{ route('admin.requests.index') }}">
+                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.requests.*') ? 'active' : '' }}" href="{{ route('admin.requests.index') }}" dusk="manage-requests-link">
                             <div class="icon-circle flex-shrink-0 me-2">
                                 <i class="fas fa-clipboard-list fa-fw"></i>
                             </div>
@@ -80,7 +80,7 @@
                 </div>
                 <ul class="nav flex-column mb-3">
                     <li class="nav-item mb-1">
-                        <a class="nav-link d-flex align-items-center {{ request()->is('admin/settings*') ? 'active' : '' }}" href="/admin/settings">
+                        <a class="nav-link d-flex align-items-center {{ request()->is('admin/settings*') ? 'active' : '' }}" href="/admin/settings" dusk="settings-link">
                             <div class="icon-circle flex-shrink-0 me-2">
                                 <i class="fas fa-cog fa-fw"></i>
                             </div>
@@ -88,7 +88,7 @@
                         </a>
                     </li>
                     <li class="nav-item mb-1">
-                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.system.logs') ? 'active' : '' }}" href="{{ route('admin.system.logs') }}">
+                        <a class="nav-link d-flex align-items-center {{ request()->routeIs('admin.system.logs') ? 'active' : '' }}" href="{{ route('admin.system.logs') }}" dusk="quick-link-system-logs">
                             <div class="icon-circle flex-shrink-0 me-2">
                                 <i class="fas fa-file-alt fa-fw"></i>
                             </div>
@@ -368,7 +368,7 @@
             </li>
             <li class="nav-item mb-1">
                 <a class="nav-link d-flex align-items-center text-danger" href="{{ route('logout') }}"
-                   onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
+                   onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();" dusk="logout-link">
                     <div class="icon-circle flex-shrink-0 me-2">
                         <i class="fas fa-sign-out-alt fa-fw"></i>
                     </div>

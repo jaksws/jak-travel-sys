@@ -130,9 +130,35 @@
                                             @csrf
                                             @method('PATCH')
                                         </form>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal-{{ $user->id }}" dusk="delete-user-button-{{ $user->id }}">حذف</button>
                                     </div>
                                 </td>
                             </tr>
+                            <!-- حذف مودال لكل مستخدم -->
+                            <div class="modal fade" id="deleteUserModal-{{ $user->id }}" tabindex="-1" aria-labelledby="deleteUserModalLabel-{{ $user->id }}" aria-hidden="true" dusk="delete-user-modal-{{ $user->id }}">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteUserModalLabel-{{ $user->id }}">تأكيد الحذف</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-danger mb-0">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                هل أنت متأكد من رغبتك في حذف هذا المستخدم؟ هذا الإجراء لا يمكن التراجع عنه وسيؤدي إلى حذف جميع البيانات المرتبطة به.
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger" dusk="confirm-delete-button">نعم، قم بالحذف</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @empty
                             <tr>
                                 <td colspan="7" class="text-center py-4">لم يتم العثور على أي مستخدمين</td>

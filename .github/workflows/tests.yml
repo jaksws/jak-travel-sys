@@ -30,11 +30,22 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
           coverage: none
 
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction
 
       - name: Apply version-specific compatibility fixes
-        run: php -f app/Compatibility/apply-fixes.php ${{ matrix.php }}
+        run: |
+          if [[ "${{ matrix.php }}" == "8.3" || "${{ matrix.php }}" == "8.4" ]]; then
+            php -f app/Compatibility/apply-fixes.php
+          fi
 
       - name: Copy environment file
         run: cp .env.example .env
@@ -49,8 +60,8 @@ jobs:
           echo "DB_CONNECTION=sqlite" >> .env
           echo "DB_DATABASE=database/database.sqlite" >> .env
 
-      - name: Generate app key
-        run: php artisan key:generate
+      - name: Generate app key and export
+        run: echo "APP_KEY=$(php artisan key:generate --show)" >> $GITHUB_ENV
 
       - name: Create storage symlink
         run: php artisan storage:link
@@ -86,20 +97,33 @@ jobs:
             exit 1
           fi
 
-      - name: Backup Database
-        run: php artisan app:database-backup --verbose
+      - name: Ensure SQLite database file creation
+        run: |
+          if [ ! -f "database/database.sqlite" ]; then
+            touch database/database.sqlite
+          fi
+
+      - name: Check and Create Migrations Table
+        run: |
+          if ! php artisan migrate:status; then
+            echo "Migrations table not found. Creating..."
+            php artisan migrate:install
+          fi
 
       - name: Run Migrations
-        run: php artisan migrate:safe --force --verbose
+        run: php artisan migrate:safe --force
+
+      - name: Backup Database
+        run: php artisan app:database-backup
 
       - name: Seed Database
-        run: php artisan db:seed --verbose
+        run: php artisan db:seed
 
       - name: Check Application Status
-        run: php artisan app:check-status --verbose
+        run: php artisan app:check-status
 
       - name: Execute tests
-        run: php artisan test --verbose
+        run: php artisan test
         env:
           APP_ENV: testing
           DB_CONNECTION: sqlite
@@ -112,7 +136,6 @@ jobs:
           FILESYSTEM_DRIVER: local
           LOG_CHANNEL: stack
           LOG_LEVEL: debug
-          APP_KEY: base64:$(php artisan key:generate --show)
           APP_URL: http://localhost
           APP_DEBUG: true
           APP_PORT: 8000
@@ -120,5 +143,7 @@ jobs:
           APP_LOCALE: en
           APP_FALLBACK_LOCALE: en
           APP_TIMEZONE: UTC
-          APP_LOCALE_FALLBACK: en
-          APP_LOCALE_FALLBACKS: en
+
+      - name: Send failure notification
+        if: failure()
+        run: echo "⚠️ The GitHub Actions workflow failed."

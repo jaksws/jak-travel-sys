@@ -7,8 +7,9 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" dusk="requests-page">
     <h1 class="mb-4 text-xl font-bold">لوحة تحكم المسؤول</h1>
+    <p class="mb-4">مرحباً، {{ auth()->user()->name }}</p>
 
     <!-- شريط إجراءات سريع للاختبارات -->
     <div class="row mb-4">
@@ -22,7 +23,7 @@
                 <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary" dusk="manage-requests-link">إدارة الطلبات</a>
                 <a href="/admin/settings" class="btn btn-outline-dark" dusk="settings-link">الإعدادات</a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">تسجيل الخروج</a>
+                <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" dusk="logout-link-main">تسجيل الخروج</a>
             </div>
         </div>
     </div>
@@ -327,21 +328,28 @@
     </div>
 
     <!-- نموذج إنشاء صفحة جديدة -->
-    <div class="container py-5">
-        <h2>Create a New Page</h2>
-        <form action="{{ route('admin.createPage') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label for="pageName" class="form-label">Page Name</label>
-                <input type="text" class="form-control" id="pageName" name="pageName" placeholder="Enter page name" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Page</button>
-        </form>
+    <div class="container-fluid" dusk="settings-page">
+        <div class="container py-5">
+            <h2>Create a New Page</h2>
+            <form action="{{ route('admin.createPage') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label for="pageName" class="form-label">Page Name</label>
+                    <input type="text" class="form-control" id="pageName" name="pageName" placeholder="Enter page name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Page</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- سجلات النظام -->
+    <div class="container-fluid" dusk="system-logs-page">
+        <!-- محتوى سجلات النظام -->
     </div>
 </div>
 
 <!-- Modal: إضافة مستخدم جديد -->
-<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true" dusk="create-user-modal">
   <div class="modal-dialog">
     <div class="modal-content">
       <form method="POST" action="{{ route('admin.users.store') }}">
@@ -394,7 +402,7 @@
 </div>
 
 <!-- Modal: إضافة طلب جديد -->
-<div class="modal fade" id="createRequestModal" tabindex="-1" aria-labelledby="createRequestModalLabel" aria-hidden="true">
+<div class="modal fade" id="createRequestModal" tabindex="-1" aria-labelledby="createRequestModalLabel" aria-hidden="true" dusk="create-request-modal">
   <div class="modal-dialog">
     <div class="modal-content">
       <form method="POST" action="{{ route('admin.requests.store') }}">

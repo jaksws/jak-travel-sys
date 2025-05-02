@@ -14,6 +14,28 @@ class AgencySeeder extends Seeder
      */
     public function run(): void
     {
+        // تأكد من وجود الوكالات الأساسية دائماً في بيئة الاختبار
+        if (app()->environment('testing')) {
+            \App\Models\Agency::firstOrCreate(
+                ['email' => 'info@yemen-travel.com'],
+                [
+                    'name' => 'وكالة اليمن للسفر والسياحة',
+                    'phone' => '777123456',
+                    'address' => 'صنعاء - شارع جمال عبد الناصر',
+                    'status' => 'active'
+                ]
+            );
+            \App\Models\Agency::firstOrCreate(
+                ['email' => 'info@gulf-travel.com'],
+                [
+                    'name' => 'وكالة الخليج للسفريات',
+                    'phone' => '777654321',
+                    'address' => 'عدن - المنصورة',
+                    'status' => 'active'
+                ]
+            );
+        }
+
         // Use firstOrCreate to avoid duplicate entries
         Agency::firstOrCreate(
             ['email' => 'info@yemen-travel.com'],

@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" dusk="settings-page">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">إعدادات النظام</h1>
     </div>

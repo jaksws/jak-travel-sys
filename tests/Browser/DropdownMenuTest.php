@@ -26,9 +26,9 @@ class DropdownMenuTest extends DuskTestCase
 
     /**
      * Test user dropdown.
-     * @group dropdown
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Group('dropdown')]
     public function testUserCanOpenUserDropdownMenuInHeader(): void
     {
         $this->browse(function (Browser $browser) {
@@ -43,9 +43,9 @@ class DropdownMenuTest extends DuskTestCase
 
      /**
      * Test notifications dropdown.
-     * @group dropdown
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Group('dropdown')]
     public function testUserCanOpenNotificationsDropdownMenuInHeader(): void
     {
         $this->browse(function (Browser $browser) {
@@ -60,9 +60,9 @@ class DropdownMenuTest extends DuskTestCase
 
     /**
      * Test user dropdown menu links.
-     * @group dropdown
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\Group('dropdown')]
     public function testUserDropdownMenuShowsProfileAndLogoutLinks(): void
     {
         $this->browse(function (Browser $browser) {
