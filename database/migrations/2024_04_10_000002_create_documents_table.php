@@ -11,22 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('documents')) {
-            Schema::drop('documents');
+        if (!Schema::hasTable('documents')) {
+            Schema::create('documents', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('file_path');
+                $table->string('file_type')->nullable();
+                $table->unsignedBigInteger('size')->nullable();
+                $table->morphs('documentable');
+                $table->foreignId('uploaded_by')->constrained('users');
+                $table->enum('visibility', ['private', 'agency', 'customer', 'public'])->default('private');
+                $table->text('notes')->nullable();
+                $table->timestamps();
+            });
         }
-
-        Schema::create('documents', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('file_path');
-            $table->string('file_type')->nullable();
-            $table->unsignedBigInteger('size')->nullable();
-            $table->morphs('documentable');
-            $table->foreignId('uploaded_by')->constrained('users');
-            $table->enum('visibility', ['public', 'private', 'agency'])->default('public');
-            $table->text('notes')->nullable();
-            $table->timestamps();
-        });
     }
 
     /**

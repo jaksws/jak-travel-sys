@@ -222,7 +222,7 @@ class SafeMigrate extends Command
             foreach ($columns as $column) {
                 if (!Schema::hasColumn($table, $column)) {
                     $issues[] = "Required constraint '{$column}' does not exist in table '{$table}'.";
-                    Log::error("Required constraint '{$column}' does not exist in table '{$table}'.");
+                    Log::error("Required column '{$column}' does not exist in table '{$table}'.");
                 } else {
                     Log::info("Constraint '{$column}' exists in table '{$table}'.");
                 }

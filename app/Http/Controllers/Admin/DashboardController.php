@@ -908,8 +908,11 @@ class DashboardController extends Controller
     {
         $validated = $request->validate([
             'role_based_settings' => 'nullable|array',
+            'role_based_settings.*' => 'nullable|boolean', // Ensure each value is a boolean
             'audit_logs' => 'nullable|array',
+            'audit_logs.*' => 'nullable|boolean', // Ensure each value is a boolean
             'customizable_themes' => 'nullable|array',
+            'customizable_themes.*' => 'nullable|string|max:255', // Ensure each value is a string with a max length
         ]);
 
         $agency = auth()->user()->agency;
