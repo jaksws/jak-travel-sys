@@ -74,7 +74,18 @@ class SafeMigrate extends Command
         $this->info("Migration complete: {$migrated} tables migrated, {$skipped} tables skipped.");
         
         // Ensure all migrations are run before seeding
-        Artisan::call('migrate');
+        try {
+            if (!Schema::hasTable('migrations')) {
+                $this->error("The 'migrations' table does not exist. Please ensure all migrations are run.");
+                return Command::FAILURE;
+            }
+
+            $this->runArtisanMigrateWithRetry();
+        } catch (Throwable $e) {
+            $this->error("Migration failed: {$e->getMessage()}");
+            Log::error("Migration failed: {$e->getMessage()}");
+            return Command::FAILURE;
+        }
 
         // Check for the existence of the `requests` table before seeding
         if (!Schema::hasTable('requests')) {
@@ -270,6 +281,34 @@ class SafeMigrate extends Command
 
                 if ($attempt > $retries) {
                     $this->error("Migration failed after {$retries} retries: {$relativePath}");
+                    return;
+                }
+
+                sleep($delay);
+            }
+        }
+    }
+
+    /**
+     * Run the Artisan migrate command with retry mechanism.
+     */
+    private function runArtisanMigrateWithRetry()
+    {
+        $retries = (int) $this->option('retries');
+        $delay = (int) $this->option('delay');
+        $attempt = 0;
+
+        while ($attempt <= $retries) {
+            try {
+                Artisan::call('migrate');
+                Log::info("Artisan migrate command successful.");
+                return;
+            } catch (Throwable $e) {
+                $attempt++;
+                Log::error("Artisan migrate command failed, Attempt: {$attempt}, Error: {$e->getMessage()}");
+
+                if ($attempt > $retries) {
+                    $this->error("Artisan migrate command failed after {$retries} retries.");
                     return;
                 }
 
