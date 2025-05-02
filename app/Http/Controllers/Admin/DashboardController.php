@@ -937,7 +937,9 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'footer_preview' => 'nullable|string',
             'drag_and_drop_links' => 'nullable|array',
+            'drag_and_drop_links.*' => 'nullable|string|max:255', // Ensure each link is a string with a max length
             'additional_contact_methods' => 'nullable|array',
+            'additional_contact_methods.*' => 'nullable|string|max:255', // Ensure each contact method is a string with a max length
         ]);
 
         $agency = auth()->user()->agency;
