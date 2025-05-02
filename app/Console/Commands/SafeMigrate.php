@@ -237,7 +237,7 @@ class SafeMigrate extends Command
             'quotes' => ['id', 'price']
         ];
         foreach ($requiredColumns as $table => $columns) {
-            foreach ($ columns as $column) {
+            foreach ($columns as $column) {
                 if (!Schema::hasColumn($table, $column)) {
                     $issues[] = "Required column '{$column}' does not exist in table '{$table}' after migration.";
                     Log::error("Required column '{$column}' does not exist in table '{$table}' after migration.");
