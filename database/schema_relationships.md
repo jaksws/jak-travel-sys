@@ -4,7 +4,7 @@
 
 ### agencies (الوكالات)
 - id (PK)
-- user_id (FK → users.id, nullable)
+- user_id (FK → users.id, nullable) - Represents the primary user or administrator associated with the agency.
 - name
 - logo (nullable)
 - phone

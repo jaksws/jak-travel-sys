@@ -27,7 +27,7 @@
 ## 1. currencies (العملات)
 - 2024_04_07_000001_create_currencies_table.php
 - 2025_04_11_174037_add_missing_columns_to_tables.php
-- 2025_04_11_184724_add_unique_constraint_to_currencies_table.php
+- 2025_04_11_184724_add_unique_constraint_to_currencies_table.php: Adds a unique constraint to the currencies table to ensure no duplicate entries.
 
 ## 2. users (المستخدمون)
 - 0001_01_01_000000_create_users_table.php
