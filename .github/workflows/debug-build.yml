@@ -148,7 +148,7 @@ jobs:
         run: php artisan app:check-status
 
       - name: Run Migrations
-        run: php artisan migrate --force
+        run: php artisan migrate
 
       - name: Seed Database
         run: php artisan db:seed

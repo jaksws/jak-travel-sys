@@ -104,7 +104,7 @@ jobs:
           fi
 
       - name: Run Migrations
-        run: php artisan migrate --force
+        run: php artisan migrate
 
       - name: Backup Database
         run: php artisan app:database-backup
