@@ -31,6 +31,9 @@ return new class extends Migration
             $table->string('locale', 10)->default('ar');
             $table->string('theme')->nullable(); // Consolidated theme preference
             $table->boolean('email_notifications')->default(true); // Defaulting to true, adjust if needed
+            $table->string('phone')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_admin')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
