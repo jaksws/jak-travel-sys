@@ -39,7 +39,7 @@ jobs:
         run: mkdir -p public/storage
 
       - name: Run migrations
-        run: php artisan migrate:safe --force
+        run: php artisan migrate --force
 
       - name: Create cache table
         run: php artisan cache:table && php artisan migrate --force
