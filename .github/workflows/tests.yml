@@ -103,15 +103,8 @@ jobs:
             touch database/database.sqlite
           fi
 
-      - name: Check and Create Migrations Table
-        run: |
-          if ! php artisan migrate:status; then
-            echo "Migrations table not found. Creating..."
-            php artisan migrate:install
-          fi
-
       - name: Run Migrations
-        run: php artisan migrate:safe --force
+        run: php artisan migrate --force
 
       - name: Backup Database
         run: php artisan app:database-backup
