@@ -1,1 +1,6 @@
-{"image":"mcr.microsoft.com/devcontainers/universal:2"}
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "tasks": {
+    "build": "composer install && npm install && npm run build"
+  }
+}

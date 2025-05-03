@@ -10,7 +10,7 @@ class ServiceButtonAndRouteTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function agency_services_page_shows_add_service_button_and_create_route()
     {
         $agency = User::factory()->create(['role' => 'agency']);
@@ -23,7 +23,7 @@ class ServiceButtonAndRouteTest extends TestCase
         $createResponse->assertSee('اسم الخدمة');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function subagent_services_page_shows_add_service_button_and_create_route()
     {
         $subagent = User::factory()->create(['role' => 'subagent']);
@@ -36,7 +36,7 @@ class ServiceButtonAndRouteTest extends TestCase
         $createResponse->assertSee('اسم الخدمة');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function agency_services_index_page_has_main_buttons_and_links()
     {
         $agency = User::factory()->create(['role' => 'agency']);
@@ -49,7 +49,7 @@ class ServiceButtonAndRouteTest extends TestCase
         $response->assertSee('حذف');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function subagent_services_index_page_has_main_buttons_and_links()
     {
         $subagent = User::factory()->create(['role' => 'subagent']);

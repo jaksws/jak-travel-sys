@@ -24,25 +24,49 @@ class DatabaseStructureTest extends TestCase
 
     public function test_users_table_columns_exist()
     {
-        $columns = ['id', 'name', 'email', 'password', 'role', 'status'];
+        $columns = [
+            'id', 'name', 'email', 'password', 'role', 'status', 'agency_id', 'phone',
+            'avatar', 'id_number', 'passport_number', 'nationality', 'city', 'country',
+            'preferred_currency', 'notification_preferences', 'locale', 'theme',
+            'email_notifications', 'is_admin', 'remember_token', 'created_at', 'updated_at'
+        ];
         foreach ($columns as $col) {
-            $this->assertTrue(Schema::hasColumn('users', $col), "Column '$col' missing in users table");
+            $this->assertTrue(
+                Schema::hasColumn('users', $col),
+                "Column '$col' missing in users table"
+            );
         }
     }
 
     public function test_agencies_table_columns_exist()
     {
-        $columns = ['id', 'name', 'status'];
+        $columns = [
+            'id', 'name', 'status', 'logo', 'phone', 'email', 'address', 'license_number',
+            'default_commission_rate', 'default_currency', 'price_decimals', 'price_display_format',
+            'notification_settings', 'email_settings', 'commission_settings', 'theme_color',
+            'agency_language', 'social_media_instagram', 'social_media_twitter',
+            'social_media_facebook', 'social_media_linkedin', 'website', 'description',
+            'created_at', 'updated_at'
+        ];
         foreach ($columns as $col) {
-            $this->assertTrue(Schema::hasColumn('agencies', $col), "Column '$col' missing in agencies table");
+            $this->assertTrue(
+                Schema::hasColumn('agencies', $col),
+                "Column '$col' missing in agencies table"
+            );
         }
     }
 
     public function test_services_table_columns_exist()
     {
-        $columns = ['id', 'name', 'agency_id', 'type'];
+        $columns = [
+            'id', 'name', 'agency_id', 'type', 'description', 'status', 'base_price',
+            'commission_rate', 'currency_code', 'image', 'price', 'created_at', 'updated_at'
+        ];
         foreach ($columns as $col) {
-            $this->assertTrue(Schema::hasColumn('services', $col), "Column '$col' missing in services table");
+            $this->assertTrue(
+                Schema::hasColumn('services', $col),
+                "Column '$col' missing in services table"
+            );
         }
     }
 

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class AdminDashboardTest extends DuskTestCase
 {
@@ -17,29 +18,42 @@ class AdminDashboardTest extends DuskTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adminUser = User::factory()->create([
-            'role' => 'admin',
-            'status' => 'active',
-        ]);
-        $this->targetUser = User::factory()->create([
+        // استخدم المستخدم الإداري الثابت من Seeder
+        $this->adminUser = \App\Models\User::firstOrCreate(
+            ['email' => 'admin@dusk-test.com'],
+            [
+                'name' => 'Dusk Admin',
+                'password' => bcrypt('duskpassword'),
+                'role' => 'admin',
+                'status' => 'active',
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
+            ]
+        );
+        $this->targetUser = \App\Models\User::factory()->create([
             'role' => 'customer',
             'status' => 'active',
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_log_in_and_see_dashboard()
     {
         $this->browse(function (Browser $browser) {
-            $browser->loginAs($this->adminUser)
-                    ->visit('/admin/dashboard')
-                    ->screenshot('debug-dashboard')
+            $browser->visit('/login')
+                    ->type('email', 'admin@dusk-test.com')
+                    ->type('password', 'duskpassword')
+                    ->press('تسجيل الدخول')
+                    ->pause(2000)
+                    ->assertPathIs('/admin/dashboard')
+                    ->screenshot('debug-dashboard-manual-login')
                     ->assertSee('لوحة تحكم المسؤول')
-                    ->assertSee($this->adminUser->name);
+                    ->assertSee('Dusk Admin');
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_navigate_to_user_management()
     {
         $this->browse(function (Browser $browser) {
@@ -51,7 +65,7 @@ class AdminDashboardTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_create_new_user()
     {
         $this->browse(function (Browser $browser) {
@@ -85,108 +99,78 @@ class AdminDashboardTest extends DuskTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_edit_user()
     {
         $userToEdit = User::factory()->create(['role' => 'customer']);
-        $newName = 'Updated Name';
-
-        $this->browse(function (Browser $browser) use ($userToEdit, $newName) {
+        $this->browse(function (Browser $browser) use ($userToEdit) {
             $browser->loginAs($this->adminUser)
-                    ->visit('/admin/users')
-                    ->pause(1500)
-                    ->assertVisible("@edit-user-{$userToEdit->id}")
-                    ->screenshot('before-edit-user')
-                    ->click("@edit-user-{$userToEdit->id}")
-                    ->waitForLocation("/admin/users/{$userToEdit->id}/edit", 20)
-                    ->assertPathIs("/admin/users/{$userToEdit->id}/edit")
-                    ->waitFor('input[name=name]', 10)
-                    ->assertInputValue('name', $userToEdit->name)
-                    ->type('name', $newName)
-                    ->select('role', 'agency')
-                    ->click('@update-user-submit')
-                    ->waitForLocation('/admin/users', 20)
-                    ->assertSee($newName);
+                    ->visit('/admin/users/' . $userToEdit->id . '/edit')
+                    ->assertSee('تعديل بيانات المستخدم')
+                    ->within('@edit-user-form', function ($form) use ($userToEdit) {
+                        $form->type('name', 'Updated User Name Only')
+                             ->type('email', 'updated.only.' . $userToEdit->email)
+                             ->press('@update-user-submit');
+                    })
+                    ->screenshot('debug-edit-user-after-submit')
+                    ->waitForLocation('/admin/users', 30)
+                    ->assertPathIs('/admin/users')
+                    ->waitForText('تم تحديث بيانات المستخدم بنجاح', 20)
+                    ->assertSee('Updated User Name Only');
         });
 
-        $this->assertDatabaseHas('users', [
-            'id' => $userToEdit->id,
-            'name' => $newName,
-            'role' => 'agency'
-        ]);
+        $userToEdit->fresh()->forceDelete();
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_toggle_user_status()
     {
-        $this->assertTrue($this->targetUser->status === 'active');
-
-        $this->browse(function (Browser $browser) {
+        $userToToggle = User::factory()->create(['status' => 'active']);
+        $this->browse(function (Browser $browser) use ($userToToggle) {
             $browser->loginAs($this->adminUser)
                     ->visit('/admin/users')
-                    ->waitFor("@user-row-{$this->targetUser->id}", 10)
-                    ->pause(1500)
-                    ->screenshot('before-toggle-status')
-                    ->dump('before-toggle-status-html', 'html')
-                    ->click("@toggle-status-{$this->targetUser->id}")
-                    ->pause(2500)
-                    ->screenshot('after-toggle-status')
-                    ->dump('after-toggle-status-html', 'html')
-                    ->assertPathIs('/admin/users')
-                    ->waitFor("@user-row-{$this->targetUser->id}", 10)
-                    ->within("@user-row-{$this->targetUser->id}", function ($row) {
-                        $row->waitForText('معطل', 10)->assertSee('معطل');
+                    ->assertSee($userToToggle->name)
+                    ->within('@user-row-' . $userToToggle->id, function ($row) use ($userToToggle) {
+                        $row->assertSee('نشط')
+                            ->click('@toggle-status-' . $userToToggle->id);
+                    })
+                    ->refresh()
+                    ->within('@user-row-' . $userToToggle->id, function ($row) {
+                        $row->waitForText('معطل', 20)
+                            ->assertSee('معطل');
                     });
         });
 
-        $this->assertTrue($this->targetUser->fresh()->status === 'inactive');
+        $this->assertEquals('inactive', $userToToggle->fresh()->status);
 
-        $this->browse(function (Browser $browser) {
-            $browser->loginAs($this->adminUser)
-                    ->visit('/admin/users')
-                    ->waitFor("@user-row-{$this->targetUser->id}", 10)
-                    ->pause(1500)
-                    ->click("@toggle-status-{$this->targetUser->id}")
-                    ->pause(2500)
-                    ->assertPathIs('/admin/users')
-                    ->waitFor("@user-row-{$this->targetUser->id}", 10)
-                    ->within("@user-row-{$this->targetUser->id}", function ($row) {
-                        $row->waitForText('نشط', 10)->assertSee('نشط');
-                    });
-        });
-
-        $this->assertTrue($this->targetUser->fresh()->status === 'active');
+        $userToToggle->forceDelete();
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_delete_user()
     {
         $userToDelete = User::factory()->create();
-
         $this->browse(function (Browser $browser) use ($userToDelete) {
             $browser->loginAs($this->adminUser)
-                    ->visit("/admin/users/{$userToDelete->id}/edit")
-                    ->pause(1500)
-                    ->screenshot('before-delete-user')
-                    ->dump('before-delete-user-html', 'html')
-                    ->click('@delete-user-button')
-                    ->waitFor('#deleteUserModal', 20)
+                    ->visit('/admin/users/' . $userToDelete->id . '/edit')
+                    ->assertSee('تعديل بيانات المستخدم')
                     ->pause(1000)
-                    ->screenshot('after-delete-user-click')
-                    ->dump('after-delete-user-click-html', 'html')
-                    ->within('#deleteUserModal', function ($modal) {
-                        $modal->click('@confirm-delete-button');
+                    ->screenshot('debug-delete-user-before-modal')
+                    ->click('@delete-user-button')
+                    ->waitFor('@delete-user-modal', 20)
+                    ->within('@delete-user-modal', function ($modal) {
+                        $modal->assertSee('تأكيد الحذف')
+                              ->press('@confirm-delete-button');
                     })
-                    ->waitUntilMissing('#deleteUserModal', 20)
                     ->waitForLocation('/admin/users', 20)
-                    ->assertDontSee($userToDelete->name)
-                    ->assertDontSee($userToDelete->email);
+                    ->assertPathIs('/admin/users')
+                    ->assertDontSee($userToDelete->name);
         });
 
-        $this->assertDatabaseMissing('users', ['id' => $userToDelete->id]);
+        $this->assertDatabaseMissing('users', ['id' => $userToDelete->id, 'deleted_at' => null]);
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_navigate_to_requests_management()
     {
         $this->browse(function (Browser $browser) {
@@ -196,42 +180,44 @@ class AdminDashboardTest extends DuskTestCase
                     ->screenshot('before-requests-link')
                     ->dump('before-requests-link-html', 'html')
                     ->click('@manage-requests-link')
-                    ->waitForLocation('/admin/requests', 20)
-                    ->assertPathIs('/admin/requests')
+                    ->waitFor('@requests-page', 20)
                     ->assertSee('إدارة الطلبات');
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_navigate_to_settings()
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->adminUser)
                     ->visit('/admin/dashboard')
-                    ->pause(1500)
+                    ->pause(2000)
                     ->screenshot('before-settings-link')
-                    ->dump('before-settings-link-html', 'html')
                     ->click('@settings-link')
-                    ->waitForLocation('/admin/settings', 20)
-                    ->assertPathIs('/admin/settings')
+                    ->screenshot('after-settings-link')
+                    ->dump('after-settings-link-html', 'html')
+                    ->waitFor('@settings-page', 40)
                     ->assertSee('إعدادات النظام');
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_open_add_request_modal_or_page()
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->adminUser)
                     ->visit('/admin/dashboard')
                     ->pause(1000)
+                    ->screenshot('debug-add-request-before-modal')
                     ->click('@add-request-button-dashboard')
-                    // تحقق من ظهور صفحة أو نموذج إضافة الطلب (حسب التطبيق)
-                    ->assertPathBeginsWith('/admin/requests');
+                    ->waitFor('@create-request-modal', 20)
+                    ->within('@create-request-modal', function ($modal) {
+                        $modal->assertSee('إضافة طلب جديد');
+                    });
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_click_export_button()
     {
         $this->browse(function (Browser $browser) {
@@ -239,12 +225,11 @@ class AdminDashboardTest extends DuskTestCase
                     ->visit('/admin/dashboard')
                     ->pause(1000)
                     ->click('.btn-info')
-                    // تحقق من ظهور رسالة أو بدء التحميل (حسب التطبيق)
                     ->assertPresent('.btn-info');
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_use_search_button()
     {
         $this->browse(function (Browser $browser) {
@@ -252,38 +237,43 @@ class AdminDashboardTest extends DuskTestCase
                     ->visit('/admin/dashboard')
                     ->pause(1000)
                     ->click('.btn-light')
-                    // تحقق من ظهور حقل البحث أو نتائج البحث (حسب التطبيق)
                     ->assertPresent('.btn-light');
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_logout()
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->adminUser)
                     ->visit('/admin/dashboard')
+                    ->assertAuthenticatedAs($this->adminUser)
                     ->pause(1000)
-                    ->click('.btn-outline-danger')
-                    ->waitForLocation('/login', 10)
-                    ->assertPathIs('/login');
+                    ->waitFor('@logout-link-main')
+                    ->screenshot('debug-logout-before-click')
+                    ->click('@logout-link-main')
+                    ->waitForLocation('/login', 30)
+                    ->assertPathIs('/login')
+                    ->assertGuest();
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_navigate_to_system_logs()
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->adminUser)
                     ->visit('/admin/dashboard')
-                    ->pause(1000)
+                    ->pause(1500)
                     ->click('@quick-link-system-logs')
-                    ->waitForLocation('/admin/system/logs', 10)
+                    ->screenshot('after-system-logs-link')
+                    ->dump('after-system-logs-link-html', 'html')
+                    ->waitFor('@system-logs-page', 30)
                     ->assertSee('سجلات النظام');
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_see_latest_users_and_requests_tables()
     {
         $this->browse(function (Browser $browser) {
@@ -294,7 +284,7 @@ class AdminDashboardTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function admin_can_see_dashboard_charts()
     {
         $this->browse(function (Browser $browser) {

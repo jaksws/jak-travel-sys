@@ -6,6 +6,7 @@ use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
 
@@ -44,5 +45,33 @@ abstract class DuskTestCase extends BaseTestCase
                 ChromeOptions::CAPABILITY, $options
             )
         );
+    }
+
+    /**
+     * Reset database before each test.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // حماية إضافية: لا تسمح بتشغيل اختبارات Dusk إلا في بيئة الاختبار
+        if (!app()->environment('testing')) {
+            throw new \Exception('Dusk tests can only be run in the testing environment!');
+        }
+
+        // Ensure SQLite database file exists (for Dusk testing)
+        if (env('DB_CONNECTION') === 'sqlite' && env('DB_DATABASE') && !str_contains(env('DB_DATABASE'), ':memory:')) {
+            $dbPath = base_path(env('DB_DATABASE'));
+            if (!file_exists($dbPath)) {
+                // Create the SQLite file if it doesn't exist
+                file_put_contents($dbPath, '');
+            }
+        }
+
+        // Run fresh migrations
+        Artisan::call('migrate:fresh');
+
+        // Seed the database if needed
+        Artisan::call('db:seed');
     }
 }

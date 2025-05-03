@@ -7,33 +7,34 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
-    <h1 class="mb-4 text-xl font-bold">لوحة تحكم المسؤول</h1>
-
-    <!-- شريط إجراءات سريع للاختبارات -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="mb-3 d-flex flex-wrap gap-2">
-                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal" dusk="add-user-button"><i class="fas fa-plus"></i> إضافة مستخدم</a>
-                <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createRequestModal" dusk="add-request-button-dashboard"><i class="fas fa-plus"></i> إضافة طلب</a>
-                <a href="#" class="btn btn-info" id="export-requests-btn"><i class="fas fa-file-export"></i> تصدير</a>
-                <a href="#" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
-                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary" dusk="manage-users-link">إدارة المستخدمين</a>
-                <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary" dusk="manage-requests-link">إدارة الطلبات</a>
-                <a href="/admin/settings" class="btn btn-outline-dark" dusk="settings-link">الإعدادات</a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">تسجيل الخروج</a>
-            </div>
+<div class="container-fluid" dusk="requests-page">
+    {{-- تحسين العنوان والترحيب --}}
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2 text-xl font-bold"><i class="fas fa-tachometer-alt me-2"></i> لوحة تحكم المسؤول</h1>
+            <p class="mb-0 text-muted">مرحباً، {{ auth()->user()->name }}</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal" dusk="add-user-button"><i class="fas fa-plus"></i> إضافة مستخدم</a>
+            <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createRequestModal" dusk="add-request-button-dashboard"><i class="fas fa-plus"></i> إضافة طلب</a>
+            <a href="#" class="btn btn-info" id="export-requests-btn"><i class="fas fa-file-export"></i> تصدير</a>
+            <a href="#" class="btn btn-light"><i class="fas fa-search"></i> بحث</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary" dusk="manage-users-link">إدارة المستخدمين</a>
+            <a href="{{ route('admin.requests.index') }}" class="btn btn-outline-secondary" dusk="manage-requests-link">إدارة الطلبات</a>
+            <a href="/admin/settings" class="btn btn-outline-dark" dusk="settings-link">الإعدادات</a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+            <a href="#" class="btn btn-outline-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" dusk="logout-link-main">تسجيل الخروج</a>
         </div>
     </div>
 
     <!-- إحصائيات سريعة -->
     <div class="row mb-4">
+        {{-- تحسين مظهر الكروت بإضافة ظل وألوان أيقونات أوضح --}}
         <div class="col-md-2 col-sm-6 mb-3">
-            <div class="card h-100">
+            <div class="card h-100 shadow border-0">
                 <div class="card-body text-center">
-                    <div class="icon-circle mx-auto mb-2 bg-primary-100 text-primary">
-                        <i class="fas fa-users"></i>
+                    <div class="icon-circle mx-auto mb-2 bg-primary text-white" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                        <i class="fas fa-users fa-lg"></i>
                     </div>
                     <h5 class="card-title">المستخدمين</h5>
                     <h3 class="mb-0 font-weight-bold">{{ $stats['users'] }}</h3>
@@ -41,10 +42,10 @@
             </div>
         </div>
         <div class="col-md-2 col-sm-6 mb-3">
-            <div class="card h-100">
+            <div class="card h-100 shadow border-0">
                 <div class="card-body text-center">
-                    <div class="icon-circle mx-auto mb-2 bg-success-100 text-success">
-                        <i class="fas fa-building"></i>
+                    <div class="icon-circle mx-auto mb-2 bg-success text-white" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                        <i class="fas fa-building fa-lg"></i>
                     </div>
                     <h5 class="card-title">الوكالات</h5>
                     <h3 class="mb-0 font-weight-bold">{{ $stats['agencies'] }}</h3>
@@ -52,10 +53,10 @@
             </div>
         </div>
         <div class="col-md-2 col-sm-6 mb-3">
-            <div class="card h-100">
+            <div class="card h-100 shadow border-0">
                 <div class="card-body text-center">
-                    <div class="icon-circle mx-auto mb-2 bg-info-100 text-info">
-                        <i class="fas fa-concierge-bell"></i>
+                    <div class="icon-circle mx-auto mb-2 bg-info text-white" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                        <i class="fas fa-concierge-bell fa-lg"></i>
                     </div>
                     <h5 class="card-title">الخدمات</h5>
                     <h3 class="mb-0 font-weight-bold">{{ $stats['services'] }}</h3>
@@ -63,10 +64,10 @@
             </div>
         </div>
         <div class="col-md-2 col-sm-6 mb-3">
-            <div class="card h-100">
+            <div class="card h-100 shadow border-0">
                 <div class="card-body text-center">
-                    <div class="icon-circle mx-auto mb-2 bg-warning-100 text-warning">
-                        <i class="fas fa-clipboard-list"></i>
+                    <div class="icon-circle mx-auto mb-2 bg-warning text-white" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                        <i class="fas fa-clipboard-list fa-lg"></i>
                     </div>
                     <h5 class="card-title">الطلبات</h5>
                     <h3 class="mb-0 font-weight-bold">{{ $stats['requests'] }}</h3>
@@ -74,10 +75,10 @@
             </div>
         </div>
         <div class="col-md-2 col-sm-6 mb-3">
-            <div class="card h-100">
+            <div class="card h-100 shadow border-0">
                 <div class="card-body text-center">
-                    <div class="icon-circle mx-auto mb-2 bg-danger-100 text-danger">
-                        <i class="fas fa-file-invoice-dollar"></i>
+                    <div class="icon-circle mx-auto mb-2 bg-danger text-white" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                        <i class="fas fa-file-invoice-dollar fa-lg"></i>
                     </div>
                     <h5 class="card-title">عروض الأسعار</h5>
                     <h3 class="mb-0 font-weight-bold">{{ $stats['quotes'] }}</h3>
@@ -85,10 +86,10 @@
             </div>
         </div>
         <div class="col-md-2 col-sm-6 mb-3">
-            <div class="card h-100">
+            <div class="card h-100 shadow border-0">
                 <div class="card-body text-center">
-                    <div class="icon-circle mx-auto mb-2 bg-secondary-100 text-secondary">
-                        <i class="fas fa-money-bill-wave"></i>
+                    <div class="icon-circle mx-auto mb-2 bg-secondary text-white" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+                        <i class="fas fa-money-bill-wave fa-lg"></i>
                     </div>
                     <h5 class="card-title">المعاملات</h5>
                     <h3 class="mb-0 font-weight-bold">{{ $stats['transactions'] }}</h3>
@@ -326,22 +327,14 @@
         </div>
     </div>
 
-    <!-- نموذج إنشاء صفحة جديدة -->
-    <div class="container py-5">
-        <h2>Create a New Page</h2>
-        <form action="{{ route('admin.createPage') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label for="pageName" class="form-label">Page Name</label>
-                <input type="text" class="form-control" id="pageName" name="pageName" placeholder="Enter page name" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Page</button>
-        </form>
+    <!-- سجلات النظام -->
+    <div class="container-fluid" dusk="system-logs-page">
+        <!-- محتوى سجلات النظام -->
     </div>
 </div>
 
 <!-- Modal: إضافة مستخدم جديد -->
-<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true" dusk="create-user-modal">
   <div class="modal-dialog">
     <div class="modal-content">
       <form method="POST" action="{{ route('admin.users.store') }}">
@@ -394,7 +387,7 @@
 </div>
 
 <!-- Modal: إضافة طلب جديد -->
-<div class="modal fade" id="createRequestModal" tabindex="-1" aria-labelledby="createRequestModalLabel" aria-hidden="true">
+<div class="modal fade" id="createRequestModal" tabindex="-1" aria-labelledby="createRequestModalLabel" aria-hidden="true" dusk="create-request-modal">
   <div class="modal-dialog">
     <div class="modal-content">
       <form method="POST" action="{{ route('admin.requests.store') }}">

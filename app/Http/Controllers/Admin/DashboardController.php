@@ -125,7 +125,7 @@ class DashboardController extends Controller
         $orderDir = $request->order_dir ?? 'desc';
         $query->orderBy($orderBy, $orderDir);
 
-        $users = $query->paginate(15);
+        $users = $query->orderBy('created_at', 'desc')->paginate(15);
 
         return view('admin.users.index', compact('users'));
     }
@@ -336,6 +336,9 @@ class DashboardController extends Controller
             'payment_system' => config('v1_features.payment_system'),
             'enhanced_ui' => config('v1_features.enhanced_ui'),
             'ai_features' => config('v1_features.ai_features'),
+            'contact_phone' => config('ui.footer.contact.phone', ''),
+            'contact_email' => config('ui.footer.contact.email', ''),
+            'contact_address' => config('ui.footer.contact.address', ''),
         ];
         
         return view('admin.settings', compact('settings'));
@@ -366,6 +369,9 @@ class DashboardController extends Controller
             'footer_social_names.*' => 'nullable|string',
             'footer_social_urls.*' => 'nullable|url',
             'footer_social_icons.*' => 'nullable|string',
+            'contact_phone' => 'nullable|string',
+            'contact_email' => 'nullable|email',
+            'contact_address' => 'nullable|string',
         ]);
 
         // تحديث الإعدادات
@@ -454,7 +460,13 @@ class DashboardController extends Controller
 
         // تحديث ملف ui.php
         $this->updateUIConfig([
-            'footer' => $footer
+            'footer' => array_merge($footer, [
+                'contact' => [
+                    'phone' => $request->input('contact_phone', ''),
+                    'email' => $request->input('contact_email', ''),
+                    'address' => $request->input('contact_address', ''),
+                ],
+            ]),
         ]);
 
         // معالجة الحذف والتعديل للروابط والصفحات المرتبطة
@@ -852,5 +864,105 @@ class DashboardController extends Controller
         
         // إعادة تحميل الإعدادات
         \Artisan::call('config:clear');
+    }
+
+    /**
+     * Handle footer settings and contact information
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateFooterSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'footer_text' => 'nullable|string',
+            'footer_links' => 'nullable|array',
+            'footer_services' => 'nullable|array',
+            'footer_social' => 'nullable|array',
+            'contact_phone' => 'nullable|string',
+            'contact_email' => 'nullable|email',
+            'contact_address' => 'nullable|string',
+        ]);
+
+        $agency = auth()->user()->agency;
+
+        $agency->footer_text = $validated['footer_text'] ?? $agency->footer_text;
+        $agency->footer_links = $validated['footer_links'] ?? $agency->footer_links;
+        $agency->footer_services = $validated['footer_services'] ?? $agency->footer_services;
+        $agency->footer_social = $validated['footer_social'] ?? $agency->footer_social;
+        $agency->contact_phone = $validated['contact_phone'] ?? $agency->contact_phone;
+        $agency->contact_email = $validated['contact_email'] ?? $agency->contact_email;
+        $agency->contact_address = $validated['contact_address'] ?? $agency->contact_address;
+
+        $agency->save();
+
+        return redirect()->back()->with('success', 'تم تحديث إعدادات الفوتر بنجاح');
+    }
+
+    /**
+     * Handle role-based settings, audit logs, and customizable themes
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateAdvancedSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'role_based_settings' => 'nullable|array',
+            'role_based_settings.*' => 'nullable|boolean', // Ensure each value is a boolean
+            'audit_logs' => 'nullable|array',
+            'audit_logs.*' => 'nullable|boolean', // Ensure each value is a boolean
+            'customizable_themes' => 'nullable|array',
+            'customizable_themes.*' => 'nullable|string|max:255', // Ensure each value is a string with a max length
+            'footer_preview' => 'nullable|string',
+            'drag_and_drop_links' => 'nullable|array',
+            'drag_and_drop_links.*' => 'nullable|string|max:255', // Ensure each link is a string with a max length
+            'additional_contact_methods' => 'nullable|array',
+            'additional_contact_methods.*' => 'nullable|string|max:255', // Ensure each contact method is a string with a max length
+        ]);
+
+        $agency = optional(auth()->user())->agency;
+        if (!$agency) {
+            return redirect()->back()->with('error', 'لا يوجد وكالة مرتبطة بهذا المستخدم.');
+        }
+
+        $agency->role_based_settings = $validated['role_based_settings'] ?? $agency->role_based_settings;
+        $agency->audit_logs = $validated['audit_logs'] ?? $agency->audit_logs;
+        $agency->customizable_themes = $validated['customizable_themes'] ?? $agency->customizable_themes;
+
+        $agency->footer_preview = $validated['footer_preview'] ?? $agency->footer_preview;
+        $agency->drag_and_drop_links = $validated['drag_and_drop_links'] ?? $agency->drag_and_drop_links;
+        $agency->additional_contact_methods = $validated['additional_contact_methods'] ?? $agency->additional_contact_methods;
+
+        $agency->save();
+
+        return redirect()->back()->with('success', 'تم تحديث الإعدادات المتقدمة بنجاح');
+    }
+
+    /**
+     * Handle live preview, drag-and-drop links, and additional contact methods
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateFooterFeatures(Request $request)
+    {
+        $validated = $request->validate([
+            'footer_preview' => 'nullable|string',
+            'drag_and_drop_links' => 'nullable|array',
+            'drag_and_drop_links.*' => 'nullable|string|max:255', // Ensure each link is a string with a max length
+            'additional_contact_methods' => 'nullable|array',
+            'additional_contact_methods.*' => 'nullable|string|max:255', // Ensure each contact method is a string with a max length
+        ]);
+
+        $agency = auth()->user()->agency;
+
+        $agency->footer_preview = $validated['footer_preview'] ?? $agency->footer_preview;
+        $agency->drag_and_drop_links = $validated['drag_and_drop_links'] ?? $agency->drag_and_drop_links;
+        $agency->additional_contact_methods = $validated['additional_contact_methods'] ?? $agency->additional_contact_methods;
+
+        $agency->save();
+
+        return redirect()->back()->with('success', 'تم تحديث ميزات الفوتر بنجاح');
     }
 }

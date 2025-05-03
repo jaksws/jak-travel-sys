@@ -10,7 +10,7 @@ class PagesMainButtonsTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function agency_dashboard_has_main_links_and_buttons()
     {
         $agency = User::factory()->create(['role' => 'agency']);
@@ -24,7 +24,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('عروض الأسعار');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function subagent_dashboard_has_main_links_and_buttons()
     {
         $subagent = User::factory()->create(['role' => 'subagent']);
@@ -36,7 +36,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('عروضي');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function customer_dashboard_has_main_links_and_buttons()
     {
         $customer = User::factory()->create(['role' => 'customer']);
@@ -48,7 +48,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('عروضي');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function agency_requests_page_has_add_and_search_buttons()
     {
         $agency = User::factory()->create(['role' => 'agency']);
@@ -59,7 +59,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('بحث');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function subagent_requests_page_has_add_and_search_buttons()
     {
         $subagent = User::factory()->create(['role' => 'subagent']);
@@ -69,7 +69,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('بحث');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function customer_requests_page_has_add_and_search_buttons()
     {
         $customer = User::factory()->create(['role' => 'customer']);
@@ -80,7 +80,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('بحث');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function agency_quotes_page_has_export_and_search_buttons()
     {
         $agency = User::factory()->create(['role' => 'agency']);
@@ -90,7 +90,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('بحث');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function subagent_quotes_page_has_add_and_search_buttons()
     {
         $subagent = User::factory()->create(['role' => 'subagent']);
@@ -102,7 +102,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('بحث');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function customer_quotes_page_has_search_button()
     {
         $customer = User::factory()->create(['role' => 'customer']);
@@ -112,7 +112,7 @@ class PagesMainButtonsTest extends TestCase
         $response->assertSee('بحث');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_profile_page_has_edit_and_save_buttons()
     {
         $user = User::factory()->create();

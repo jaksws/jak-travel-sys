@@ -432,3 +432,46 @@
         box-shadow: 10014px 0 0 -4px;
     }
 }
+
+/* CSS transitions for smooth animation of the sidebar */
+.sidebar {
+    transition: right 0.3s ease;
+}
+
+/* Styles to make the sidebar touch-friendly */
+.sidebar .nav-link {
+    display: block;
+    padding: 10px 15px;
+    margin: 5px 0;
+}
+
+/* Styles to reduce the width of the sidebar on smaller screens */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 250px;
+    }
+}
+
+/* Styles to use a vertical layout for the sidebar items */
+.sidebar .nav-link {
+    display: block;
+    padding: 10px 15px;
+    margin: 5px 0;
+}
+
+/* Styles to improve the sidebar design */
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Add icons to the sidebar items */
+.sidebar .nav-link i {
+    margin-right: 10px;
+}
+
+/* Add a consistent color scheme for the sidebar */
+.sidebar .nav-link.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}

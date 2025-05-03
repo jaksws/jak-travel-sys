@@ -227,8 +227,8 @@ class QuoteController extends Controller
 
         // إرسال إشعار للسبوكيل والعميل
         try {
-            $quote->subagent->notify(new QuoteStatusChanged($quote));
-            $quote->request->customer->notify(new QuoteStatusChanged($quote));
+            $quote->subagent->notify(new QuoteStatusChanged($quote, 'agency_approved'));
+            $quote->request->customer->notify(new QuoteStatusChanged($quote, 'agency_approved'));
         } catch (\Exception $e) {
             // تسجيل الخطأ فقط، لا نريد إيقاف العملية
             \Log::error('Error sending notification: ' . $e->getMessage());

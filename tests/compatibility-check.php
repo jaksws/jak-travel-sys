@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests;
+
 /**
  * Check PHP 8.2, 8.3, and 8.4 compatibility
  * 
@@ -12,10 +14,10 @@ echo "نظام وكالات السفر (RTLA) - فحص التوافق والمت
 echo "===================================================\n\n";
 
 // Check PHP version
-$phpVersion = phpversion();
+$phpVersion = \phpversion();
 $minVersion = '8.2.0';
 $recommendedVersion = '8.4.0';
-$isVersionOk = version_compare($phpVersion, $minVersion, '>=');
+$isVersionOk = \version_compare($phpVersion, $minVersion, '>=');
 
 echo "• PHP الإصدار: $phpVersion\n";
 echo "  الإصدار المطلوب: $minVersion أو أعلى\n";
@@ -35,7 +37,7 @@ $requiredExtensions[] = 'soap';
 
 $missingExtensions = [];
 foreach ($requiredExtensions as $extension) {
-    $loaded = extension_loaded($extension);
+    $loaded = \extension_loaded($extension);
     echo "  - $extension: " . ($loaded ? "✅ متوفر" : "❌ غير متوفر") . "\n";
     if (!$loaded) {
         echo "  ⚠️ لتثبيت $extension، استخدم الأمر المناسب لنظام التشغيل الخاص بك.\n";
@@ -45,7 +47,7 @@ foreach ($requiredExtensions as $extension) {
 echo "\n";
 
 // Check memory limit
-$memoryLimit = ini_get('memory_limit');
+$memoryLimit = \ini_get('memory_limit');
 $memoryLimitBytes = return_bytes($memoryLimit);
 $recommendedMemory = 128 * 1024 * 1024; // 128MB
 
@@ -54,7 +56,7 @@ echo "  القيمة الموصى بها: 128M أو أكثر\n";
 echo "  النتيجة: " . ($memoryLimitBytes >= $recommendedMemory ? "✅ كافية" : "⚠️ قد لا تكون كافية") . "\n\n";
 
 // Check max execution time
-$maxExecutionTime = ini_get('max_execution_time');
+$maxExecutionTime = \ini_get('max_execution_time');
 $recommendedExecutionTime = 60;
 
 echo "• الحد الأقصى لوقت التنفيذ: " . ($maxExecutionTime == 0 ? "غير محدود" : "$maxExecutionTime ثانية") . "\n";
@@ -63,8 +65,8 @@ echo "  النتيجة: " . (($maxExecutionTime == 0 || $maxExecutionTime >= $re
 
 // Check database support
 echo "• دعم قواعد البيانات:\n";
-$hasMysql = extension_loaded('pdo_mysql');
-$hasSqlite = extension_loaded('pdo_sqlite');
+$hasMysql = \extension_loaded('pdo_mysql');
+$hasSqlite = \extension_loaded('pdo_sqlite');
 
 echo "  - MySQL: " . ($hasMysql ? "✅ مدعوم" : "❌ غير مدعوم") . "\n";
 echo "  - SQLite: " . ($hasSqlite ? "✅ مدعوم" : "❌ غير مدعوم") . "\n";
@@ -89,7 +91,7 @@ $writeableDirs = 0;
 $totalDirs = count($directories);
 
 foreach ($directories as $name => $dir) {
-    $isWriteable = is_dir($dir) && is_writable($dir);
+    $isWriteable = \is_dir($dir) && \is_writable($dir);
     echo "  - $name: " . ($isWriteable ? "✅ قابل للكتابة" : "❌ غير قابل للكتابة") . "\n";
     if ($isWriteable) {
         $writeableDirs++;
@@ -111,26 +113,26 @@ class TestClass {
     public static function checkCompatibility() {
         try {
             // Check readonly properties handling (PHP 8.2+)
-            if (version_compare($GLOBALS['phpVersion'], '8.2.0', '>=')) {
+            if (\version_compare($GLOBALS['phpVersion'], '8.2.0', '>=')) {
                 echo "• اختبار التوافق مع خصائص القراءة فقط (readonly): ✅ مدعوم\n";
             } else {
                 echo "• اختبار التوافق مع خصائص القراءة فقط (readonly): ⚠️ غير مدعوم بالكامل\n";
             }
             
             // Check enums support (PHP 8.1+)
-            if (version_compare($GLOBALS['phpVersion'], '8.1.0', '>=')) {
+            if (\version_compare($GLOBALS['phpVersion'], '8.1.0', '>=')) {
                 echo "• دعم Enums: ✅ مدعوم\n";
             } else {
                 echo "• دعم Enums: ❌ غير مدعوم\n";
             }
             
             // Check for fibers support (PHP 8.1+)
-            if (version_compare($GLOBALS['phpVersion'], '8.1.0', '>=') && class_exists('Fiber')) {
+            if (\version_compare($GLOBALS['phpVersion'], '8.1.0', '>=') && \class_exists('Fiber')) {
                 echo "• دعم Fibers: ✅ مدعوم\n";
             } else {
                 echo "• دعم Fibers: ❌ غير مدعوم\n";
             }
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             echo "حدث خطأ أثناء اختبار التوافق: " . $e->getMessage() . "\n";
         }
     }
