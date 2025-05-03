@@ -17,6 +17,10 @@ return new class extends Migration
                 $table->string('type');
                 $table->morphs('notifiable');
                 $table->text('data');
+                $table->text('message')->nullable();
+                $table->string('title')->nullable();
+                $table->boolean('is_read')->default(false);
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
                 $table->timestamp('read_at')->nullable();
                 $table->timestamps();
             });

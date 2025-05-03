@@ -191,6 +191,7 @@ class UserSeeder extends Seeder
                 'name' => 'Admin User',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'is_admin' => 1,
                 'status' => 'active',
                 'locale' => 'en',
                 'theme' => 'light',
@@ -200,12 +201,13 @@ class UserSeeder extends Seeder
 
         // In testing environment: Ensure a fixed admin user exists for Dusk tests
         if ($isTesting) {
-            User::firstOrCreate(
+            $admin = User::updateOrCreate(
                 ['email' => 'admin@dusk-test.com'],
                 [
                     'name' => 'Dusk Admin',
                     'password' => Hash::make('duskpassword'),
                     'role' => 'admin',
+                    'is_admin' => 1,
                     'status' => 'active',
                     'locale' => 'ar',
                     'theme' => 'light',

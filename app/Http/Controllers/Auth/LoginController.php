@@ -29,6 +29,26 @@ class LoginController extends Controller
     }
 
     /**
+     * Override the login attempt to debug why login fails
+     */
+    protected function attemptLogin(Request $request)
+    {
+        $credentials = $this->credentials($request);
+        
+        \Log::info('DUSK DEBUG: Attempting login', $credentials);
+        $attempt = $this->guard()->attempt(
+            $credentials,
+            $request->filled('remember')
+        );
+        \Log::info('DUSK DEBUG: Attempt result', ['result' => $attempt]);
+        if (!$attempt) {
+            $user = \App\Models\User::where('email', $credentials['email'])->first();
+            \Log::info('DUSK DEBUG: User from DB', $user ? $user->toArray() : ['not found']);
+        }
+        return $attempt;
+    }
+
+    /**
      * The user has been authenticated.
      *
      * @param  \Illuminate\Http\Request  $request

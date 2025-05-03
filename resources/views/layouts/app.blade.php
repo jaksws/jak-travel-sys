@@ -268,30 +268,29 @@
         @include('partials.header')
 
         <main class="py-4">
-            @if(request()->routeIs('agency.*') || request()->routeIs('subagent.*') || request()->routeIs('customer.*') || request()->routeIs('admin.*'))
+            @if(
+                request()->routeIs('agency.*') ||
+                request()->routeIs('subagent.*') ||
+                request()->routeIs('customer.*') ||
+                request()->routeIs('admin.*') ||
+                request()->routeIs('profile.*') ||
+                request()->routeIs('user.preferences') ||
+                request()->routeIs('notifications.*')
+            )
                 <div class="container-fluid">
                     <div class="row">
                         <!-- Sidebar -->
                         <div class="col-md-3 col-lg-2 sidebar collapsible"> <!-- P674c -->
                             @include('partials.sidebar')
                         </div>
-                        
                         <!-- Main content -->
                         <div class="col-md-9 col-lg-10 px-md-4">
                             <!-- Breadcrumb -->
                             <nav aria-label="breadcrumb" class="mb-4">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item">
-                                        @if(request()->routeIs('admin.*'))
-                                            <a href="{{ route('admin.dashboard') }}">{{ __('v2.dashboard') }}</a>
-                                        @else
-                                            <a href="{{ url('/') }}">{{ __('v2.dashboard') }}</a>
-                                        @endif
-                                    </li>
                                     @yield('breadcrumb')
                                 </ol>
                             </nav>
-                            
                             <!-- Content -->
                             @yield('content')
                         </div>
@@ -347,7 +346,7 @@
                                 </span>
                                 <div>
                                     <p class="mb-0 text-secondary">البريد الإلكتروني</p>
-                                    <a href="mailto:info@travelagency.com">info@travelagency.com</a>
+                                    <a href="mailto:{{ config('ui.footer.contact.email', 'info@travelagency.com') }}">{{ config('ui.footer.contact.email', 'info@travelagency.com') }}</a>
                                 </div>
                             </li>
                             <li class="mb-3 d-flex">
@@ -356,7 +355,7 @@
                                 </span>
                                 <div>
                                     <p class="mb-0 text-secondary">رقم الهاتف</p>
-                                    <a href="tel:+966551234567">+966 55 123 4567</a>
+                                    <a href="tel:{{ config('ui.footer.contact.phone', '+966551234567') }}">{{ config('ui.footer.contact.phone', '+966 55 123 4567') }}</a>
                                 </div>
                             </li>
                             <li class="d-flex">
@@ -365,7 +364,7 @@
                                 </span>
                                 <div>
                                     <p class="mb-0 text-secondary">العنوان</p>
-                                    <address class="mb-0">الرياض، المملكة العربية السعودية</address>
+                                    <address class="mb-0">{{ config('ui.footer.contact.address', 'الرياض، المملكة العربية السعودية') }}</address>
                                 </div>
                             </li>
                         </ul>

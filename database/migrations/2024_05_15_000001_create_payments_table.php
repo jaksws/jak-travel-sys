@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('transaction_id')->nullable();
             $table->text('error_message')->nullable();
             $table->text('payment_details')->nullable();
+            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });
     }

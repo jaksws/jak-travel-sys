@@ -13,137 +13,189 @@
         <h1 class="h3 mb-0 text-gray-800">إعدادات النظام</h1>
     </div>
 
+    {{-- رسائل النجاح/الخطأ --}}
     @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show my-3" role="alert">
         {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
+    @if($errors->any())
+    <div class="alert alert-danger my-3">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold">تعديل الإعدادات العامة</h6>
+    {{-- بطاقة الإعدادات العامة --}}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-cogs me-2"></i> {{ __('v2.general_settings') }}</h5>
         </div>
         <div class="card-body">
             <form action="{{ route('admin.settings.update') }}" method="POST" class="mb-0">
                 @csrf
-                <div class="row mb-4">
+                <div class="row g-3">
                     <div class="col-lg-6">
                         <h5 class="mb-3">واجهة المستخدم</h5>
-                        
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="multilingual" name="multilingual" value="1" {{ $settings['multilingual'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="multilingual" name="multilingual" value="1" {{ ($settings['multilingual'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="multilingual">
                                 دعم تعدد اللغات
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="تفعيل دعم اللغات المتعددة في النظام"></i>
                                 <small class="d-block text-muted">تفعيل دعم اللغات المتعددة في النظام</small>
                             </label>
                         </div>
-                        
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="dark_mode" name="dark_mode" value="1" {{ $settings['dark_mode'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="dark_mode" name="dark_mode" value="1" {{ ($settings['dark_mode'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="dark_mode">
                                 الوضع الداكن
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="تفعيل الوضع الليلي لجميع المستخدمين"></i>
                                 <small class="d-block text-muted">السماح للمستخدمين باستخدام الوضع الداكن</small>
                             </label>
                         </div>
-                        
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="enhanced_ui" name="enhanced_ui" value="1" {{ $settings['enhanced_ui'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="enhanced_ui" name="enhanced_ui" value="1" {{ ($settings['enhanced_ui'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="enhanced_ui">
                                 واجهة مستخدم محسنة
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="تفعيل الرسوم المتحركة والمؤثرات البصرية المتقدمة"></i>
                                 <small class="d-block text-muted">تفعيل الرسوم المتحركة والمؤثرات البصرية المتقدمة</small>
                             </label>
                         </div>
                     </div>
-                    
                     <div class="col-lg-6">
                         <h5 class="mb-3">المدفوعات والميزات المتقدمة</h5>
-                        
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="payment_system" name="payment_system" value="1" {{ $settings['payment_system'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="payment_system" name="payment_system" value="1" {{ ($settings['payment_system'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="payment_system">
                                 نظام الدفع
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="تفعيل معالجة المدفوعات داخل النظام"></i>
                                 <small class="d-block text-muted">تفعيل معالجة المدفوعات داخل النظام</small>
                             </label>
                         </div>
-                        
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="ai_features" name="ai_features" value="1" {{ $settings['ai_features'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="ai_features" name="ai_features" value="1" {{ ($settings['ai_features'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="ai_features">
                                 ميزات الذكاء الاصطناعي
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="تفعيل الذكاء الاصطناعي لتحسين تجربة المستخدم"></i>
                                 <small class="d-block text-muted">تفعيل الذكاء الاصطناعي لتحسين تجربة المستخدم</small>
                             </label>
                         </div>
                     </div>
                 </div>
-                
                 <hr class="my-4">
-                <h5 class="mb-3">إعدادات الفوتر</h5>
-                <div class="mb-3">
-                    <label for="footer_text" class="form-label">نص الفوتر</label>
-                    <input type="text" class="form-control" id="footer_text" name="footer_text" value="{{ config('ui.footer.text', '') }}">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">روابط الفوتر</label>
-                    <div id="footer-links-list">
-                        @php $footerLinks = config('ui.footer.links', []); @endphp
-                        @foreach($footerLinks as $i => $link)
-                        <div class="input-group mb-2 footer-link-row">
-                            <input type="text" name="footer_link_texts[]" class="form-control" placeholder="النص" value="{{ $link['text'] }}">
-                            <input type="text" name="footer_link_urls[]" class="form-control" placeholder="الرابط" value="{{ $link['url'] }}">
-                            <button type="button" class="btn btn-danger remove-footer-link">-</button>
-                        </div>
-                        @endforeach
+                {{-- تحسين واجهة إعدادات الفوتر --}}
+                <div class="card mb-4 border-info shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-shoe-prints me-2"></i> إعدادات الفوتر</h5>
                     </div>
-                    <button type="button" class="btn btn-sm btn-secondary" id="add-footer-link">إضافة رابط</button>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">روابط الخدمات بالفوتر</label>
-                    <div id="footer-service-links-list">
-                        @php $footerServiceLinks = config('ui.footer.services', []); @endphp
-                        @foreach($footerServiceLinks as $i => $link)
-                        <div class="input-group mb-2 footer-service-link-row">
-                            <input type="text" name="footer_service_link_texts[]" class="form-control" placeholder="النص" value="{{ $link['text'] }}">
-                            <input type="text" name="footer_service_link_urls[]" class="form-control" placeholder="الرابط" value="{{ $link['url'] }}">
-                            <button type="button" class="btn btn-danger remove-footer-service-link">-</button>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="footer_text" class="form-label fw-bold">
+                                        نص الفوتر
+                                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="النص الرئيسي الذي يظهر في أسفل الموقع"></i>
+                                    </label>
+                                    <input type="text" class="form-control" id="footer_text" name="footer_text" value="{{ config('ui.footer.text', '') }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        روابط الفوتر
+                                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="روابط سريعة تظهر في الفوتر"></i>
+                                    </label>
+                                    <div id="footer-links-list">
+                                        @php $footerLinks = config('ui.footer.links', []); @endphp
+                                        @foreach($footerLinks as $i => $link)
+                                        <div class="input-group mb-2 footer-link-row">
+                                            <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                            <input type="text" name="footer_link_texts[]" class="form-control" placeholder="النص" value="{{ $link['text'] }}">
+                                            <input type="text" name="footer_link_urls[]" class="form-control" placeholder="الرابط" value="{{ $link['url'] }}">
+                                            <button type="button" class="btn btn-outline-danger remove-footer-link" title="حذف الرابط"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-info mt-2" id="add-footer-link">
+                                        <i class="fas fa-plus"></i> إضافة رابط
+                                    </button>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        روابط الخدمات بالفوتر
+                                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="روابط الخدمات السريعة في الفوتر"></i>
+                                    </label>
+                                    <div id="footer-service-links-list">
+                                        @php $footerServiceLinks = config('ui.footer.services', []); @endphp
+                                        @foreach($footerServiceLinks as $i => $link)
+                                        <div class="input-group mb-2 footer-service-link-row">
+                                            <span class="input-group-text"><i class="fas fa-concierge-bell"></i></span>
+                                            <input type="text" name="footer_service_link_texts[]" class="form-control" placeholder="النص" value="{{ $link['text'] }}">
+                                            <input type="text" name="footer_service_link_urls[]" class="form-control" placeholder="الرابط" value="{{ $link['url'] }}">
+                                            <button type="button" class="btn btn-outline-danger remove-footer-service-link" title="حذف الرابط"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-info mt-2" id="add-footer-service-link">
+                                        <i class="fas fa-plus"></i> إضافة رابط خدمة
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        روابط التواصل الاجتماعي
+                                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="روابط حسابات التواصل الاجتماعي"></i>
+                                    </label>
+                                    <div id="footer-social-list">
+                                        @php $footerSocial = config('ui.footer.social', []); @endphp
+                                        @foreach($footerSocial as $i => $social)
+                                        <div class="input-group mb-2 footer-social-row">
+                                            <span class="input-group-text"><i class="fab fa-{{ $social['icon'] ?? 'globe' }}"></i></span>
+                                            <input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة" value="{{ $social['name'] }}">
+                                            <input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط" value="{{ $social['url'] }}">
+                                            <input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)" value="{{ $social['icon'] }}">
+                                            <button type="button" class="btn btn-outline-danger remove-footer-social" title="حذف الشبكة"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-info mt-2" id="add-footer-social">
+                                        <i class="fas fa-plus"></i> إضافة شبكة
+                                    </button>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contact_phone" class="form-label fw-bold">
+                                        رقم الهاتف
+                                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="رقم الهاتف الظاهر في الفوتر"></i>
+                                    </label>
+                                    <input type="text" class="form-control" id="contact_phone" name="contact_phone" value="{{ config('ui.footer.contact.phone', '') }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contact_email" class="form-label fw-bold">
+                                        البريد الإلكتروني
+                                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="البريد الإلكتروني الظاهر في الفوتر"></i>
+                                    </label>
+                                    <input type="email" class="form-control" id="contact_email" name="contact_email" value="{{ config('ui.footer.contact.email', '') }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contact_address" class="form-label fw-bold">
+                                        العنوان الفعلي
+                                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="العنوان الفعلي للوكالة أو الشركة"></i>
+                                    </label>
+                                    <input type="text" class="form-control" id="contact_address" name="contact_address" value="{{ config('ui.footer.contact.address', '') }}">
+                                </div>
+                            </div>
                         </div>
-                        @endforeach
                     </div>
-                    <button type="button" class="btn btn-sm btn-secondary" id="add-footer-service-link">إضافة رابط خدمة</button>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">روابط التواصل الاجتماعي</label>
-                    <div id="footer-social-list">
-                        @php $footerSocial = config('ui.footer.social', []); @endphp
-                        @foreach($footerSocial as $i => $social)
-                        <div class="input-group mb-2 footer-social-row">
-                            <input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة" value="{{ $social['name'] }}">
-                            <input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط" value="{{ $social['url'] }}">
-                            <input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)" value="{{ $social['icon'] }}">
-                            <button type="button" class="btn btn-danger remove-footer-social">-</button>
-                        </div>
-                        @endforeach
-                    </div>
-                    <button type="button" class="btn btn-sm btn-secondary" id="add-footer-social">إضافة شبكة</button>
-                </div>
-                <div class="mb-3">
-                    <label for="contact_phone" class="form-label">رقم الهاتف</label>
-                    <input type="text" class="form-control" id="contact_phone" name="contact_phone" value="{{ config('ui.footer.contact.phone', '') }}">
-                </div>
-                <div class="mb-3">
-                    <label for="contact_email" class="form-label">البريد الإلكتروني</label>
-                    <input type="email" class="form-control" id="contact_email" name="contact_email" value="{{ config('ui.footer.contact.email', '') }}">
-                </div>
-                <div class="mb-3">
-                    <label for="contact_address" class="form-label">العنوان الفعلي</label>
-                    <input type="text" class="form-control" id="contact_address" name="contact_address" value="{{ config('ui.footer.contact.address', '') }}">
                 </div>
                 <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('add-footer-link').onclick = function() {
                         const row = document.createElement('div');
                         row.className = 'input-group mb-2 footer-link-row';
-                        row.innerHTML = `<input type="text" name="footer_link_texts[]" class="form-control" placeholder="النص"><input type="text" name="footer_link_urls[]" class="form-control" placeholder="الرابط"><button type="button" class="btn btn-danger remove-footer-link">-</button>`;
+                        row.innerHTML = `<span class="input-group-text"><i class="fas fa-link"></i></span><input type="text" name="footer_link_texts[]" class="form-control" placeholder="النص"><input type="text" name="footer_link_urls[]" class="form-control" placeholder="الرابط"><button type="button" class="btn btn-outline-danger remove-footer-link" title="حذف الرابط"><i class="fas fa-trash"></i></button>`;
                         document.getElementById('footer-links-list').appendChild(row);
                     };
                     document.getElementById('footer-links-list').addEventListener('click', function(e) {
@@ -154,7 +206,7 @@
                     document.getElementById('add-footer-service-link').onclick = function() {
                         const row = document.createElement('div');
                         row.className = 'input-group mb-2 footer-service-link-row';
-                        row.innerHTML = `<input type="text" name="footer_service_link_texts[]" class="form-control" placeholder="النص"><input type="text" name="footer_service_link_urls[]" class="form-control" placeholder="الرابط"><button type="button" class="btn btn-danger remove-footer-service-link">-</button>`;
+                        row.innerHTML = `<span class="input-group-text"><i class="fas fa-concierge-bell"></i></span><input type="text" name="footer_service_link_texts[]" class="form-control" placeholder="النص"><input type="text" name="footer_service_link_urls[]" class="form-control" placeholder="الرابط"><button type="button" class="btn btn-outline-danger remove-footer-service-link" title="حذف الرابط"><i class="fas fa-trash"></i></button>`;
                         document.getElementById('footer-service-links-list').appendChild(row);
                     };
                     document.getElementById('footer-service-links-list').addEventListener('click', function(e) {
@@ -165,7 +217,7 @@
                     document.getElementById('add-footer-social').onclick = function() {
                         const row = document.createElement('div');
                         row.className = 'input-group mb-2 footer-social-row';
-                        row.innerHTML = `<input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة"><input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط"><input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)" title="أدخل اسم الأيقونة مثل: facebook"><button type="button" class="btn btn-danger remove-footer-social">-</button>`;
+                        row.innerHTML = `<span class="input-group-text"><i class="fab fa-globe"></i></span><input type="text" name="footer_social_names[]" class="form-control" placeholder="اسم الشبكة"><input type="text" name="footer_social_urls[]" class="form-control" placeholder="الرابط"><input type="text" name="footer_social_icons[]" class="form-control" placeholder="الأيقونة (مثال: facebook)" title="أدخل اسم الأيقونة مثل: facebook"><button type="button" class="btn btn-outline-danger remove-footer-social" title="حذف الشبكة"><i class="fas fa-trash"></i></button>`;
                         document.getElementById('footer-social-list').appendChild(row);
                     };
                     document.getElementById('footer-social-list').addEventListener('click', function(e) {
@@ -188,6 +240,121 @@
         </div>
     </div>
 
+    {{-- بطاقة الإعدادات المتقدمة --}}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-sliders-h me-2"></i> الإعدادات المتقدمة</h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.settings.updateAdvancedSettings') }}" method="POST" class="mb-0">
+                @csrf
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">إعدادات حسب الدور</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="role_based_settings" name="role_based_settings" value="1" {{ ($settings['role_based_settings'] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="role_based_settings">
+                                إعدادات حسب الدور
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="تفعيل إعدادات مخصصة حسب صلاحية المستخدم"></i>
+                                <small class="d-block text-muted">تفعيل إعدادات مختلفة حسب دور المستخدم</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">سجلات التدقيق</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="audit_logs" name="audit_logs" value="1" {{ ($settings['audit_logs'] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="audit_logs">
+                                سجلات التدقيق
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="عرض التغييرات التي تم إجراؤها على الإعدادات"></i>
+                                <small class="d-block text-muted">عرض التغييرات التي تم إجراؤها على الإعدادات</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">تخصيص الثيمات</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="customizable_themes" name="customizable_themes" value="1" {{ ($settings['customizable_themes'] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="customizable_themes">
+                                تخصيص الثيمات
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="السماح للمسؤولين بتخصيص الثيمات"></i>
+                                <small class="d-block text-muted">السماح للمسؤولين بتخصيص الثيمات</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> حفظ الإعدادات
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-undo me-1"></i> إعادة تعيين
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- بطاقة ميزات الفوتر --}}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-shapes me-2"></i> ميزات الفوتر</h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.settings.updateAdvancedSettings') }}" method="POST" class="mb-0">
+                @csrf
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">معاينة الفوتر</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="footer_preview" name="footer_preview" value="1" {{ ($settings['footer_preview'] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="footer_preview">
+                                معاينة الفوتر
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="عرض معاينة حية للفوتر أثناء التعديل"></i>
+                                <small class="d-block text-muted">عرض معاينة حية للفوتر أثناء التعديل</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">سحب وإفلات الروابط</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="drag_and_drop_links" name="drag_and_drop_links" value="1" {{ ($settings['drag_and_drop_links'] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="drag_and_drop_links">
+                                سحب وإفلات الروابط
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="إعادة ترتيب الروابط باستخدام السحب والإفلات"></i>
+                                <small class="d-block text-muted">إعادة ترتيب الروابط باستخدام السحب والإفلات</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <h5 class="mb-3">طرق تواصل إضافية</h5>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="additional_contact_methods" name="additional_contact_methods" value="1" {{ ($settings['additional_contact_methods'] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="additional_contact_methods">
+                                طرق تواصل إضافية
+                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="إضافة طرق تواصل مثل واتساب وتيليجرام"></i>
+                                <small class="d-block text-muted">إضافة طرق تواصل مثل واتساب وتيليجرام</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> حفظ الإعدادات
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-undo me-1"></i> إعادة تعيين
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- معلومات النظام --}}
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold">إعدادات متقدمة</h6>
@@ -349,6 +516,7 @@
         </div>
     </div>
 
+    {{-- أدوات النظام --}}
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold">أدوات النظام</h6>
@@ -411,3 +579,13 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // تفعيل تلميحات Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+@endpush
