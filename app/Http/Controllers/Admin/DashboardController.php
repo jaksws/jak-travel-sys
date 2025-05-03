@@ -914,13 +914,25 @@ class DashboardController extends Controller
             'audit_logs.*' => 'nullable|boolean', // Ensure each value is a boolean
             'customizable_themes' => 'nullable|array',
             'customizable_themes.*' => 'nullable|string|max:255', // Ensure each value is a string with a max length
+            'footer_preview' => 'nullable|string',
+            'drag_and_drop_links' => 'nullable|array',
+            'drag_and_drop_links.*' => 'nullable|string|max:255', // Ensure each link is a string with a max length
+            'additional_contact_methods' => 'nullable|array',
+            'additional_contact_methods.*' => 'nullable|string|max:255', // Ensure each contact method is a string with a max length
         ]);
 
-        $agency = auth()->user()->agency;
+        $agency = optional(auth()->user())->agency;
+        if (!$agency) {
+            return redirect()->back()->with('error', 'لا يوجد وكالة مرتبطة بهذا المستخدم.');
+        }
 
         $agency->role_based_settings = $validated['role_based_settings'] ?? $agency->role_based_settings;
         $agency->audit_logs = $validated['audit_logs'] ?? $agency->audit_logs;
         $agency->customizable_themes = $validated['customizable_themes'] ?? $agency->customizable_themes;
+
+        $agency->footer_preview = $validated['footer_preview'] ?? $agency->footer_preview;
+        $agency->drag_and_drop_links = $validated['drag_and_drop_links'] ?? $agency->drag_and_drop_links;
+        $agency->additional_contact_methods = $validated['additional_contact_methods'] ?? $agency->additional_contact_methods;
 
         $agency->save();
 

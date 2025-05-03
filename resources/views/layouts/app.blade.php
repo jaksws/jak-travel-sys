@@ -268,30 +268,29 @@
         @include('partials.header')
 
         <main class="py-4">
-            @if(request()->routeIs('agency.*') || request()->routeIs('subagent.*') || request()->routeIs('customer.*') || request()->routeIs('admin.*'))
+            @if(
+                request()->routeIs('agency.*') ||
+                request()->routeIs('subagent.*') ||
+                request()->routeIs('customer.*') ||
+                request()->routeIs('admin.*') ||
+                request()->routeIs('profile.*') ||
+                request()->routeIs('user.preferences') ||
+                request()->routeIs('notifications.*')
+            )
                 <div class="container-fluid">
                     <div class="row">
                         <!-- Sidebar -->
                         <div class="col-md-3 col-lg-2 sidebar collapsible"> <!-- P674c -->
                             @include('partials.sidebar')
                         </div>
-                        
                         <!-- Main content -->
                         <div class="col-md-9 col-lg-10 px-md-4">
                             <!-- Breadcrumb -->
                             <nav aria-label="breadcrumb" class="mb-4">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item">
-                                        @if(request()->routeIs('admin.*'))
-                                            <a href="{{ route('admin.dashboard') }}">{{ __('v2.dashboard') }}</a>
-                                        @else
-                                            <a href="{{ url('/') }}">{{ __('v2.dashboard') }}</a>
-                                        @endif
-                                    </li>
                                     @yield('breadcrumb')
                                 </ol>
                             </nav>
-                            
                             <!-- Content -->
                             @yield('content')
                         </div>
