@@ -32,7 +32,7 @@
                         <h5 class="mb-3">واجهة المستخدم</h5>
                         
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="multilingual" name="multilingual" value="1" {{ $settings['multilingual'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="multilingual" name="multilingual" value="1" {{ ($settings['multilingual'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="multilingual">
                                 دعم تعدد اللغات
                                 <small class="d-block text-muted">تفعيل دعم اللغات المتعددة في النظام</small>
@@ -40,7 +40,7 @@
                         </div>
                         
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="dark_mode" name="dark_mode" value="1" {{ $settings['dark_mode'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="dark_mode" name="dark_mode" value="1" {{ ($settings['dark_mode'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="dark_mode">
                                 الوضع الداكن
                                 <small class="d-block text-muted">السماح للمستخدمين باستخدام الوضع الداكن</small>
@@ -48,7 +48,7 @@
                         </div>
                         
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="enhanced_ui" name="enhanced_ui" value="1" {{ $settings['enhanced_ui'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="enhanced_ui" name="enhanced_ui" value="1" {{ ($settings['enhanced_ui'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="enhanced_ui">
                                 واجهة مستخدم محسنة
                                 <small class="d-block text-muted">تفعيل الرسوم المتحركة والمؤثرات البصرية المتقدمة</small>
@@ -60,7 +60,7 @@
                         <h5 class="mb-3">المدفوعات والميزات المتقدمة</h5>
                         
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="payment_system" name="payment_system" value="1" {{ $settings['payment_system'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="payment_system" name="payment_system" value="1" {{ ($settings['payment_system'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="payment_system">
                                 نظام الدفع
                                 <small class="d-block text-muted">تفعيل معالجة المدفوعات داخل النظام</small>
@@ -68,7 +68,7 @@
                         </div>
                         
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="ai_features" name="ai_features" value="1" {{ $settings['ai_features'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="ai_features" name="ai_features" value="1" {{ ($settings['ai_features'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="ai_features">
                                 ميزات الذكاء الاصطناعي
                                 <small class="d-block text-muted">تفعيل الذكاء الاصطناعي لتحسين تجربة المستخدم</small>
@@ -199,7 +199,7 @@
                     <div class="col-lg-6">
                         <h5 class="mb-3">إعدادات حسب الدور</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="role_based_settings" name="role_based_settings" value="1" {{ $settings['role_based_settings'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="role_based_settings" name="role_based_settings" value="1" {{ ($settings['role_based_settings'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="role_based_settings">
                                 إعدادات حسب الدور
                                 <small class="d-block text-muted">تفعيل إعدادات مختلفة حسب دور المستخدم</small>
@@ -209,7 +209,7 @@
                     <div class="col-lg-6">
                         <h5 class="mb-3">سجلات التدقيق</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="audit_logs" name="audit_logs" value="1" {{ $settings['audit_logs'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="audit_logs" name="audit_logs" value="1" {{ ($settings['audit_logs'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="audit_logs">
                                 سجلات التدقيق
                                 <small class="d-block text-muted">عرض التغييرات التي تم إجراؤها على الإعدادات</small>
@@ -221,7 +221,7 @@
                     <div class="col-lg-6">
                         <h5 class="mb-3">تخصيص الثيمات</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="customizable_themes" name="customizable_themes" value="1" {{ $settings['customizable_themes'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="customizable_themes" name="customizable_themes" value="1" {{ ($settings['customizable_themes'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="customizable_themes">
                                 تخصيص الثيمات
                                 <small class="d-block text-muted">السماح للمسؤولين بتخصيص الثيمات</small>
@@ -246,13 +246,13 @@
             <h6 class="m-0 font-weight-bold">ميزات الفوتر</h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.settings.updateFooterFeatures') }}" method="POST" class="mb-0">
+            <form action="{{ route('admin.settings.updateAdvancedSettings') }}" method="POST" class="mb-0">
                 @csrf
                 <div class="row mb-4">
                     <div class="col-lg-6">
                         <h5 class="mb-3">معاينة الفوتر</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="footer_preview" name="footer_preview" value="1" {{ $settings['footer_preview'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="footer_preview" name="footer_preview" value="1" {{ ($settings['footer_preview'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="footer_preview">
                                 معاينة الفوتر
                                 <small class="d-block text-muted">عرض معاينة حية للفوتر أثناء التعديل</small>
@@ -262,7 +262,7 @@
                     <div class="col-lg-6">
                         <h5 class="mb-3">سحب وإفلات الروابط</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="drag_and_drop_links" name="drag_and_drop_links" value="1" {{ $settings['drag_and_drop_links'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="drag_and_drop_links" name="drag_and_drop_links" value="1" {{ ($settings['drag_and_drop_links'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="drag_and_drop_links">
                                 سحب وإفلات الروابط
                                 <small class="d-block text-muted">إعادة ترتيب الروابط باستخدام السحب والإفلات</small>
@@ -274,7 +274,7 @@
                     <div class="col-lg-6">
                         <h5 class="mb-3">طرق تواصل إضافية</h5>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="additional_contact_methods" name="additional_contact_methods" value="1" {{ $settings['additional_contact_methods'] ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="additional_contact_methods" name="additional_contact_methods" value="1" {{ ($settings['additional_contact_methods'] ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label" for="additional_contact_methods">
                                 طرق تواصل إضافية
                                 <small class="d-block text-muted">إضافة طرق تواصل مثل واتساب وتيليجرام</small>

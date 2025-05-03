@@ -272,6 +272,7 @@ Route::group([
     // Admin settings routes
     Route::get('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'settings'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\Admin\DashboardController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/advanced', [\App\Http\Controllers\Admin\DashboardController::class, 'updateAdvancedSettings'])->name('settings.updateAdvancedSettings');
     
     // Create page route
     Route::post('/create-page', function (\Illuminate\Http\Request $request) {

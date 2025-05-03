@@ -22,7 +22,14 @@ return new class extends Migration
             $table->string('refund_reference')->nullable();
             $table->decimal('amount', 10, 2);
             $table->enum('type', ['payment', 'commission', 'refund']);
-            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', [
+                'pending',
+                'completed',
+                'cancelled',
+                'refunded',
+                'failed',
+                'processing',
+            ])->default('pending');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

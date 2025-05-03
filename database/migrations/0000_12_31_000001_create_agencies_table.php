@@ -8,25 +8,31 @@ return new class extends Migration
 {
     public function up()
     {
+        Schema::dropIfExists('agencies');
         Schema::create('agencies', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable()->index()->after('id');
             $table->string('name');
+            $table->string('status')->default('active');
             $table->string('logo')->nullable();
             $table->string('phone');
-            $table->string('contact_email')->nullable()->after('phone');
             $table->string('email')->unique();
             $table->text('address')->nullable();
-            $table->string('status')->default('active'); // Use status instead of is_active
+            $table->string('license_number')->unique();
+            $table->decimal('default_commission_rate', 5, 2)->default(10.00);
+            $table->string('default_currency', 10)->default('SAR');
+            $table->unsignedTinyInteger('price_decimals')->default(2);
+            $table->string('price_display_format')->default('symbol_first');
             $table->json('notification_settings')->nullable();
             $table->json('email_settings')->nullable();
             $table->json('commission_settings')->nullable();
-            $table->unsignedTinyInteger('price_decimals')->default(2);
-            $table->string('price_display_format')->default('symbol_first');
-            $table->boolean('auto_convert_prices')->default(true);
-            $table->decimal('default_commission_rate', 5, 2)->default(10.00);
-            $table->string('default_currency', 10)->default('SAR');
+            $table->string('theme_color')->nullable();
+            $table->string('agency_language')->nullable();
+            $table->string('social_media_instagram')->nullable();
+            $table->string('social_media_twitter')->nullable();
+            $table->string('social_media_facebook')->nullable();
+            $table->string('social_media_linkedin')->nullable();
             $table->string('website')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

@@ -21,7 +21,19 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('commission_amount', 10, 2)->nullable();
             $table->text('details')->nullable();
-            $table->enum('status', ['pending', 'agency_approved', 'agency_rejected', 'customer_approved', 'customer_rejected'])->default('pending');
+            $table->enum('status', [
+                'pending',
+                'accepted',
+                'rejected',
+                'expired',
+                'paid',
+                'unpaid',
+                'canceled',
+                'agency_approved',
+                'agency_rejected',
+                'customer_approved',
+                'customer_rejected',
+            ])->default('pending');
             $table->timestamps();
         });
     }

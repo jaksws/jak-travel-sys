@@ -347,7 +347,7 @@
                                 </span>
                                 <div>
                                     <p class="mb-0 text-secondary">البريد الإلكتروني</p>
-                                    <a href="mailto:info@travelagency.com">info@travelagency.com</a>
+                                    <a href="mailto:{{ config('ui.footer.contact.email', 'info@travelagency.com') }}">{{ config('ui.footer.contact.email', 'info@travelagency.com') }}</a>
                                 </div>
                             </li>
                             <li class="mb-3 d-flex">
@@ -356,7 +356,7 @@
                                 </span>
                                 <div>
                                     <p class="mb-0 text-secondary">رقم الهاتف</p>
-                                    <a href="tel:+966551234567">+966 55 123 4567</a>
+                                    <a href="tel:{{ config('ui.footer.contact.phone', '+966551234567') }}">{{ config('ui.footer.contact.phone', '+966 55 123 4567') }}</a>
                                 </div>
                             </li>
                             <li class="d-flex">
@@ -365,7 +365,7 @@
                                 </span>
                                 <div>
                                     <p class="mb-0 text-secondary">العنوان</p>
-                                    <address class="mb-0">الرياض، المملكة العربية السعودية</address>
+                                    <address class="mb-0">{{ config('ui.footer.contact.address', 'الرياض، المملكة العربية السعودية') }}</address>
                                 </div>
                             </li>
                         </ul>

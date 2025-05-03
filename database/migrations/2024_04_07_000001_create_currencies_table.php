@@ -24,9 +24,9 @@ return new class extends Migration
         });
 
         // Adding currency field to services and agencies tables
-        Schema::table('services', function (Blueprint $table) {
-            $table->string('currency_code', 3)->default('SAR')->after('base_price');
-        });
+        // Schema::table('services', function (Blueprint $table) {
+        //     $table->string('currency_code', 3)->default('SAR')->after('base_price');
+        // });
 
         // Schema::table('agencies', function (Blueprint $table) {
         //     $table->string('default_currency', 3)->default('SAR')->after('name');

@@ -460,12 +460,13 @@ class DashboardController extends Controller
 
         // تحديث ملف ui.php
         $this->updateUIConfig([
-            'footer' => $footer,
-            'contact' => [
-                'phone' => $request->input('contact_phone', ''),
-                'email' => $request->input('contact_email', ''),
-                'address' => $request->input('contact_address', ''),
-            ],
+            'footer' => array_merge($footer, [
+                'contact' => [
+                    'phone' => $request->input('contact_phone', ''),
+                    'email' => $request->input('contact_email', ''),
+                    'address' => $request->input('contact_address', ''),
+                ],
+            ]),
         ]);
 
         // معالجة الحذف والتعديل للروابط والصفحات المرتبطة

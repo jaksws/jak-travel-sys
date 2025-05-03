@@ -22,7 +22,8 @@ class AgencySeeder extends Seeder
                     'name' => 'وكالة اليمن للسفر والسياحة',
                     'phone' => '777123456',
                     'address' => 'صنعاء - شارع جمال عبد الناصر',
-                    'status' => 'active'
+                    'status' => 'active',
+                    'license_number' => 'AG10001'
                 ]
             );
             \App\Models\Agency::firstOrCreate(
@@ -31,7 +32,8 @@ class AgencySeeder extends Seeder
                     'name' => 'وكالة الخليج للسفريات',
                     'phone' => '777654321',
                     'address' => 'عدن - المنصورة',
-                    'status' => 'active'
+                    'status' => 'active',
+                    'license_number' => 'AG10002'
                 ]
             );
         }
@@ -43,7 +45,8 @@ class AgencySeeder extends Seeder
                 'name' => 'وكالة اليمن للسفر والسياحة',
                 'phone' => '777123456',
                 'address' => 'صنعاء - شارع جمال عبد الناصر',
-                'status' => 'active'
+                'status' => 'active',
+                'license_number' => 'AG10001'
             ]
         );
 
@@ -53,7 +56,8 @@ class AgencySeeder extends Seeder
                 'name' => 'وكالة الخليج للسفريات',
                 'phone' => '777654321',
                 'address' => 'عدن - المنصورة',
-                'status' => 'active'
+                'status' => 'active',
+                'license_number' => 'AG10002'
             ]
         );
 
@@ -63,7 +67,8 @@ class AgencySeeder extends Seeder
                 'name' => 'وكالة الشرق للسفر',
                 'phone' => '777111222',
                 'address' => 'حضرموت - المكلا',
-                'status' => 'active'
+                'status' => 'active',
+                'license_number' => 'AG10003'
             ]
         );
     }

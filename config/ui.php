@@ -79,11 +79,11 @@ return array (
     'services' => 
     array (
     ),
-  ),
-  'contact' => 
-  array (
-    'phone' => '123456789',
-    'email' => 'test@example.com',
-    'address' => '123 Test St',
+    'contact' => 
+    array (
+      'phone' => '123456789',
+      'email' => 'test@example.com',
+      'address' => '123 Test St',
+    ),
   ),
 );

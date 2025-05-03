@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('quote_attachments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('quote_id')->constrained()->onDelete('cascade');
+            $table->string('name')->nullable();
             $table->string('file_name')->nullable();
             $table->string('file_path')->nullable();
             $table->string('file_type')->nullable();

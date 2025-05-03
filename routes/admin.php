@@ -34,4 +34,5 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // ... system logs and settings routes ...
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings.index'); // Add this line for displaying settings
     Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/advanced', [DashboardController::class, 'updateAdvancedSettings'])->name('admin.settings.updateAdvancedSettings');
 });
