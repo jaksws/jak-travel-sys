@@ -18,11 +18,20 @@ class AdminDashboardTest extends DuskTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adminUser = User::factory()->create([
-            'role' => 'admin',
-            'status' => 'active',
-        ]);
-        $this->targetUser = User::factory()->create([
+        // استخدم المستخدم الإداري الثابت من Seeder
+        $this->adminUser = \App\Models\User::firstOrCreate(
+            ['email' => 'admin@dusk-test.com'],
+            [
+                'name' => 'Dusk Admin',
+                'password' => bcrypt('duskpassword'),
+                'role' => 'admin',
+                'status' => 'active',
+                'locale' => 'ar',
+                'theme' => 'light',
+                'email_notifications' => true,
+            ]
+        );
+        $this->targetUser = \App\Models\User::factory()->create([
             'role' => 'customer',
             'status' => 'active',
         ]);
