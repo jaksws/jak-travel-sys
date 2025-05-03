@@ -69,7 +69,7 @@ return array (
   ),
   'footer' => 
   array (
-    'text' => '',
+    'text' => 'h',
     'links' => 
     array (
     ),

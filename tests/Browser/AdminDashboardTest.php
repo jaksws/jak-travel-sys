@@ -41,11 +41,15 @@ class AdminDashboardTest extends DuskTestCase
     public function admin_can_log_in_and_see_dashboard()
     {
         $this->browse(function (Browser $browser) {
-            $browser->loginAs($this->adminUser)
-                    ->visit('/admin/dashboard')
-                    ->screenshot('debug-dashboard')
+            $browser->visit('/login')
+                    ->type('email', 'admin@dusk-test.com')
+                    ->type('password', 'duskpassword')
+                    ->press('تسجيل الدخول')
+                    ->pause(2000)
+                    ->assertPathIs('/admin/dashboard')
+                    ->screenshot('debug-dashboard-manual-login')
                     ->assertSee('لوحة تحكم المسؤول')
-                    ->assertSee($this->adminUser->name);
+                    ->assertSee('Dusk Admin');
         });
     }
 

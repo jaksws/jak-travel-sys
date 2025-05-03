@@ -201,7 +201,7 @@ class UserSeeder extends Seeder
 
         // In testing environment: Ensure a fixed admin user exists for Dusk tests
         if ($isTesting) {
-            User::firstOrCreate(
+            $admin = User::updateOrCreate(
                 ['email' => 'admin@dusk-test.com'],
                 [
                     'name' => 'Dusk Admin',
