@@ -103,3 +103,11 @@ jobs:
         upload: true
         # Generate detailed reports on test coverage
         test-coverage: true
+
+    - name: Send notification for workflow results
+      if: always()
+      uses: actions/notify@v2
+      with:
+        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        status: ${{ job.status }}
+        message: "CodeQL workflow ${{ job.status }} for ${{ github.repository }}"

@@ -1,8 +1,8 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "tasks": {
-    "test": "composer install && cp .env.example .env && php artisan key:generate && php artisan migrate && php artisan db:seed && npm install && npm run build && php artisan test",
-    "build": "composer install && npm install && npm run build",
-    "launch": "composer install && cp .env.example .env && php artisan key:generate && php artisan migrate && npm install && npm run build && php artisan serve"
+    "test": "composer install --ignore-platform-reqs && cp .env.example .env && php artisan key:generate && php artisan migrate && php artisan db:seed && npm install && npm run build && php artisan test",
+    "build": "composer install --ignore-platform-reqs && npm install && npm run build",
+    "launch": "composer install --ignore-platform-reqs && cp .env.example .env && php artisan key:generate && php artisan migrate && npm install && npm run build && php artisan serve"
   }
 }
