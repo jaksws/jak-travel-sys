@@ -38,6 +38,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction
 
@@ -139,4 +147,8 @@ jobs:
 
       - name: Send failure notification
         if: failure()
-        run: echo "⚠️ The GitHub Actions workflow failed."
+        uses: actions/notify@v2
+        with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          status: failure
+          message: "⚠️ The GitHub Actions workflow failed."
