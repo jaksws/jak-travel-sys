@@ -13,6 +13,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Artisan; // Import Artisan facade
 
 class DashboardController extends Controller
 {
@@ -330,12 +331,22 @@ class DashboardController extends Controller
      */
     public function settings()
     {
+        // Fetch all required settings with defaults
         $settings = [
-            'multilingual' => config('v1_features.multilingual'),
-            'dark_mode' => config('v1_features.dark_mode'),
-            'payment_system' => config('v1_features.payment_system'),
-            'enhanced_ui' => config('v1_features.enhanced_ui'),
-            'ai_features' => config('v1_features.ai_features'),
+            // v1_features settings
+            'multilingual' => config('v1_features.multilingual', false),
+            'dark_mode' => config('v1_features.dark_mode', false),
+            'payment_system' => config('v1_features.payment_system', false),
+            'enhanced_ui' => config('v1_features.enhanced_ui', false),
+            'ai_features' => config('v1_features.ai_features', false),
+            'role_based_settings' => config('v1_features.role_based_settings', false),
+            'audit_logs' => config('v1_features.audit_logs', false),
+            'customizable_themes' => config('v1_features.customizable_themes', false),
+            'footer_preview' => config('v1_features.footer_preview', false),
+            'drag_and_drop_links' => config('v1_features.drag_and_drop_links', false),
+            'additional_contact_methods' => config('v1_features.additional_contact_methods', false),
+
+            // ui settings (footer contact)
             'contact_phone' => config('ui.footer.contact.phone', ''),
             'contact_email' => config('ui.footer.contact.email', ''),
             'contact_address' => config('ui.footer.contact.address', ''),
@@ -352,15 +363,18 @@ class DashboardController extends Controller
      */
     public function updateSettings(Request $request)
     {
-        \Log::info('Received settings update request', $request->all());
-        \Log::info('Footer settings before update', config('ui.footer'));
+        Log::info('Received settings update request', $request->all());
+        Log::info('Footer settings before update', config('ui.footer'));
 
         $validated = $request->validate([
+            // v1_features validation
             'multilingual' => 'nullable|in:on',
             'dark_mode' => 'nullable|in:on',
             'payment_system' => 'nullable|in:on',
             'enhanced_ui' => 'nullable|in:on',
             'ai_features' => 'nullable|in:on',
+
+            // Footer validation
             'footer_text' => 'nullable|string',
             'footer_link_texts.*' => 'nullable|string',
             'footer_link_urls.*' => 'nullable|url',
@@ -374,52 +388,34 @@ class DashboardController extends Controller
             'contact_address' => 'nullable|string',
         ]);
 
-        // تحديث الإعدادات
-        $settings = [
+        // تحديث إعدادات v1_features
+        $v1Settings = [
             'multilingual' => $request->has('multilingual'),
             'dark_mode' => $request->has('dark_mode'),
             'payment_system' => $request->has('payment_system'),
             'enhanced_ui' => $request->has('enhanced_ui'),
             'ai_features' => $request->has('ai_features'),
+            'role_based_settings' => config('v1_features.role_based_settings', false),
+            'audit_logs' => config('v1_features.audit_logs', false),
+            'customizable_themes' => config('v1_features.customizable_themes', false),
+            'footer_preview' => config('v1_features.footer_preview', false),
+            'drag_and_drop_links' => config('v1_features.drag_and_drop_links', false),
+            'additional_contact_methods' => config('v1_features.additional_contact_methods', false),
         ];
 
-        \Log::info('Processed v1_features settings before saving:', $settings);
+        Log::info('Processed v1_features settings before saving:', $v1Settings);
 
-        // حفظ الإعدادات في ملف التكوين
-        $configPath = config_path('v1_features.php');
-        $configContent = "<?php\n\nreturn [\n";
+        // حفظ الإعدادات في ملف التكوين v1_features.php
+        $configPathV1 = config_path('v1_features.php');
+        $this->writeConfig($configPathV1, $v1Settings);
+        Log::info('Finished writing v1_features.php');
 
-        $currentSettings = config('v1_features');
-        $mergedSettings = array_merge($currentSettings, $settings);
-
-        foreach ($mergedSettings as $key => $value) {
-            if (is_bool($value)) {
-                $configContent .= "    '{$key}' => " . ($value ? 'true' : 'false') . ",\n";
-            } elseif (is_array($value)) {
-                $configContent .= "    '{$key}' => " . var_export($value, true) . ",\n";
-            } else {
-                $configContent .= "    '{$key}' => '" . addslashes($value) . "',\n";
-            }
-        }
-
-        $configContent .= "];\n";
-
-        file_put_contents($configPath, $configContent);
-        \Log::info('Finished writing v1_features.php');
-
-        // تحديث إعدادات الفوتر
+        // تحديث إعدادات الفوتر في ui.php
         $footer = config('ui.footer', []);
         $footer['text'] = $request->input('footer_text', '');
 
         $existingLinks = $footer['links'] ?? [];
-        $existingServiceLinks = $footer['services'] ?? [];
-        $existingSocialLinks = $footer['social'] ?? [];
-
         $footer['links'] = [];
-        $footer['services'] = [];
-        $footer['social'] = [];
-
-        // Rebuild links from request
         if ($request->has('footer_link_texts')) {
             foreach ($request->footer_link_texts as $index => $text) {
                 if (!empty($text) && isset($request->footer_link_urls[$index]) && !empty($request->footer_link_urls[$index])) {
@@ -430,8 +426,8 @@ class DashboardController extends Controller
                 }
             }
         }
-
-        // Rebuild service links from request
+        
+        $footer['services'] = [];
         if ($request->has('footer_service_link_texts')) {
             foreach ($request->footer_service_link_texts as $index => $text) {
                 if (!empty($text) && isset($request->footer_service_link_urls[$index]) && !empty($request->footer_service_link_urls[$index])) {
@@ -443,7 +439,7 @@ class DashboardController extends Controller
             }
         }
 
-        // Rebuild social links from request
+        $footer['social'] = [];
         if ($request->has('footer_social_names')) {
             foreach ($request->footer_social_names as $index => $name) {
                 if (!empty($name) && isset($request->footer_social_urls[$index]) && !empty($request->footer_social_urls[$index])) {
@@ -455,21 +451,18 @@ class DashboardController extends Controller
                 }
             }
         }
+        
+        $footer['contact'] = [
+             'phone' => $request->input('contact_phone', ''),
+             'email' => $request->input('contact_email', ''),
+             'address' => $request->input('contact_address', ''),
+        ];
 
-        \Log::info('Processed footer settings before saving:', $footer);
+        Log::info('Processed footer settings before saving:', $footer);
 
         // تحديث ملف ui.php
-        $this->updateUIConfig([
-            'footer' => array_merge($footer, [
-                'contact' => [
-                    'phone' => $request->input('contact_phone', ''),
-                    'email' => $request->input('contact_email', ''),
-                    'address' => $request->input('contact_address', ''),
-                ],
-            ]),
-        ]);
+        $this->updateUIConfig(['footer' => $footer]);
 
-        // معالجة الحذف والتعديل للروابط والصفحات المرتبطة
         $newLinks = $footer['links'];
 
         // حذف الصفحات المرتبطة بالروابط المحذوفة
@@ -481,7 +474,7 @@ class DashboardController extends Controller
 
                 if (File::exists($viewPath)) {
                     File::delete($viewPath);
-                    \Log::info("Deleted view file: {$viewPath}");
+                    Log::info("Deleted view file: {$viewPath}");
                 }
 
                 $routePath = base_path('routes/web.php');
@@ -494,7 +487,7 @@ class DashboardController extends Controller
                     $newRouteContent = preg_replace($pattern, '', $routeContent);
                     if ($newRouteContent !== $routeContent) {
                         File::put($routePath, $newRouteContent);
-                        \Log::info("Removed route for page: {$pageName}");
+                        Log::info("Removed route for page: {$pageName}");
                     }
                 }
             }
@@ -509,7 +502,7 @@ class DashboardController extends Controller
                 if (!File::exists($viewPath)) {
                     $viewContent = "@extends('layouts.app')\n\n@section('title', '{$newLink['text']}')\n\n@section('content')\n<div class=\"container py-5\">\n    <h1 class=\"mb-4\">{$newLink['text']}</h1>\n    <p>This is the {$newLink['text']} page. Add your content here.</p>\n</div>\n@endsection";
                     File::put($viewPath, $viewContent);
-                    \Log::info("Created view file: {$viewPath}");
+                    Log::info("Created view file: {$viewPath}");
 
                     $routePath = base_path('routes/web.php');
                     if (File::exists($routePath)) {
@@ -517,321 +510,21 @@ class DashboardController extends Controller
                         $routeDefinition = "Route::view('/{$pageName}', '{$pageName}')->name('{$pageName}');";
                         if (strpos($routeContent, $routeDefinition) === false) {
                             File::append($routePath, "\n" . $routeDefinition);
-                            \Log::info("Added route for page: {$pageName}");
+                            Log::info("Added route for page: {$pageName}");
                         }
                     }
                 }
             }
         }
 
-        \Log::info('Footer settings after update', $footer);
-        \Log::info('Settings update completed successfully.');
+        Log::info('Footer settings after update', $footer);
+        Log::info('Settings update completed successfully.');
 
-        \Artisan::call('config:clear');
+        Artisan::call('config:clear');
 
         return redirect('/admin/settings')->with('success', 'تم تحديث إعدادات النظام بنجاح');
     }
 
-    /**
-     * عرض صفحة إدارة الصفحة الرئيسية
-     * 
-     * @return \Illuminate\View\View
-     */
-    public function homePageManager()
-    {
-        // جلب بيانات الصفحة الرئيسية
-        $homePageSections = config('ui.home_page_sections', []);
-        $colors = config('ui.colors', []);
-        $fonts = config('ui.fonts', []);
-        $logoSettings = config('ui.logos', []);
-        
-        return view('admin.ui.home_page', compact('homePageSections', 'colors', 'fonts', 'logoSettings'));
-    }
-    
-    /**
-     * تحديث بيانات الصفحة الرئيسية
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function updateHomePage(Request $request)
-    {
-        // التحقق من البيانات
-        $request->validate([
-            'sections' => 'array',
-            'section_order' => 'string',
-            'primary_color' => 'string|max:7',
-            'secondary_color' => 'string|max:7',
-            'accent_color' => 'string|max:7',
-            'font_primary' => 'string|max:100',
-            'font_secondary' => 'string|max:100',
-        ]);
-
-        // تحديث بيانات الصفحة الرئيسية
-        $sections = $request->sections ?? [];
-        $sectionOrder = explode(',', $request->section_order);
-        
-        // تحديث الألوان
-        $colors = [
-            'primary' => $request->primary_color,
-            'secondary' => $request->secondary_color,
-            'accent' => $request->accent_color,
-        ];
-        
-        // تحديث الخطوط
-        $fonts = [
-            'primary' => $request->font_primary,
-            'secondary' => $request->font_secondary,
-        ];
-        
-        // معالجة تحميل الشعارات
-        $logoSettings = config('ui.logos', []);
-        
-        if ($request->hasFile('main_logo')) {
-            $mainLogo = $request->file('main_logo');
-            $mainLogoPath = $mainLogo->store('logos', 'public');
-            $logoSettings['main'] = $mainLogoPath;
-        }
-        
-        if ($request->hasFile('small_logo')) {
-            $smallLogo = $request->file('small_logo');
-            $smallLogoPath = $smallLogo->store('logos', 'public');
-            $logoSettings['small'] = $smallLogoPath;
-        }
-        
-        // حفظ الإعدادات في ملف التكوين
-        $this->updateUIConfig([
-            'home_page_sections' => $sections,
-            'section_order' => $sectionOrder,
-            'colors' => $colors,
-            'fonts' => $fonts,
-            'logos' => $logoSettings,
-        ]);
-        
-        return redirect()->route('admin.ui.home')->with('success', 'تم تحديث الصفحة الرئيسية بنجاح');
-    }
-    
-    /**
-     * عرض صفحة إدارة واجهات التطبيق
-     * 
-     * @return \Illuminate\View\View
-     */
-    public function interfacesManager()
-    {
-        $navigation = config('ui.navigation', []);
-        $pages = config('ui.pages', []);
-        $banners = config('ui.banners', []);
-        $alerts = config('ui.alerts', []);
-        $footer = config('ui.footer', []);
-        
-        return view('admin.ui.interfaces', compact('navigation', 'pages', 'banners', 'alerts', 'footer'));
-    }
-    
-    /**
-     * تحديث واجهات التطبيق
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function updateInterfaces(Request $request)
-    {
-        // تحديث معلومات التنقل
-        $navigation = $request->navigation ?? [];
-        
-        // تحديث معلومات الصفحات
-        $pages = config('ui.pages', []);
-        
-        if ($request->has('page_updates')) {
-            foreach ($request->page_updates as $id => $data) {
-                if (isset($pages[$id])) {
-                    $pages[$id]['title'] = $data['title'] ?? $pages[$id]['title'];
-                    $pages[$id]['content'] = $data['content'] ?? $pages[$id]['content'];
-                    $pages[$id]['active'] = isset($data['active']);
-                }
-            }
-        }
-        
-        // إضافة صفحة جديدة
-        if ($request->filled('new_page_title') && $request->filled('new_page_slug')) {
-            $pages[$request->new_page_slug] = [
-                'title' => $request->new_page_title,
-                'content' => $request->new_page_content ?? '',
-                'active' => true,
-            ];
-        }
-        
-        // تحديث البانرات
-        $banners = [];
-        if ($request->has('banner_titles')) {
-            foreach ($request->banner_titles as $index => $title) {
-                if (!empty($title)) {
-                    $banner = [
-                        'title' => $title,
-                        'content' => $request->banner_contents[$index] ?? '',
-                        'active' => isset($request->banner_active[$index]),
-                    ];
-                    
-                    if (isset($request->file('banner_images')[$index])) {
-                        $image = $request->file('banner_images')[$index];
-                        $path = $image->store('banners', 'public');
-                        $banner['image'] = $path;
-                    } elseif (isset($request->banner_existing_images[$index])) {
-                        $banner['image'] = $request->banner_existing_images[$index];
-                    }
-                    
-                    $banners[] = $banner;
-                }
-            }
-        }
-        
-        // تحديث التنبيهات
-        $alerts = [];
-        if ($request->has('alert_messages')) {
-            foreach ($request->alert_messages as $index => $message) {
-                if (!empty($message)) {
-                    $alerts[] = [
-                        'message' => $message,
-                        'type' => $request->alert_types[$index] ?? 'info',
-                        'active' => isset($request->alert_active[$index]),
-                        'expiry' => $request->alert_expiry[$index] ?? null,
-                    ];
-                }
-            }
-        }
-        
-        // تحديث معلومات التذييل
-        $footer = [
-            'text' => $request->footer_text ?? config('ui.footer.text', ''),
-            'links' => [],
-            'social' => [],
-        ];
-        
-        if ($request->has('footer_link_texts')) {
-            foreach ($request->footer_link_texts as $index => $text) {
-                if (!empty($text) && !empty($request->footer_link_urls[$index])) {
-                    $footer['links'][] = [
-                        'text' => $text,
-                        'url' => $request->footer_link_urls[$index],
-                    ];
-                }
-            }
-        }
-        
-        if ($request->has('footer_social_names')) {
-            foreach ($request->footer_social_names as $index => $name) {
-                if (!empty($name) && !empty($request->footer_social_urls[$index])) {
-                    $footer['social'][] = [
-                        'name' => $name,
-                        'url' => $request->footer_social_urls[$index],
-                        'icon' => $request->footer_social_icons[$index] ?? 'globe',
-                    ];
-                }
-            }
-        }
-        
-        // حفظ الإعدادات في ملف التكوين
-        $this->updateUIConfig([
-            'navigation' => $navigation,
-            'pages' => $pages,
-            'banners' => $banners,
-            'alerts' => $alerts,
-            'footer' => $footer,
-        ]);
-        
-        return redirect()->route('admin.ui.interfaces')->with('success', 'تم تحديث واجهات التطبيق بنجاح');
-    }
-    
-    /**
-     * عرض صفحة التقارير والإحصائيات
-     * 
-     * @param Request $request
-     * @return \Illuminate\View\View
-     */
-    public function analyticsReports(Request $request)
-    {
-        // الإحصائيات العامة للزيارات
-        $visitorStats = [
-            'total' => $this->getRandomStat(10000, 50000), // بيانات وهمية للعرض
-            'unique' => $this->getRandomStat(5000, 15000),
-            'average_time' => rand(120, 360),
-            'bounce_rate' => rand(20, 60),
-        ];
-        
-        // إحصائيات الصفحات الأكثر زيارةً
-        $topPages = [
-            ['path' => '/', 'title' => 'الصفحة الرئيسية', 'visits' => $this->getRandomStat(1000, 5000)],
-            ['path' => '/services', 'title' => 'الخدمات', 'visits' => $this->getRandomStat(800, 3000)],
-            ['path' => '/contact', 'title' => 'اتصل بنا', 'visits' => $this->getRandomStat(500, 2000)],
-            ['path' => '/about', 'title' => 'من نحن', 'visits' => $this->getRandomStat(400, 1500)],
-            ['path' => '/blog', 'title' => 'المدونة', 'visits' => $this->getRandomStat(300, 1000)],
-        ];
-        
-        // بيانات المتصفحات
-        $browsers = [
-            'Chrome' => $this->getRandomStat(40, 60),
-            'Firefox' => $this->getRandomStat(10, 20),
-            'Safari' => $this->getRandomStat(10, 25),
-            'Edge' => $this->getRandomStat(5, 15),
-            'Others' => $this->getRandomStat(1, 10),
-        ];
-        
-        // بيانات الأجهزة
-        $devices = [
-            'Desktop' => $this->getRandomStat(40, 60),
-            'Mobile' => $this->getRandomStat(30, 50),
-            'Tablet' => $this->getRandomStat(5, 15),
-            'Others' => $this->getRandomStat(1, 5),
-        ];
-        
-        // بيانات تحميلات التطبيق
-        $downloads = [
-            'android' => $this->getRandomStat(1000, 5000),
-            'ios' => $this->getRandomStat(800, 4000),
-        ];
-        
-        // معلومات حالة الخادم
-        $serverStatus = [
-            'uptime' => rand(95, 100) . '%',
-            'response_time' => rand(50, 200) . 'ms',
-            'memory_usage' => rand(40, 80) . '%',
-            'disk_usage' => rand(30, 70) . '%',
-        ];
-        
-        // بيانات الزيارات لآخر 7 أيام
-        $visitorsData = [
-            'dates' => collect([]),
-            'visits' => collect([]),
-        ];
-        
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $visitorsData['dates']->push($date->format('Y-m-d'));
-            $visitorsData['visits']->push($this->getRandomStat(100, 1000));
-        }
-        
-        return view('admin.ui.analytics', compact(
-            'visitorStats',
-            'topPages',
-            'browsers',
-            'devices',
-            'downloads',
-            'serverStatus',
-            'visitorsData'
-        ));
-    }
-    
-    /**
-     * توليد إحصائية عشوائية للعرض
-     * 
-     * @param int $min
-     * @param int $max
-     * @return int
-     */
-    private function getRandomStat($min, $max)
-    {
-        return rand($min, $max);
-    }
-    
     /**
      * تحديث ملف التكوين للواجهة
      * 
@@ -845,58 +538,35 @@ class DashboardController extends Controller
         
         // جلب الإعدادات الحالية
         if (file_exists($configPath)) {
-            $currentConfig = config('ui');
+            // Use require to get the array directly, avoiding potential caching issues with config() helper during update
+            $currentConfig = require $configPath;
         }
         
-        // دمج الإعدادات الجديدة
-        $newConfig = array_merge($currentConfig, $data);
+        // دمج الإعدادات الجديدة بشكل متكرر للحفاظ على البنية المتداخلة
+        $newConfig = array_replace_recursive($currentConfig, $data);
         
-        \Log::info('Updating UI config with data:', $data);
-        \Log::info('Current UI config:', $currentConfig);
-        \Log::info('New UI config:', $newConfig);
-        \Log::info('UI config after update:', $newConfig);
+        Log::info('Updating UI config with data:', $data);
+        Log::info('Current UI config:', $currentConfig);
+        Log::info('New UI config:', $newConfig);
 
-        // إنشاء محتوى ملف التكوين
-        $configContent = "<?php\n\nreturn " . var_export($newConfig, true) . ";\n";
-        
-        // حفظ ملف التكوين
-        file_put_contents($configPath, $configContent);
+        // Use the helper function to write the config file
+        $this->writeConfig($configPath, $newConfig);
         
         // إعادة تحميل الإعدادات
-        \Artisan::call('config:clear');
+        Artisan::call('config:clear');
     }
 
     /**
-     * Handle footer settings and contact information
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Helper function to write configuration file.
+     *
+     * @param string $path
+     * @param array $config
+     * @return void
      */
-    public function updateFooterSettings(Request $request)
+    private function writeConfig(string $path, array $config): void
     {
-        $validated = $request->validate([
-            'footer_text' => 'nullable|string',
-            'footer_links' => 'nullable|array',
-            'footer_services' => 'nullable|array',
-            'footer_social' => 'nullable|array',
-            'contact_phone' => 'nullable|string',
-            'contact_email' => 'nullable|email',
-            'contact_address' => 'nullable|string',
-        ]);
-
-        $agency = auth()->user()->agency;
-
-        $agency->footer_text = $validated['footer_text'] ?? $agency->footer_text;
-        $agency->footer_links = $validated['footer_links'] ?? $agency->footer_links;
-        $agency->footer_services = $validated['footer_services'] ?? $agency->footer_services;
-        $agency->footer_social = $validated['footer_social'] ?? $agency->footer_social;
-        $agency->contact_phone = $validated['contact_phone'] ?? $agency->contact_phone;
-        $agency->contact_email = $validated['contact_email'] ?? $agency->contact_email;
-        $agency->contact_address = $validated['contact_address'] ?? $agency->contact_address;
-
-        $agency->save();
-
-        return redirect()->back()->with('success', 'تم تحديث إعدادات الفوتر بنجاح');
+        $content = "<?php\n\nreturn " . var_export($config, true) . ";\n";
+        file_put_contents($path, $content);
     }
 
     /**
@@ -907,34 +577,27 @@ class DashboardController extends Controller
      */
     public function updateAdvancedSettings(Request $request)
     {
+        // Validate only the settings relevant to this form
         $validated = $request->validate([
-            'role_based_settings' => 'nullable|array',
-            'role_based_settings.*' => 'nullable|boolean', // Ensure each value is a boolean
-            'audit_logs' => 'nullable|array',
-            'audit_logs.*' => 'nullable|boolean', // Ensure each value is a boolean
-            'customizable_themes' => 'nullable|array',
-            'customizable_themes.*' => 'nullable|string|max:255', // Ensure each value is a string with a max length
-            'footer_preview' => 'nullable|string',
-            'drag_and_drop_links' => 'nullable|array',
-            'drag_and_drop_links.*' => 'nullable|string|max:255', // Ensure each link is a string with a max length
-            'additional_contact_methods' => 'nullable|array',
-            'additional_contact_methods.*' => 'nullable|string|max:255', // Ensure each contact method is a string with a max length
+            'role_based_settings' => 'nullable|in:on',
+            'audit_logs' => 'nullable|in:on',
+            'customizable_themes' => 'nullable|in:on',
         ]);
 
-        $agency = optional(auth()->user())->agency;
-        if (!$agency) {
-            return redirect()->back()->with('error', 'لا يوجد وكالة مرتبطة بهذا المستخدم.');
-        }
+        // Fetch current v1_features config
+        $configPath = config_path('v1_features.php');
+        $currentSettings = file_exists($configPath) ? require $configPath : [];
 
-        $agency->role_based_settings = $validated['role_based_settings'] ?? $agency->role_based_settings;
-        $agency->audit_logs = $validated['audit_logs'] ?? $agency->audit_logs;
-        $agency->customizable_themes = $validated['customizable_themes'] ?? $agency->customizable_themes;
+        // Update only the relevant settings
+        $newSettings = array_merge($currentSettings, [
+            'role_based_settings' => $request->has('role_based_settings'),
+            'audit_logs' => $request->has('audit_logs'),
+            'customizable_themes' => $request->has('customizable_themes'),
+        ]);
 
-        $agency->footer_preview = $validated['footer_preview'] ?? $agency->footer_preview;
-        $agency->drag_and_drop_links = $validated['drag_and_drop_links'] ?? $agency->drag_and_drop_links;
-        $agency->additional_contact_methods = $validated['additional_contact_methods'] ?? $agency->additional_contact_methods;
-
-        $agency->save();
+        // Write the updated config
+        $this->writeConfig($configPath, $newSettings);
+        Artisan::call('config:clear');
 
         return redirect()->back()->with('success', 'تم تحديث الإعدادات المتقدمة بنجاح');
     }
@@ -947,21 +610,27 @@ class DashboardController extends Controller
      */
     public function updateFooterFeatures(Request $request)
     {
+        // Validate only the settings relevant to this form
         $validated = $request->validate([
-            'footer_preview' => 'nullable|string',
-            'drag_and_drop_links' => 'nullable|array',
-            'drag_and_drop_links.*' => 'nullable|string|max:255', // Ensure each link is a string with a max length
-            'additional_contact_methods' => 'nullable|array',
-            'additional_contact_methods.*' => 'nullable|string|max:255', // Ensure each contact method is a string with a max length
+            'footer_preview' => 'nullable|in:on',
+            'drag_and_drop_links' => 'nullable|in:on',
+            'additional_contact_methods' => 'nullable|in:on',
         ]);
 
-        $agency = auth()->user()->agency;
+        // Fetch current v1_features config
+        $configPath = config_path('v1_features.php');
+        $currentSettings = file_exists($configPath) ? require $configPath : [];
 
-        $agency->footer_preview = $validated['footer_preview'] ?? $agency->footer_preview;
-        $agency->drag_and_drop_links = $validated['drag_and_drop_links'] ?? $agency->drag_and_drop_links;
-        $agency->additional_contact_methods = $validated['additional_contact_methods'] ?? $agency->additional_contact_methods;
+        // Update only the relevant settings
+        $newSettings = array_merge($currentSettings, [
+            'footer_preview' => $request->has('footer_preview'),
+            'drag_and_drop_links' => $request->has('drag_and_drop_links'),
+            'additional_contact_methods' => $request->has('additional_contact_methods'),
+        ]);
 
-        $agency->save();
+        // Write the updated config
+        $this->writeConfig($configPath, $newSettings);
+        Artisan::call('config:clear');
 
         return redirect()->back()->with('success', 'تم تحديث ميزات الفوتر بنجاح');
     }
