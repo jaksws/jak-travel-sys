@@ -909,13 +909,6 @@ class DashboardController extends Controller
     {
         $validated = $request->validate([
             'role_based_settings' => 'nullable|array',
-<<<<<<< HEAD
-            'audit_logs' => 'nullable|array',
-            'customizable_themes' => 'nullable|array',
-        ]);
-
-        $agency = auth()->user()->agency;
-=======
             'role_based_settings.*' => 'nullable|boolean', // Ensure each value is a boolean
             'audit_logs' => 'nullable|array',
             'audit_logs.*' => 'nullable|boolean', // Ensure each value is a boolean
@@ -932,19 +925,15 @@ class DashboardController extends Controller
         if (!$agency) {
             return redirect()->back()->with('error', 'لا يوجد وكالة مرتبطة بهذا المستخدم.');
         }
->>>>>>> origin/master
 
         $agency->role_based_settings = $validated['role_based_settings'] ?? $agency->role_based_settings;
         $agency->audit_logs = $validated['audit_logs'] ?? $agency->audit_logs;
         $agency->customizable_themes = $validated['customizable_themes'] ?? $agency->customizable_themes;
 
-<<<<<<< HEAD
-=======
         $agency->footer_preview = $validated['footer_preview'] ?? $agency->footer_preview;
         $agency->drag_and_drop_links = $validated['drag_and_drop_links'] ?? $agency->drag_and_drop_links;
         $agency->additional_contact_methods = $validated['additional_contact_methods'] ?? $agency->additional_contact_methods;
 
->>>>>>> origin/master
         $agency->save();
 
         return redirect()->back()->with('success', 'تم تحديث الإعدادات المتقدمة بنجاح');
@@ -961,13 +950,9 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'footer_preview' => 'nullable|string',
             'drag_and_drop_links' => 'nullable|array',
-<<<<<<< HEAD
-            'additional_contact_methods' => 'nullable|array',
-=======
             'drag_and_drop_links.*' => 'nullable|string|max:255', // Ensure each link is a string with a max length
             'additional_contact_methods' => 'nullable|array',
             'additional_contact_methods.*' => 'nullable|string|max:255', // Ensure each contact method is a string with a max length
->>>>>>> origin/master
         ]);
 
         $agency = auth()->user()->agency;
