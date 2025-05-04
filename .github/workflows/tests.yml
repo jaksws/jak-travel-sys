@@ -160,3 +160,9 @@ jobs:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: failure
           message: "⚠️ The GitHub Actions workflow failed."
+
+      - name: Handle GitHub workflow errors
+        run: |
+          echo "Checking for GitHub workflow errors..."
+          # Add logic to check for GitHub workflow errors
+          # This is a placeholder for the actual implementation

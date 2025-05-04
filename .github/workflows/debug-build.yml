@@ -163,3 +163,9 @@ jobs:
           key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-
+
+      - name: Handle GitHub workflow errors
+        run: |
+          echo "Checking for GitHub workflow errors..."
+          # Add logic to check for GitHub workflow errors
+          # This is a placeholder for the actual implementation

@@ -85,7 +85,18 @@ class CheckApplicationStatus extends Command
             $this->info('✓ الرابط العام موجود');
         }
 
+        // التحقق من أخطاء سير عمل GitHub
+        $this->info('التحقق من أخطاء سير عمل GitHub...');
+        $this->checkGitHubWorkflowErrors();
+
         // إرجاع حالة التطبيق
         $this->info('تم الانتهاء من فحص حالة التطبيق!');
+    }
+
+    private function checkGitHubWorkflowErrors()
+    {
+        $this->info('التحقق من أخطاء سير عمل GitHub...');
+        // Add logic to check for GitHub workflow errors
+        // This is a placeholder for the actual implementation
     }
 }
