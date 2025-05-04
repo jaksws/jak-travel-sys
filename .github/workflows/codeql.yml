@@ -13,9 +13,9 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
   schedule:
     - cron: '39 20 * * 3'
 
@@ -26,7 +26,6 @@ jobs:
     #   - https://gh.io/recommended-hardware-resources-for-running-codeql
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
-    # Consider using larger runners or machines with greater resources for possible analysis time improvements.
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     permissions:
       # required for all workflows
@@ -100,3 +99,15 @@ jobs:
         # The category value is prefixed with '/language:' to group analysis results
         # by language, which is useful when analyzing multiple languages in the same workflow.
         category: "/language:${{matrix.language}}"
+        output: sarif
+        upload: true
+        # Generate detailed reports on test coverage
+        test-coverage: true
+
+    - name: Send notification for workflow results
+      if: always()
+      uses: actions/notify@v2
+      with:
+        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        status: ${{ job.status }}
+        message: "CodeQL workflow ${{ job.status }} for ${{ github.repository }}"

@@ -123,4 +123,23 @@ class AdminSettingsTest extends AdminTestCase
         $response->assertSee('test@example.com');
         $response->assertSee('123 Test St');
     }
+
+    /**
+     * Test that admin can update footer features.
+     *
+     * @return void
+     */
+    public function test_admin_can_update_footer_features()
+    {
+        $this->loginAsAdmin();
+        $data = [
+            'footer_preview' => 'on',
+            'drag_and_drop_links' => 'on',
+            'additional_contact_methods' => 'on',
+        ];
+        $response = $this->post(route('admin.settings.updateFooterFeatures'), $data);
+        $response->assertStatus(302);
+        $response->assertRedirect(route('admin.settings'));
+        $response->assertSessionHas('success');
+    }
 }

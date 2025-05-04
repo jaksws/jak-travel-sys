@@ -155,3 +155,11 @@ jobs:
 
       - name: Run Tests
         run: php artisan test
+
+      - name: Cache build artifacts
+        uses: actions/cache@v2
+        with:
+          path: public/build
+          key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
