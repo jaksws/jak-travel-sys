@@ -30,10 +30,10 @@ Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(f
     Route::delete('/requests/{request}', [DashboardController::class, 'destroyRequest'])->name('requests.destroy'); // Assuming destroyRequest method exists or will be created
 
     // Settings Routes
-    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings'); // Renamed from settings.index for consistency
-    Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('settings.update'); // General settings update
-    Route::post('/settings/advanced', [DashboardController::class, 'updateAdvancedSettings'])->name('settings.updateAdvancedSettings');
-    Route::post('/settings/footer-features', [DashboardController::class, 'updateFooterFeatures'])->name('settings.updateFooterFeatures'); // Add this route definition
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('admin.settings'); // Renamed from settings.index for consistency
+    Route::post('/settings', [DashboardController::class, 'updateSettings'])->name('admin.settings.update'); // General settings update
+    Route::post('/settings/advanced', [DashboardController::class, 'updateAdvancedSettings'])->name('admin.settings.updateAdvancedSettings');
+    Route::post('/settings/footer-features', [DashboardController::class, 'updateFooterFeatures'])->name('admin.settings.updateFooterFeatures'); // Add this route definition
 
     // ... system logs and settings routes ...
 });

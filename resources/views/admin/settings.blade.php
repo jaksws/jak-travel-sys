@@ -303,7 +303,7 @@
             <h5 class="mb-0"><i class="fas fa-shapes me-2"></i> ميزات الفوتر</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.settings.updateAdvancedSettings') }}" method="POST" class="mb-0">
+            <form action="{{ route('admin.settings.updateFooterFeatures') }}" method="POST" class="mb-0">
                 @csrf
                 <div class="row g-3">
                     <div class="col-lg-6">
@@ -337,113 +337,6 @@
                             <label class="form-check-label" for="additional_contact_methods">
                                 طرق تواصل إضافية
                                 <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" title="إضافة طرق تواصل مثل واتساب وتيليجرام"></i>
-                                <small class="d-block text-muted">إضافة طرق تواصل مثل واتساب وتيليجرام</small>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> حفظ الإعدادات
-                    </button>
-                    <button type="reset" class="btn btn-secondary">
-                        <i class="fas fa-undo me-1"></i> إعادة تعيين
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- معلومات النظام --}}
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold">إعدادات متقدمة</h6>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('admin.settings.updateAdvancedSettings') }}" method="POST" class="mb-0">
-                @csrf
-                <div class="row mb-4">
-                    <div class="col-lg-6">
-                        <h5 class="mb-3">إعدادات حسب الدور</h5>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="role_based_settings" name="role_based_settings" value="1" {{ $settings['role_based_settings'] ? 'checked' : '' }}>
-                            <label class="form-check-label" for="role_based_settings">
-                                إعدادات حسب الدور
-                                <small class="d-block text-muted">تفعيل إعدادات مختلفة حسب دور المستخدم</small>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <h5 class="mb-3">سجلات التدقيق</h5>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="audit_logs" name="audit_logs" value="1" {{ $settings['audit_logs'] ? 'checked' : '' }}>
-                            <label class="form-check-label" for="audit_logs">
-                                سجلات التدقيق
-                                <small class="d-block text-muted">عرض التغييرات التي تم إجراؤها على الإعدادات</small>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <div class="col-lg-6">
-                        <h5 class="mb-3">تخصيص الثيمات</h5>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="customizable_themes" name="customizable_themes" value="1" {{ $settings['customizable_themes'] ? 'checked' : '' }}>
-                            <label class="form-check-label" for="customizable_themes">
-                                تخصيص الثيمات
-                                <small class="d-block text-muted">السماح للمسؤولين بتخصيص الثيمات</small>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> حفظ الإعدادات
-                    </button>
-                    <button type="reset" class="btn btn-secondary">
-                        <i class="fas fa-undo me-1"></i> إعادة تعيين
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold">ميزات الفوتر</h6>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('admin.settings.updateFooterFeatures') }}" method="POST" class="mb-0">
-                @csrf
-                <div class="row mb-4">
-                    <div class="col-lg-6">
-                        <h5 class="mb-3">معاينة الفوتر</h5>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="footer_preview" name="footer_preview" value="1" {{ $settings['footer_preview'] ? 'checked' : '' }}>
-                            <label class="form-check-label" for="footer_preview">
-                                معاينة الفوتر
-                                <small class="d-block text-muted">عرض معاينة حية للفوتر أثناء التعديل</small>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <h5 class="mb-3">سحب وإفلات الروابط</h5>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="drag_and_drop_links" name="drag_and_drop_links" value="1" {{ $settings['drag_and_drop_links'] ? 'checked' : '' }}>
-                            <label class="form-check-label" for="drag_and_drop_links">
-                                سحب وإفلات الروابط
-                                <small class="d-block text-muted">إعادة ترتيب الروابط باستخدام السحب والإفلات</small>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <div class="col-lg-6">
-                        <h5 class="mb-3">طرق تواصل إضافية</h5>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="additional_contact_methods" name="additional_contact_methods" value="1" {{ $settings['additional_contact_methods'] ? 'checked' : '' }}>
-                            <label class="form-check-label" for="additional_contact_methods">
-                                طرق تواصل إضافية
                                 <small class="d-block text-muted">إضافة طرق تواصل مثل واتساب وتيليجرام</small>
                             </label>
                         </div>
