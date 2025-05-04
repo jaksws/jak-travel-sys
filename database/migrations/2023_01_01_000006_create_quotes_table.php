@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('rejection_reason')->nullable();
             $table->foreignId('subagent_id')->nullable()->constrained('users');
             $table->decimal('price', 10, 2);
+            $table->string('currency_code', 3)->default('SAR');
             $table->decimal('commission_amount', 10, 2)->nullable();
             $table->text('details')->nullable();
             $table->enum('status', [

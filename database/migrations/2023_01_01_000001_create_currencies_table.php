@@ -33,9 +33,9 @@ return new class extends Migration
         // });
 
         // Modify quotes table to store currency information
-        Schema::table('quotes', function (Blueprint $table) {
-            $table->string('currency_code', 3)->default('SAR')->after('price');
-        });
+        // Schema::table('quotes', function (Blueprint $table) {
+        //     $table->string('currency_code', 3)->default('SAR')->after('price');
+        // });
     }
 
     /**
@@ -61,8 +61,9 @@ return new class extends Migration
             }
         });
 
-        Schema::table('quotes', function (Blueprint $table) {
-            $table->dropColumn('currency_code');
-        });
+        // Remove the corresponding dropColumn from the down method as well
+        // Schema::table('quotes', function (Blueprint $table) {
+        //     $table->dropColumn('currency_code');
+        // });
     }
 };
