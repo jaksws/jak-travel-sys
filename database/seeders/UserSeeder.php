@@ -238,5 +238,19 @@ class UserSeeder extends Seeder
         } else {
             fwrite(STDOUT, "UserSeeder failed. No users were created.\n");
         }
+
+        // Add default admin user
+        User::firstOrCreate(
+            ['email' => 'admin@jaksws.com'],
+            [
+                'name' => 'admin',
+                'password' => Hash::make('admin@1211'),
+                'role' => 'admin',
+                'status' => 'active',
+                'locale' => 'en',
+                'theme' => 'light',
+                'email_notifications' => true,
+            ]
+        );
     }
 }
