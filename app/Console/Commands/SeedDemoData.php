@@ -39,6 +39,8 @@ class SeedDemoData extends Command
 
         // التحقق من وجود بيانات
         if (Agency::count() > 0) {
+            sleep(3);
+            $confirm = env('DEFAULT_YES_RESPONSE', 'yes');
             if (!$this->confirm('توجد بيانات بالفعل في النظام. هل تريد المتابعة وإضافة المزيد من البيانات التجريبية؟', true)) {
                 $this->info('تم إلغاء العملية.');
                 return 0;

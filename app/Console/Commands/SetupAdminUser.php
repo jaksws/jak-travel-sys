@@ -11,7 +11,7 @@ use App\Models\User;
 
 class SetupAdminUser extends Command
 {
-    protected $signature = 'app:setup-admin-user';
+    protected $signature = 'app:setup-admin-user {--default-yes}';
     protected $description = 'إنشاء أو تحديث حساب مستخدم من نوع مسؤول (admin) - يدير جميع الوكالات';
 
     public function handle()
@@ -56,7 +56,14 @@ class SetupAdminUser extends Command
         $adminExists = $this->checkForExistingAdmin($roleColumn, $adminType);
         
         if ($adminExists) {
-            if (!$this->confirm('تم اكتشاف مستخدم بدور مسؤول. هل ترغب في إنشاء مستخدم مسؤول جديد؟', true)) {
+            if ($this->option('default-yes')) {
+                sleep(3);
+                $confirm = env('DEFAULT_YES_RESPONSE', 'yes');
+            } else {
+                $confirm = $this->confirm('تم اكتشاف مستخدم بدور مسؤول. هل ترغب في إنشاء مستخدم مسؤول جديد؟', true);
+            }
+
+            if (!$confirm) {
                 $this->info('تم إلغاء العملية.');
                 return 0;
             }
