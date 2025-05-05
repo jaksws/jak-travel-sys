@@ -215,5 +215,28 @@ class UserSeeder extends Seeder
                 ]
             );
         }
+
+        // Add a timer when asking the user for duration and seconds
+        fwrite(STDOUT, "Please enter the duration in seconds: ");
+        $handle = fopen("php://stdin", "r");
+        $duration = trim(fgets($handle));
+        fclose($handle);
+
+        if (!is_numeric($duration) || $duration <= 0) {
+            fwrite(STDOUT, "Invalid duration. Exiting.\n");
+            return;
+        }
+
+        fwrite(STDOUT, "Timer set for $duration seconds. Starting...\n");
+        sleep($duration);
+        fwrite(STDOUT, "Timer completed.\n");
+
+        // Check to ensure the user seeder is working correctly
+        $userCount = User::count();
+        if ($userCount > 0) {
+            fwrite(STDOUT, "UserSeeder completed successfully. Total users: $userCount\n");
+        } else {
+            fwrite(STDOUT, "UserSeeder failed. No users were created.\n");
+        }
     }
 }
