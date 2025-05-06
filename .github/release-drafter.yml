@@ -1,0 +1,22 @@
+name-template: 'v$NEXT_PATCH_VERSION'
+tag-template: 'v$NEXT_PATCH_VERSION'
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'bug'
+  - title: '🧹 Chores'
+    labels:
+      - 'chore'
+  - title: '📝 Documentation'
+    labels:
+      - 'documentation'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/jaksws/jak-travel-sys/compare/$PREVIOUS_TAG...$NEW_TAG

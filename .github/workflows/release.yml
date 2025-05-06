@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  generate-release-notes:
+    runs-on: ubuntu-latest
+    needs: create-release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate release notes
+        uses: release-drafter/release-drafter@v5
+        with:
+          config-name: .github/release-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-publish-docker:
+    runs-on: ubuntu-latest
+    needs: generate-release-notes
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/jak-travel-sys:${{ github.ref }}
+
+  deploy-to-staging:
+    runs-on: ubuntu-latest
+    needs: build-and-publish-docker
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_SSH_USER }}@${{ secrets.STAGING_SERVER }} << 'EOF'
+            docker pull ${{ secrets.DOCKER_USERNAME }}/jak-travel-sys:${{ github.ref }}
+            docker stop jak-travel-sys || true
+            docker rm jak-travel-sys || true
+            docker run -d --name jak-travel-sys -p 80:80 ${{ secrets.DOCKER_USERNAME }}/jak-travel-sys:${{ github.ref }}
+          EOF

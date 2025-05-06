@@ -2,7 +2,7 @@
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "tasks": {
     "build": "composer install --ignore-platform-reqs && npm install && npm run build",
-    "test": "composer install --ignore-platform-reqs && npm install && cp .env.example .env && php artisan key:generate && php artisan migrate && php artisan db:seed && php artisan test",
+    "test": "composer install --ignore-platform-reqs && cp .env.example .env && php artisan key:generate && touch database/database.sqlite && php artisan migrate && php artisan db:seed && npm install && npm run build && php artisan test",
     "launch": "composer install --ignore-platform-reqs && cp .env.example .env && php artisan key:generate && php artisan migrate && npm install && npm run build && php artisan serve"
   }
 }
