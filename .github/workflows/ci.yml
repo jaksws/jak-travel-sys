@@ -12,144 +12,79 @@ on:
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          extensions: mbstring, sqlite3, intl, bcmath
-          coverage: none
-
-      - name: Install dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
-
+      - name: Setup PHP
+        uses: ./.github/actions/setup-php
       - name: Copy .env
         run: cp .env.example .env
-
       - name: Generate app key
         run: php artisan key:generate
-
       - name: Create SQLite database
         run: |
           mkdir -p database
           touch database/database.sqlite
-
       - name: Ensure public/storage exists
         run: mkdir -p public/storage
-
       - name: Run migrations
         run: php artisan migrate
-
       - name: Create cache table
         run: php artisan cache:table && php artisan migrate
-
       - name: Run custom application status check
         run: php artisan app:check-status
 
   phpstan:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          extensions: mbstring, sqlite3, intl, bcmath
-          coverage: none
-
-      - name: Install dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
-
+      - name: Setup PHP
+        uses: ./.github/actions/setup-php
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
 
   php-cs-fixer:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          extensions: mbstring, sqlite3, intl, bcmath
-          coverage: none
-
-      - name: Install dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
-
+      - name: Setup PHP
+        uses: ./.github/actions/setup-php
       - name: Run PHP CS Fixer
         run: vendor/bin/php-cs-fixer fix --dry-run --diff
 
   security-check:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          extensions: mbstring, sqlite3, intl, bcmath
-          coverage: none
-
-      - name: Install dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
-
+      - name: Setup PHP
+        uses: ./.github/actions/setup-php
       - name: Run security check
         run: vendor/bin/security-checker security:check
 
   performance-tests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          extensions: mbstring, sqlite3, intl, bcmath
-          coverage: none
-
-      - name: Install dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
-
+      - name: Setup PHP
+        uses: ./.github/actions/setup-php
       - name: Run performance tests
         run: php artisan performance:test
 
   code-coverage:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+      - name: Setup PHP (with xdebug)
+        uses: ./.github/actions/setup-php
         with:
-          php-version: 8.2
-          extensions: mbstring, sqlite3, intl, bcmath
           coverage: xdebug
-
-      - name: Install dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
-
       - name: Run tests with coverage
         run: php artisan test --coverage
-
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
@@ -160,76 +95,40 @@ jobs:
 
   cypress-tests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
       - name: Run Cypress tests
         run: npm run cypress:run
 
   browserstack-tests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
       - name: Run BrowserStack tests
         run: npm run browserstack:run
 
   accessibility-tests:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
       - name: Run accessibility tests
         run: npm run axe:run
 
   prettier:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
       - name: Run Prettier
         run: npm run prettier:check

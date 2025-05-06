@@ -12,24 +12,17 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         php: [8.2, 8.3, 8.4]
-
     name: PHP ${{ matrix.php }}
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: ./.github/actions/setup-php
         with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
           coverage: none
-
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
@@ -37,47 +30,29 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction
-
       - name: Apply version-specific compatibility fixes
         run: |
           if [[ "${{ matrix.php }}" == "8.3" || "${{ matrix.php }}" == "8.4" ]]; then
             php -f app/Compatibility/apply-fixes.php
           fi
-
       - name: Copy environment file
         run: cp .env.example .env
-
       - name: Create SQLite Database
         run: |
           mkdir -p database
           touch database/database.sqlite
-
       - name: Ensure .env is configured for SQLite
         run: |
           echo "DB_CONNECTION=sqlite" >> .env
           echo "DB_DATABASE=database/database.sqlite" >> .env
-
       - name: Generate app key and export
         run: echo "APP_KEY=$(php artisan key:generate --show)" >> $GITHUB_ENV
-
       - name: Create storage symlink
         run: php artisan storage:link
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install NPM dependencies
-        run: npm ci
-
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
       - name: Copy debug Vite config
         run: cp vite.config.debug.js vite.config.js
-
       - name: Build assets
         run: |
           npm run build
@@ -96,25 +71,19 @@ jobs:
             echo "ERROR: manifest.json not found in public/build/ or public/build/.vite/"
             exit 1
           fi
-
       - name: Ensure SQLite database file creation
         run: |
           if [ ! -f "database/database.sqlite" ]; then
             touch database/database.sqlite
           fi
-
       - name: Run Migrations
         run: php artisan migrate
-
       - name: Backup Database
         run: php artisan app:database-backup
-
       - name: Seed Database
         run: php artisan db:seed
-
       - name: Check Application Status
         run: php artisan app:check-status
-
       - name: Execute tests
         run: php artisan test
         env:
@@ -136,7 +105,6 @@ jobs:
           APP_LOCALE: en
           APP_FALLBACK_LOCALE: en
           APP_TIMEZONE: UTC
-
       - name: Send failure notification
         if: failure()
-        run: echo "⚠️ The GitHub Actions workflow failed."
+        run: echo "\u26a0\ufe0f The GitHub Actions workflow failed."

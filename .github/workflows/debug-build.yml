@@ -10,13 +10,9 @@ on:
 jobs:
   debug:
     runs-on: ubuntu-latest
-    
-    # Add least-privilege permissions
     permissions:
-      contents: read  # only need read access to checkout code
-      packages: read  # if you need to read from GitHub Packages
-      
-    # Database service for testing
+      contents: read
+      packages: read
     services:
       mysql:
         image: mysql:8.0
@@ -26,26 +22,14 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    
     steps:
       - uses: actions/checkout@v3
-      
-      # Add PHP setup step before Node.js setup
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: ./.github/actions/setup-php
         with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, mysql, pdo_mysql
           coverage: none
-          tools: composer:v2
-          ini-values: memory_limit=-1
-          
       - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
+        uses: ./.github/actions/setup-node
       - name: Cache Composer dependencies
         uses: actions/cache@v2
         with:
@@ -53,7 +37,6 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-
       - name: Install PHP dependencies
         timeout-minutes: 10
         env:
@@ -65,20 +48,15 @@ jobs:
         run: |
           echo "PHP Version: $(php -v)"
           echo "Composer Version: $(composer -V)"
-          echo "Memory Limit: $(php -r 'echo ini_get("memory_limit");')"
+          echo "Memory Limit: $(php -r 'echo ini_get(\"memory_limit\");')"
           echo "Installing Composer dependencies..."
-          
-          # Try with increased memory limit
           php -d memory_limit=-1 $(which composer) install --prefer-dist --no-interaction --no-progress
-          
-          # Verify composer installation completed successfully
           if [ $? -eq 0 ]; then
             echo "✅ Composer install completed successfully"
           else
             echo "❌ Composer install failed"
             exit 1
           fi
-          
       - name: Cache NPM dependencies
         uses: actions/cache@v2
         with:
@@ -86,10 +64,8 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
-
       - name: Install Node.js Dependencies
         run: npm ci
-        
       - name: Debug Environment
         run: |
           php --version
@@ -97,25 +73,18 @@ jobs:
           npm --version
           ls -la
           cat package.json
-          
       - name: Build Assets
         run: |
           npm run build
           echo "Checking build output:"
           ls -la public/build/
-          
-          # Check .vite subdirectory where manifest is actually located
           echo "Checking .vite subdirectory:"
           ls -la public/build/.vite/
-          
       - name: Verify Manifest
         run: |
-          # Check for manifest in the .vite subdirectory where Vite v6+ places it
           if [ -f "public/build/.vite/manifest.json" ]; then
             echo "✅ manifest.json exists in .vite subdirectory!"
             cat public/build/.vite/manifest.json
-            
-            # Copy manifest to parent directory if needed by your application
             echo "Copying manifest to parent directory for compatibility"
             cp public/build/.vite/manifest.json public/build/manifest.json
           else
@@ -124,17 +93,13 @@ jobs:
             find public -type f | sort
             exit 1
           fi
-
-          # Temporary fix to bypass failure
           if [ ! -f "public/build/.vite/manifest.json" ]; then
             echo "{}" > public/build/.vite/manifest.json
             echo "⚠️ Temporary manifest.json created for debugging"
           fi
           cp public/build/.vite/manifest.json public/build/manifest.json
-
       - name: Backup Database
         run: php artisan app:database-backup
-
       - name: Ensure SQLite database file creation
         run: |
           if [ ! -f "database/database.sqlite" ]; then
@@ -143,15 +108,11 @@ jobs:
           else
             echo "SQLite database file already exists."
           fi
-
       - name: Check Application Status
         run: php artisan app:check-status
-
       - name: Run Migrations
         run: php artisan migrate
-
       - name: Seed Database
         run: php artisan db:seed
-
       - name: Run Tests
         run: php artisan test

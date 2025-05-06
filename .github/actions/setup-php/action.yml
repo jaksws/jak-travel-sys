@@ -1,0 +1,19 @@
+name: 'Setup PHP and Install Composer Dependencies'
+description: 'Sets up PHP and installs Composer dependencies.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
+        extensions: mbstring, sqlite3, intl, bcmath
+        coverage: ${{ inputs.coverage || 'none' }}
+    - name: Install dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+      shell: bash
+inputs:
+  coverage:
+    description: 'Coverage driver (none or xdebug)'
+    required: false
+    default: 'none'
