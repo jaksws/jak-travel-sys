@@ -1,0 +1,19 @@
+name: PHP Setup
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        required: false
+        type: string
+        default: '8.2'
+jobs:
+  setup-php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version }}
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
