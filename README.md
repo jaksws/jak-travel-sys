@@ -28,6 +28,12 @@
 - [📮 التواصل والمساهمة](#-التواصل-والمساهمة)
 - [📝 الترخيص](#-الترخيص)
 - [📋 اختبارات سلامة قاعدة البيانات](#-اختبارات-سلامة-قاعدة-البيانات)
+- [🛠️ Code Style & Linting](#️-code-style--linting)
+- [🔒 Security](#-security)
+- [🤝 Contributing](#-contributing)
+- [🧪 Test Coverage](#-test-coverage)
+- [📦 Dependency Management](#-dependency-management)
+- [📝 Changelog](#-changelog)
 
 ## 🎯 المميزات الرئيسية
 
@@ -577,5 +583,49 @@ npm run build
 ### ملاحظة حول أمر seed-demo
 - أمر `php artisan app:seed-demo` لا يعمل تلقائياً على قاعدة بيانات الاختبار الخاصة بـ PHPUnit.
 - تم تجاوز ذلك بإنشاء بيانات demo عبر Factories مباشرة في بيئة الاختبار.
+
+---
+
+## 🛠️ Code Style & Linting
+
+- **PHP:** The project uses [PHP CS Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for code style. Run `vendor/bin/php-cs-fixer fix` to auto-fix style issues.
+- **JS/TS:** The project uses [Prettier](https://prettier.io/) for formatting. Run `npm run prettier:check` to check formatting.
+- **ESLint:** (Recommended) Add ESLint for JavaScript/TypeScript linting. Install with `npm install --save-dev eslint` and run `npx eslint .`.
+
+---
+
+## 🔒 Security
+
+- Never commit real secrets or credentials. Use `.env.example` as a template.
+- Review [SECURITY.md](SECURITY.md) for responsible disclosure and security practices.
+- All secrets in CI/CD must be stored in GitHub Actions secrets.
+
+---
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, code style, and PR process.
+
+---
+
+## 🧪 Test Coverage
+
+- Run all tests: `php artisan test`
+- Run with coverage: `php artisan test --coverage`
+- Coverage is reported in CI. Aim for high coverage and add tests for new features.
+
+---
+
+## 📦 Dependency Management
+
+- PHP dependencies: managed via Composer (`composer install`)
+- JS dependencies: managed via npm (`npm install`)
+- Automated updates: [Dependabot](https://github.com/dependabot) is enabled for Composer, npm, and GitHub Actions.
+
+---
+
+## 📝 Changelog
+
+All notable changes are documented in [CHANGELOG.md](CHANGELOG.md). Update it with every release.
 
 ---
