@@ -7,6 +7,18 @@ use Illuminate\Validation\ValidationException;
 
 class AdminSettingsTest extends AdminTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Ensure the test environment simulates an authenticated admin user
+        $this->loginAsAdmin();
+
+        // Set the role attribute to 'admin' for the test admin user
+        $this->admin->role = 'admin';
+        $this->admin->save();
+    }
+
     /**
      * Test that admin can view settings page.
      *
@@ -14,7 +26,6 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_admin_can_view_settings_page()
     {
-        $this->loginAsAdmin();
         $response = $this->get(route('admin.settings'));
         $response->assertStatus(200);
         $response->assertSee('multilingual');
@@ -32,7 +43,6 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_admin_can_update_settings()
     {
-        $this->loginAsAdmin();
         $data = [
             'multilingual' => 'on',
             'dark_mode' => 'on',
@@ -56,7 +66,6 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_settings_validation()
     {
-        $this->loginAsAdmin();
         $data = [
             'dark_mode' => 'invalid_value', // Send an invalid value
         ];
@@ -75,7 +84,6 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_contact_information_settings_are_saved_correctly()
     {
-        $this->loginAsAdmin();
         $data = [
             'contact_phone' => '123456789',
             'contact_email' => 'test@example.com',
@@ -98,7 +106,6 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_settings_form_displays_contact_information_fields()
     {
-        $this->loginAsAdmin();
         $response = $this->get(route('admin.settings'));
         $response->assertStatus(200);
         $response->assertSee('contact_phone');

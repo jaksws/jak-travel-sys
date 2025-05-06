@@ -303,6 +303,7 @@
             <h5 class="mb-0"><i class="fas fa-shapes me-2"></i> ميزات الفوتر</h5>
         </div>
         <div class="card-body">
+            @if(Route::has('admin.settings.updateFooterFeatures'))
             <form action="{{ route('admin.settings.updateFooterFeatures') }}" method="POST" class="mb-0">
                 @csrf
                 <div class="row g-3">
@@ -351,6 +352,9 @@
                     </button>
                 </div>
             </form>
+            @else
+            <p class="text-danger">The footer features update route is not available.</p>
+            @endif
         </div>
     </div>
 

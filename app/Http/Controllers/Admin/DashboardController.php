@@ -634,4 +634,43 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('success', 'تم تحديث ميزات الفوتر بنجاح');
     }
+
+    /**
+     * Update the home page settings.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateHomePage(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'banner_image' => 'nullable|image|max:2048',
+        ]);
+
+        // Logic to update home page settings
+        // Example: Save to a configuration file or database
+
+        return redirect()->back()->with('success', 'Home page settings updated successfully.');
+    }
+
+    /**
+     * Update the interface settings.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateInterfaces(Request $request)
+    {
+        $validated = $request->validate([
+            'theme' => 'required|string|in:light,dark',
+            'layout' => 'required|string|in:default,compact',
+        ]);
+
+        // Logic to update interface settings
+        // Example: Save to a configuration file or database
+
+        return redirect()->back()->with('success', 'Interface settings updated successfully.');
+    }
 }

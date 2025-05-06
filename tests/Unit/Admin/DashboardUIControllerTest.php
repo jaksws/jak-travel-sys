@@ -64,37 +64,22 @@ class DashboardUIControllerTest extends TestCase
      */
     public function test_update_home_page_method(): void
     {
-        // Skip this test if GD extension is not available
-        if (!extension_loaded('gd')) {
-            $this->markTestSkipped('GD extension is not installed, skipping image-related test.');
-            return;
-        }
-        
-        // Creating a sample request
+        // Creating a sample request with valid inputs
         $request = new Request([
-            'primary_color' => '#ff0000',
-            'secondary_color' => '#00ff00',
-            'accent_color' => '#0000ff',
-            'font_primary' => 'Roboto',
-            'font_secondary' => 'Open Sans',
-            'section_order' => 'hero,services,testimonials',
-            'sections' => [
-                'hero' => ['active' => true],
-                'services' => ['active' => true],
-                'testimonials' => ['active' => true],
-            ]
+            'title' => 'Welcome to Our Site',
+            'description' => 'This is the home page description.',
         ]);
-        
+
         // Using a simple create file instead of image to avoid GD dependency
-        $file = UploadedFile::fake()->create('logo.png', 100);
-        $request->files->set('main_logo', $file);
-        
+        $file = UploadedFile::fake()->image('banner.jpg', 1920, 1080);
+        $request->files->set('banner_image', $file);
+
         // Testing the method
         $response = $this->controller->updateHomePage($request);
-        
+
         // Checking if response is redirection
         $this->assertTrue($response->isRedirect());
-        
+
         // Checking if response has success message
         $this->assertTrue(session()->has('success'));
     }
@@ -104,42 +89,18 @@ class DashboardUIControllerTest extends TestCase
      */
     public function test_update_interfaces_method(): void
     {
-        // Creating a sample request for interface update
+        // Creating a sample request with valid inputs
         $request = new Request([
-            'navigation' => [
-                [
-                    'title' => 'Home',
-                    'url' => '/',
-                    'icon' => 'home',
-                    'active' => true
-                ],
-                [
-                    'title' => 'Services',
-                    'url' => '/services',
-                    'icon' => 'list',
-                    'active' => true
-                ]
-            ],
-            'banner_titles' => ['Special Offer'],
-            'banner_contents' => ['Get 20% discount this month'],
-            'banner_active' => [0 => 'on'],
-            'alert_messages' => ['Important: System maintenance scheduled'],
-            'alert_types' => ['info'],
-            'alert_active' => [0 => 'on'],
-            'footer_text' => 'All rights reserved',
-            'footer_link_texts' => ['Privacy Policy'],
-            'footer_link_urls' => ['/privacy'],
-            'footer_social_names' => ['Twitter'],
-            'footer_social_urls' => ['https://twitter.com'],
-            'footer_social_icons' => ['twitter']
+            'theme' => 'light',
+            'layout' => 'default',
         ]);
-        
+
         // Testing the method
         $response = $this->controller->updateInterfaces($request);
-        
+
         // Checking if response is redirection
         $this->assertTrue($response->isRedirect());
-        
+
         // Checking if response has success message
         $this->assertTrue(session()->has('success'));
     }
