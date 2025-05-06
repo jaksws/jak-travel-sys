@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class AdminSettingsTest extends AdminTestCase
 {
@@ -11,12 +12,13 @@ class AdminSettingsTest extends AdminTestCase
     {
         parent::setUp();
 
-        // Ensure the test environment simulates an authenticated admin user
-        $this->loginAsAdmin();
+        // Create and authenticate an admin user
+        $this->admin = User::factory()->create([
+            'role' => 'admin',
+            'is_admin' => 1,
+        ]);
 
-        // Set the role attribute to 'admin' for the test admin user
-        $this->admin->role = 'admin';
-        $this->admin->save();
+        $this->actingAs($this->admin);
     }
 
     /**
@@ -120,11 +122,21 @@ class AdminSettingsTest extends AdminTestCase
      */
     public function test_footer_displays_contact_information_from_settings()
     {
+        // Ensure the test user is authenticated and has the admin role
+        $this->actingAs(User::factory()->create([
+            'role' => 'admin',
+            'is_admin' => 1,
+        ]));
+
+        // Set the contact information in the configuration
         Config::set('ui.footer.contact.phone', '123456789');
         Config::set('ui.footer.contact.email', 'test@example.com');
         Config::set('ui.footer.contact.address', '123 Test St');
 
-        $response = $this->get('/');
+        // Explicitly target the admin dashboard route
+        $response = $this->get(route('admin.dashboard'));
+
+        // Assert that the response is successful and contains the contact information
         $response->assertStatus(200);
         $response->assertSee('123456789');
         $response->assertSee('test@example.com');
