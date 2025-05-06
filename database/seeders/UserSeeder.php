@@ -22,9 +22,10 @@ class UserSeeder extends Seeder
             fwrite(STDOUT, "Warning: Running this seeder will affect user data.\n");
             fwrite(STDOUT, "Are you sure you want to continue? Type 'yes' and press Enter to proceed, or anything else to skip: ");
             $handle = fopen ("php://stdin","r");
+            sleep(3);
             $line = trim(fgets($handle));
             fclose($handle);
-            if ($line !== 'yes') {
+            if ($line !== env('DEFAULT_YES_RESPONSE', 'yes')) {
                 fwrite(STDOUT, "UserSeeder skipped.\n");
                 return; // Skip only this seeder
             }
