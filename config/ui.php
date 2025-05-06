@@ -69,7 +69,7 @@ return array (
   ),
   'footer' => 
   array (
-    'text' => '',
+    'text' => 'جميع الحقوق محفوظة',
     'links' => 
     array (
     ),
@@ -81,9 +81,9 @@ return array (
     ),
     'contact' => 
     array (
-      'phone' => '123456789',
-      'email' => 'test@example.com',
-      'address' => '123 Test St',
+      'phone' => '777736963',
+      'email' => 'admin@jaksws.com',
+      'address' => 'صنعاء - الصافية - خلف سبافون',
     ),
   ),
 );
