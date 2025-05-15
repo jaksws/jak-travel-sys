@@ -7,6 +7,7 @@ on:
 jobs:
   summary:
     runs-on: ubuntu-latest
+    
     permissions:
       issues: write
       models: read
@@ -27,8 +28,13 @@ jobs:
 
       - name: Comment with AI summary
         run: |
-          gh issue comment $ISSUE_NUMBER --body '${{ steps.inference.outputs.response }}'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          RESPONSE: ${{ steps.inference.outputs.response }}
+         if [ -z "$RESPONSE" ]; then
+         echo "No summary generated"
+         exit 0
+         else
+          gh issue comment $ISSUE_NUMBER --body "**AI Summary:** $RESPONSE"
+           fi
+    env:
+       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       ISSUE_NUMBER: ${{ github.event.issue.number }}
+       RESPONSE: ${{ steps.inference.outputs.response }}
