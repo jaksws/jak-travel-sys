@@ -84,13 +84,9 @@ jobs:
         run: |
           if [ -f "public/build/.vite/manifest.json" ]; then
             echo "✅ manifest.json exists in .vite subdirectory!"
-            cat public/build/.vite/manifest.json
-            echo "Copying manifest to parent directory for compatibility"
             cp public/build/.vite/manifest.json public/build/manifest.json
           else
             echo "❌ ERROR: manifest.json not found in .vite subdirectory!"
-            echo "Directory contents:"
-            find public -type f | sort
             exit 1
           fi
           if [ ! -f "public/build/.vite/manifest.json" ]; then
@@ -104,9 +100,6 @@ jobs:
         run: |
           if [ ! -f "database/database.sqlite" ]; then
             touch database/database.sqlite
-            echo "SQLite database file created."
-          else
-            echo "SQLite database file already exists."
           fi
       - name: Check Application Status
         run: php artisan app:check-status
