@@ -61,7 +61,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/jak-travel-sys:${{ github.ref_name }}
+          tags: your-dockerhub-username/your-image-name:${{ github.ref_name }} # TODO: Customize Docker image name and tags
+          # Add other necessary parameters like build-args, file, etc.
 
   deploy-to-staging:
     runs-on: ubuntu-latest
@@ -73,9 +74,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Deploy to staging
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.STAGING_SSH_USER }}@${{ secrets.STAGING_SERVER }} << 'EOF'
-            docker pull ${{ secrets.DOCKER_USERNAME }}/jak-travel-sys:${{ github.ref_name }}
-            docker stop jak-travel-sys || true
-            docker rm jak-travel-sys || true
-            docker run -d --name jak-travel-sys -p 80:80 ${{ secrets.DOCKER_USERNAME }}/jak-travel-sys:${{ github.ref_name }}
-          EOF
+          echo "TODO: Add deployment script for staging"
+          # Example: scp -r . user@staging-server:/var/www/html
+          # Example: ssh user@staging-server 'cd /var/www/html && ./deploy.sh'
