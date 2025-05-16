@@ -48,6 +48,10 @@ jobs:
         run: php artisan storage:link
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
+      - name: Install Node.js dependencies
+        run: npm ci
+      - name: Build frontend assets
+        run: npm run build
       - name: Copy debug Vite config
         run: cp vite.config.debug.js vite.config.js
       - name: Build assets
