@@ -24,3 +24,6 @@ yarn-error.log
 /storage
 # Codacy analysis results
 results.sarif
+
+#Ignore vscode AI rules
+.github\copilot-instructions.md
