@@ -5,7 +5,8 @@
         "dev": "vite",
         "build": "vite build",
         "build-debug": "vite build --config vite.config.debug.js",
-        "lint": "eslint ."
+        "lint": "eslint .",
+        "test": "echo \"No test script defined. Add your tests to package.json!\" && exit 0"
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",

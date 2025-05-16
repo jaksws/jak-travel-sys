@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup PHP
-        uses: ./.github/actions/setup-php
+        uses: shivammathur/setup-php@v2
         with:
+          php-version: ${{ inputs.php-version }}
           coverage: none

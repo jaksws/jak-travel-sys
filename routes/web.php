@@ -332,7 +332,5 @@ Route::view('/privacy', 'privacy')->name('privacy');
 // Terms and Conditions route
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/roles', 'roles')->name('roles');
-Route::view('/الخصوصية', 'الخصوصية')->name('الخصوصية');
-Route::view('/اتفاقية-المستخدم', 'اتفاقية-المستخدم')->name('اتفاقية-المستخدم');
-Route::view('/القوانين', 'القوانين')->name('القوانين');
+Route::view('/user-agreement', 'user-agreement')->name('user-agreement');
 Route::view('/t1', 't1')->name('t1');
