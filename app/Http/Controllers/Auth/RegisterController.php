@@ -40,14 +40,19 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:agency,subagent,customer'],
             'agency_id' => ['nullable', 'exists:agencies,id'],
-        ]);
+        ];
+        // Require license_number if registering as agency
+        if (($data['role'] ?? null) === 'agency') {
+            $rules['license_number'] = ['required', 'string', 'max:255', 'unique:agencies,license_number'];
+        }
+        return Validator::make($data, $rules);
     }
 
     /**
@@ -61,7 +66,7 @@ class RegisterController extends Controller
         // Create user first
         $user = User::create([
             'name' => $data['name'],
-            'email' => $data['email'], // Make sure this is properly assigned
+            'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => $data['role'],
             'phone' => $data['phone'] ?? null,
@@ -69,14 +74,19 @@ class RegisterController extends Controller
 
         // If the user is of agency type, create an agency record
         if ($data['role'] === 'agency') {
-            // Create agency
+            if (empty($data['license_number'])) {
+                // Defensive: throw a validation exception if license_number is missing
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'license_number' => __('رقم الترخيص مطلوب لتسجيل الوكالة.')
+                ]);
+            }
             $agency = Agency::create([
                 'name' => $data['agency_name'] ?? $data['name'],
-                'email' => $data['email'], // Add this line to set the email
+                'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
+                'license_number' => $data['license_number'],
+                'status' => 'active',
             ]);
-
-            // Associate user with agency
             $user->agency_id = $agency->id;
             $user->save();
         }
