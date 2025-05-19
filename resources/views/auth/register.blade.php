@@ -86,7 +86,7 @@
                             <label for="agency_id" class="form-label">اختر الوكالة الرئيسية</label>
                             <select id="agency_id" name="agency_id" class="form-control @error('agency_id') is-invalid @enderror">
                                 <option value="">-- اختر الوكالة --</option>
-                                @foreach(\App\Models\Agency::orderBy('name')->get() as $agency)
+                                @foreach($agencies as $agency)
                                     <option value="{{ $agency->id }}" {{ old('agency_id') == $agency->id ? 'selected' : '' }}>{{ $agency->name }}</option>
                                 @endforeach
                             </select>

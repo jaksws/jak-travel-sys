@@ -33,6 +33,18 @@ class RegisterController extends Controller
     }
 
     /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
+    {
+        // Fetch only necessary columns for efficiency
+        $agencies = \App\Models\Agency::orderBy('name')->get(['id', 'name']);
+        return view('auth.register', ['agencies' => $agencies]);
+    }
+
+    /**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
