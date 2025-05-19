@@ -86,8 +86,11 @@ class RegisterController extends Controller
 
         // If the user is of agency type, create an agency record
         if ($data['role'] === 'agency') {
+            // Defensive check: This should not be necessary if validation is working correctly.
+            // However, if this method could be called from somewhere that bypasses validation,
+            // or if $data is manipulated after validation, this check prevents inconsistent state.
+            // Throwing a ValidationException here is a last-resort safeguard.
             if (empty($data['license_number'])) {
-                // Defensive: throw a validation exception if license_number is missing
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'license_number' => __('رقم الترخيص مطلوب لتسجيل الوكالة.')
                 ]);
