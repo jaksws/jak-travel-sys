@@ -76,7 +76,7 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         // The defensive check for license_number may be redundant since the validator already enforces it for agency registrations.
-        // The defensive check for license_number may be redundant since the validator already enforces it for agency registrations.
+
         // Create user first
         $user = User::create([
             'name' => $data['name'],
