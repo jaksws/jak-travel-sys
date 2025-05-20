@@ -4,6 +4,17 @@
   <img src="public/images/logo.png" alt="نظام وكالات السفر" height="150" onerror="this.src='https://via.placeholder.com/300x150?text=RTLA'">
 </p>
 
+## تجربة النظام (Demo) 🌍
+
+يمكنك تجربة نظام إدارة وكالات السفر مباشرة من خلال الرابط التالي:  
+👉 [https://sys.jaksws.com/](https://sys.jaksws.com/)
+
+
+## Live Demo ✈️
+
+You can try the Travel Agency Management System directly via:  
+👉 [https://sys.jaksws.com/](https://sys.jaksws.com/)
+
 نظام متكامل لإدارة وكالات السفر والحج والعمرة، مع دعم كامل للغة العربية والاتجاه من اليمين إلى اليسار.
 
 ## 📑 جدول المحتويات
