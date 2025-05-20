@@ -264,9 +264,9 @@
     </style>
 </head>
 <body>
-    <div id="app">
-        @include('partials.header')
+    @include('partials.header')
 
+    <div id="app">
         <main class="py-4">
             @if(
                 request()->routeIs('agency.*') ||
