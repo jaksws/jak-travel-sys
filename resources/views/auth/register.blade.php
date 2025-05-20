@@ -97,6 +97,7 @@
                             @enderror
                         </div>
 
+                        @push('scripts')
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
                                 var roleSelect = document.getElementById('role');
