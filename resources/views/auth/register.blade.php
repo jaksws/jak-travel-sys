@@ -86,7 +86,7 @@
                             <label for="agency_id" class="form-label">اختر الوكالة الرئيسية</label>
                             <select id="agency_id" name="agency_id" class="form-control @error('agency_id') is-invalid @enderror">
                                 <option value="">-- اختر الوكالة --</option>
-                                @foreach(isset($agencies) ? $agencies : [] as $agency)
+                                @foreach($agencies ?? [] as $agency)
                                     <option value="{{ $agency->id }}" {{ old('agency_id') == $agency->id ? 'selected' : '' }}>{{ $agency->name }}</option>
                                 @endforeach
                             </select>
@@ -125,6 +125,7 @@
                                 toggleFields(); // Initial call
                             });
                         </script>
+                        @endpush
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
