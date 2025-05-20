@@ -99,7 +99,7 @@ class RegisterController extends Controller
                 ]);
             }
             $agency = Agency::create([
-                'name' => $data['name'], // Simplified: Use user's name as agency name
+                'name' => $data['name'], // Simplified: Use user\'s name as agency name
                 'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
                 'license_number' => $data['license_number'],
@@ -107,6 +107,12 @@ class RegisterController extends Controller
             ]);
             $user->agency_id = $agency->id;
             $user->save();
+        } elseif ($data['role'] === 'subagent') {
+            if (!empty($data['agency_id'])) {
+                // The validator ensures 'agency_id' exists in the 'agencies' table if provided.
+                $user->agency_id = $data['agency_id'];
+                $user->save();
+            }
         }
 
         return $user;
