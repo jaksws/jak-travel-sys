@@ -76,7 +76,7 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         // The defensive check for license_number may be redundant since the validator already enforces it for agency registrations.
-        // The defensive check for license_number may be redundant since the validator already enforces it for agency registrations.
+
         // Create user first
         $user = User::create([
             'name' => $data['name'],
@@ -94,7 +94,6 @@ class RegisterController extends Controller
             // Throwing a ValidationException here is a last-resort safeguard.
             if (empty($data['license_number'])) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                     'license_number' => e(__('رقم الترخيص مطلوب لتسجيل الوكالة.'))
                 ]);
             }
