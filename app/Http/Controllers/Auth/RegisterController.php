@@ -99,7 +99,7 @@ class RegisterController extends Controller
                 ]);
             }
             $agency = Agency::create([
-                'name' => $data['agency_name'] ?? $data['name'],
+                'name' => $data['name'], // Simplified: Use user's name as agency name
                 'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
                 'license_number' => $data['license_number'],
