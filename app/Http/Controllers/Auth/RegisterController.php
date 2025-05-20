@@ -33,6 +33,18 @@ class RegisterController extends Controller
     }
 
     /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
+    {
+        // Fetch only necessary columns for efficiency
+        $agencies = \App\Models\Agency::orderBy('name')->get(['id', 'name']);
+        return view('auth.register', ['agencies' => $agencies]);
+    }
+
+    /**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
@@ -40,14 +52,19 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:agency,subagent,customer'],
             'agency_id' => ['nullable', 'exists:agencies,id'],
-        ]);
+        ];
+        // Require license_number if registering as agency
+        if (($data['role'] ?? null) === 'agency') {
+            $rules['license_number'] = ['required', 'string', 'max:255', 'unique:agencies,license_number'];
+        }
+        return Validator::make($data, $rules);
     }
 
     /**
@@ -58,10 +75,12 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        // The defensive check for license_number may be redundant since the validator already enforces it for agency registrations.
+        // The defensive check for license_number may be redundant since the validator already enforces it for agency registrations.
         // Create user first
         $user = User::create([
             'name' => $data['name'],
-            'email' => $data['email'], // Make sure this is properly assigned
+            'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => $data['role'],
             'phone' => $data['phone'] ?? null,
@@ -69,16 +88,31 @@ class RegisterController extends Controller
 
         // If the user is of agency type, create an agency record
         if ($data['role'] === 'agency') {
-            // Create agency
+            // Defensive check: This should not be necessary if validation is working correctly.
+            // However, if this method could be called from somewhere that bypasses validation,
+            // or if $data is manipulated after validation, this check prevents inconsistent state.
+            // Throwing a ValidationException here is a last-resort safeguard.
+            if (empty($data['license_number'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    'license_number' => e(__('رقم الترخيص مطلوب لتسجيل الوكالة.'))
+                ]);
+            }
             $agency = Agency::create([
-                'name' => $data['agency_name'] ?? $data['name'],
-                'email' => $data['email'], // Add this line to set the email
+                'name' => $data['name'], // Simplified: Use user\'s name as agency name
+                'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
+                'license_number' => $data['license_number'],
+                'status' => 'active',
             ]);
-
-            // Associate user with agency
             $user->agency_id = $agency->id;
             $user->save();
+        } elseif ($data['role'] === 'subagent') {
+            if (!empty($data['agency_id'])) {
+                // The validator ensures 'agency_id' exists in the 'agencies' table if provided.
+                $user->agency_id = $data['agency_id'];
+                $user->save();
+            }
         }
 
         return $user;

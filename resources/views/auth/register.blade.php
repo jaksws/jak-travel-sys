@@ -57,6 +57,75 @@
                             <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
                         </div>
 
+                        <div class="mb-3">
+                            <label for="role" class="form-label">نوع المستخدم</label>
+                            <select id="role" name="role" class="form-control @error('role') is-invalid @enderror" required>
+                                <option value="">اختر نوع المستخدم</option>
+                                <option value="agency" {{ old('role') == 'agency' ? 'selected' : '' }}>وكيل رئيسي</option>
+                                <option value="subagent" {{ old('role') == 'subagent' ? 'selected' : '' }}>سبوكيل</option>
+                                <option value="customer" {{ old('role') == 'customer' ? 'selected' : '' }}>عميل</option>
+                            </select>
+                            @error('role')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3" id="license_number_group" style="display: none;">
+                            <label for="license_number" class="form-label">رقم الترخيص للوكالة</label>
+                            <input id="license_number" type="text" class="form-control @error('license_number') is-invalid @enderror" name="license_number" value="{{ old('license_number') }}">
+                            @error('license_number')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3" id="agency_id_group" style="display: none;">
+                            <label for="agency_id" class="form-label">اختر الوكالة الرئيسية</label>
+                            <select id="agency_id" name="agency_id" class="form-control @error('agency_id') is-invalid @enderror">
+                                <option value="">-- اختر الوكالة --</option>
+                                @foreach(isset($agencies) ? $agencies : [] as $agency)
+                                    <option value="{{ $agency->id }}" {{ old('agency_id') == $agency->id ? 'selected' : '' }}>{{ $agency->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('agency_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        @push('scripts')
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var roleSelect = document.getElementById('role');
+                                var licenseGroup = document.getElementById('license_number_group');
+                                var agencyGroup = document.getElementById('agency_id_group');
+                                function toggleFields() {
+                                    if (roleSelect.value === 'agency') {
+                                        licenseGroup.style.display = '';
+                                        document.getElementById('license_number').setAttribute('required', 'required');
+                                        agencyGroup.style.display = 'none';
+                                        document.getElementById('agency_id').removeAttribute('required');
+                                    } else if (roleSelect.value === 'subagent') {
+                                        licenseGroup.style.display = 'none';
+                                        document.getElementById('license_number').removeAttribute('required');
+                                        agencyGroup.style.display = '';
+                                        document.getElementById('agency_id').setAttribute('required', 'required');
+                                    } else {
+                                        licenseGroup.style.display = 'none';
+                                        document.getElementById('license_number').removeAttribute('required');
+                                        agencyGroup.style.display = 'none';
+                                        document.getElementById('agency_id').removeAttribute('required');
+                                    }
+                                }
+                                roleSelect.addEventListener('change', toggleFields);
+                                toggleFields(); // Initial call
+                            });
+                        </script>
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 تسجيل

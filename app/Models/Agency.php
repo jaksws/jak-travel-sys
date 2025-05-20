@@ -13,6 +13,7 @@ class Agency extends Model
         'name',
         'email',
         'phone',
+        'license_number', // <-- FIX: allow mass assignment
         'contact_email',
         'website',
         'tax_number',
