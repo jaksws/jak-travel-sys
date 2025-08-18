@@ -9,7 +9,7 @@
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",
-        "@tailwindcss/vite": "^4.1.7",
+        "@tailwindcss/vite": "^4.1.12",
         "axios": "^1.9.0",
         "bootstrap": "^5.3.6",
         "concurrently": "^9.0.1",
