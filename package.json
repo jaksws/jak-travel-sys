@@ -16,7 +16,7 @@
         "eslint": "^9.27.0",
         "laravel-vite-plugin": "^1.2.0",
         "tailwindcss": "^4.1.6",
-        "sass": "^1.89.0",
+        "sass": "^1.92.1",
         "vite": "^6.3.5"
     }
 }
